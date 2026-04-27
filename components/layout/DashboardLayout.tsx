@@ -15,6 +15,8 @@ import {
   IconLogOut,
   IconMessageCircle,
   IconLock,
+  IconMenu,
+  IconX,
 } from '@/components/ui/Icons';
 import { logoutAction } from '@/app/actions/auth';
 import { UpgradeModal } from '@/components/ui/UpgradeModal';
@@ -56,6 +58,7 @@ export function DashboardLayout({ children, subscription }: DashboardLayoutProps
   const pathname = usePathname();
   const [lockedModule, setLockedModule] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const planBadge = PLAN_BADGE[subscription.plan] ?? PLAN_BADGE.FREE;
   const userName = subscription.userName ?? 'Usuário';
@@ -154,18 +157,109 @@ export function DashboardLayout({ children, subscription }: DashboardLayoutProps
         </div>
       </aside>
 
+      {/* ── Mobile Sidebar Overlay ─────────────────────────── */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+      
+      {/* ── Mobile Sidebar ─────────────────────────────────── */}
+      <aside className={`fixed inset-y-0 left-0 w-[280px] bg-white border-r border-zinc-200 flex flex-col h-screen shrink-0 z-50 md:hidden transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        {/* Logo & Close */}
+        <div className="p-6 pb-6 flex items-center justify-between">
+          <Link href="/dashboard" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+            <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+              <IconMessageCircle className="w-5 h-5 text-white" />
+            </div>
+            <div className="font-extrabold text-xl tracking-tight text-zinc-900">
+              Recebe<span className="text-green-500">Fácil</span>
+            </div>
+          </Link>
+          <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-zinc-400 hover:text-zinc-600 rounded-lg bg-zinc-50">
+            <IconX className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+          {MENU_ITEMS.map((item) => {
+            const isActive = pathname === item.path;
+            const isLocked = !subscription.allowed_modules.includes(item.module);
+            const Icon = item.icon;
+
+            if (isLocked) {
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => { setLockedModule(item.module); setMobileMenuOpen(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-sm transition-all text-zinc-400 hover:bg-amber-50 hover:text-amber-600 group"
+                >
+                  <Icon className="w-5 h-5 text-zinc-300 group-hover:text-amber-400" />
+                  <span className="flex-1 text-left">{item.name}</span>
+                  <IconLock className="w-3.5 h-3.5 text-zinc-300 group-hover:text-amber-400 shrink-0" />
+                </button>
+              );
+            }
+
+            return (
+              <Link
+                key={item.path}
+                href={item.path}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-sm transition-all ${
+                  isActive
+                    ? 'bg-green-100 text-green-700'
+                    : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900'
+                }`}
+              >
+                <Icon className={`w-5 h-5 ${isActive ? 'text-green-600' : 'text-zinc-400'}`} />
+                {item.name}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* User Profile & Logout */}
+        <div className="p-4 border-t border-zinc-100 mt-auto bg-[#f8fafc] flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center font-bold text-green-700 text-sm shrink-0">
+            {userName.charAt(0).toUpperCase()}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-zinc-900 truncate">{userName}</p>
+            <p className={`text-[10px] uppercase font-bold tracking-wider truncate ${planBadge.color}`}>
+              {planBadge.label}
+            </p>
+          </div>
+          <form action={logoutAction}>
+            <button type="submit" className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-lg">
+              <IconLogOut className="w-5 h-5" />
+            </button>
+          </form>
+        </div>
+      </aside>
+
       {/* ── Main Content ───────────────────────────────────── */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
 
         {/* Top Header */}
-        <header className="h-20 bg-white border-b border-zinc-200/60 flex items-center justify-between px-8 shrink-0 z-10 sticky top-0">
-          <div className="w-full max-w-md relative group">
-            <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-green-500 transition-colors" />
-            <input
-              type="text"
-              placeholder="Buscar cobranças ou clientes..."
-              className="w-full bg-[#f4f7fb] border-none rounded-full pl-11 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:bg-white transition-all text-zinc-700 font-medium placeholder:font-normal placeholder:text-zinc-400"
-            />
+        <header className="h-20 bg-white border-b border-zinc-200/60 flex items-center justify-between px-4 sm:px-8 shrink-0 z-10 sticky top-0">
+          <div className="flex items-center gap-3 w-full max-w-md">
+            <button 
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden p-2 -ml-2 text-zinc-500 hover:text-zinc-900 rounded-lg hover:bg-zinc-50"
+            >
+              <IconMenu className="w-6 h-6" />
+            </button>
+            <div className="relative group flex-1 hidden sm:block">
+              <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-green-500 transition-colors" />
+              <input
+                type="text"
+                placeholder="Buscar cobranças ou clientes..."
+                className="w-full bg-[#f4f7fb] border-none rounded-full pl-11 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:bg-white transition-all text-zinc-700 font-medium placeholder:font-normal placeholder:text-zinc-400"
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-6">

@@ -84,19 +84,29 @@ Para justificar o valor dos planos mais altos, o módulo de cobranças terá sub
 
 ---
 
-## 4. Ordem de Implementação Recomendada
+## 4. Status de Implementação (Atualizado)
 
-1.  **Fase 1: O Esqueleto e Componentes Visuais (Dumb Components)**
-    *   Criar o layout base da página `/dashboard/cobrancas`.
-    *   Criar a tabela interativa (usando Tailwind e radix-ui/react-table ou similar).
-    *   Implementar os badgets de status (`PENDING`, `PAID`, `OVERDUE`).
-2.  **Fase 2: As Travas Visuais e "Empty States"**
-    *   Criar o componente de Progressão do Plano (Ex: 8/10 cobranças).
-    *   Implementar as lógicas condicionais (`planType === 'FREE'`) para renderizar os "Cadeados" (Lock Icons) na tabela e nas ações em massa.
-3.  **Fase 3: Detalhes da Cobrança**
+✅ **Fase 1: O Esqueleto e Componentes Visuais (Concluída)**
+    *   Layout base da página `/dashboard/cobrancas` com responsividade completa (Mobile Sidebar menu).
+    *   Tabela interativa implementada.
+
+✅ **Fase 2: Travas Visuais e "Empty States" (Concluída)**
+    *   Componente de Progressão do Plano consumindo métricas reais da API.
+    *   Lógicas condicionais (`planType`) implementadas (Plan Gating em pleno funcionamento).
+
+✅ **Fase 3: Ações de Cobrança e Interface Mobile (Concluída)**
+    *   Floating Action Bar para `Bulk Actions` ajustada para dispositivos móveis.
+    *   Drawer de "Nova Cobrança" com preview adaptativo.
+
+✅ **Fase 4: Integração com Back-End (Concluída)**
+    *   Carregamento simultâneo via `Promise.allSettled` de Métricas, Assinatura e Cobranças (`GET /charges`).
+    *   Ações reais ligadas: `DELETE /charges/:id`, `POST /charges/bulk/cancel`, `POST /charges/bulk/remind`.
+    *   Disparo de WhatsApp integrado (`wa.me` com template populado dinamicamente).
+    *   Cópia de link PIX mapeando o `id` da cobrança.
+
+⏳ **Fase 5: Detalhes da Cobrança e Régua Global (Pendente)**
     *   Criar o componente `ChargeDetailsDrawer` focado na visão da Timeline do WhatsApp.
-4.  **Fase 4: Integração (Fetch API)**
-    *   Conectar a tabela à futura rota `GET /charges` do backend.
+    *   Tela de Régua de Automação Global (`/dashboard/cobrancas/automation`).
 
 ---
 

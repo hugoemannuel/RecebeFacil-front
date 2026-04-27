@@ -176,7 +176,7 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
 
       {/* Drawer */}
       <div className={`fixed top-0 right-0 h-full z-50 flex transition-transform duration-300 ease-out ${open ? 'translate-x-0' : 'translate-x-full'}`}
-        style={{ width: step === 2 ? '900px' : '480px', maxWidth: '100vw' }}>
+        style={{ width: '100%', maxWidth: step === 2 ? '900px' : '480px' }}>
 
         <div className="flex-1 bg-white flex flex-col shadow-2xl overflow-hidden">
 
@@ -206,7 +206,7 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
             <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-hidden flex">
 
             {/* ── Step content + preview ── */}
-            <div className="flex-1 flex overflow-hidden">
+            <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
 
               {/* Steps */}
               <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
@@ -238,7 +238,7 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
 
               {/* Preview WhatsApp — só no step 2 */}
               {step === 2 && (
-                <div className="w-[380px] border-l border-zinc-100 flex flex-col bg-zinc-50 shrink-0">
+                <div className="w-full md:w-[380px] border-t md:border-t-0 md:border-l border-zinc-100 flex flex-col bg-zinc-50 shrink-0">
                   <div className="px-5 py-4 border-b border-zinc-100">
                     <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
                       <IconSparkles className="w-3.5 h-3.5 text-green-500" /> Preview ao vivo

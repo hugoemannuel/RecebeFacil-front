@@ -31,6 +31,7 @@ import {
 import { formatMoney, maskPhone } from '@/lib/formatters';
 import { NewChargeDrawer } from '@/components/forms/NewChargeDrawer';
 import { toast } from 'sonner';
+import { api } from '@/services/api';
 
 type Charge = {
   id: string;
@@ -149,7 +150,11 @@ export function ChargesClient({
           <div className="flex items-center justify-end gap-2">
             {plan === 'FREE' && row.original.status !== 'PAID' && (
               <button
-                onClick={() => toast.success('Redirecionando para WhatsApp Web...')}
+                onClick={() => {
+                  const text = `Olá ${row.original.debtorName}, a cobrança no valor de ${formatMoney(row.original.amount)} vence dia ${format(new Date(row.original.dueDate), 'dd/MM/yyyy')}.`;
+                  window.open(`https://wa.me/${row.original.phone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`, '_blank');
+                  toast.success('Redirecionando para WhatsApp Web...');
+                }}
                 className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm"
               >
                 <IconSend className="w-3 h-3" /> Cobrar
@@ -166,11 +171,25 @@ export function ChargesClient({
                   <DropdownMenu.Item className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-zinc-50 rounded-lg text-zinc-700 font-medium">
                     <IconExternalLink className="w-4 h-4 text-zinc-400" /> Ver Detalhes
                   </DropdownMenu.Item>
-                  <DropdownMenu.Item className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-zinc-50 rounded-lg text-zinc-700 font-medium" onClick={() => toast.success('Link PIX copiado!')}>
-                    <IconCopy className="w-4 h-4 text-zinc-400" /> Copiar Link PIX
+                  <DropdownMenu.Item className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-zinc-50 rounded-lg text-zinc-700 font-medium" onClick={() => {
+                    navigator.clipboard.writeText(`https://recebefacil.com/p/${row.original.id}`);
+                    toast.success('Link de pagamento copiado!');
+                  }}>
+                    <IconCopy className="w-4 h-4 text-zinc-400" /> Copiar Link
                   </DropdownMenu.Item>
                   <DropdownMenu.Separator className="h-px bg-zinc-100 my-1" />
-                  <DropdownMenu.Item className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-red-50 rounded-lg text-red-600 font-medium">
+                  <DropdownMenu.Item 
+                    className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-red-50 rounded-lg text-red-600 font-medium"
+                    onClick={async () => {
+                      try {
+                        await api.delete(`/charges/${row.original.id}`);
+                        setData(prev => prev.map(c => c.id === row.original.id ? { ...c, status: 'CANCELED' } : c));
+                        toast.success('Cobrança cancelada.');
+                      } catch {
+                        toast.error('Erro ao cancelar.');
+                      }
+                    }}
+                  >
                     <IconTrash className="w-4 h-4 text-red-500" /> Cancelar Cobrança
                   </DropdownMenu.Item>
                 </DropdownMenu.Content>
@@ -311,8 +330,8 @@ export function ChargesClient({
 
       {/* FLOATING ACTION BAR (Bulk Actions para PRO/UNLIMITED) */}
       {showBulkActions && (plan === 'PRO' || plan === 'UNLIMITED') && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-zinc-900 text-white rounded-2xl shadow-2xl shadow-zinc-900/30 px-6 py-4 flex items-center gap-6 z-40 animate-in slide-in-from-bottom-10 fade-in duration-300">
-          <div className="flex items-center gap-3 border-r border-zinc-700 pr-6">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90vw] md:w-auto max-w-2xl bg-zinc-900 text-white rounded-2xl shadow-2xl shadow-zinc-900/30 px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-center gap-3 md:gap-6 z-40 animate-in slide-in-from-bottom-10 fade-in duration-300">
+          <div className="flex items-center gap-3 md:border-r border-zinc-700 md:pr-6">
             <span className="flex items-center justify-center bg-green-500 text-zinc-900 w-6 h-6 rounded-full text-xs font-bold">
               {selectedRows.length}
             </span>
@@ -320,15 +339,34 @@ export function ChargesClient({
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => {
-                toast.success(`${selectedRows.length} lembretes disparados via WhatsApp!`);
-                table.resetRowSelection();
+              onClick={async () => {
+                const ids = selectedRows.map(r => r.original.id);
+                try {
+                  await api.post('/charges/bulk/remind', { chargeIds: ids });
+                  toast.success(`${ids.length} lembretes disparados via WhatsApp!`);
+                  table.resetRowSelection();
+                } catch {
+                  toast.error('Erro ao disparar.');
+                }
               }}
               className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-lg transition-colors"
             >
               Enviar Lembretes
             </button>
-            <button className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-bold rounded-lg transition-colors">
+            <button 
+              onClick={async () => {
+                const ids = selectedRows.map(r => r.original.id);
+                try {
+                  await api.post('/charges/bulk/cancel', { chargeIds: ids });
+                  setData(prev => prev.map(c => ids.includes(c.id) ? { ...c, status: 'CANCELED' } : c));
+                  toast.success(`${ids.length} cobranças canceladas.`);
+                  table.resetRowSelection();
+                } catch {
+                  toast.error('Erro ao cancelar.');
+                }
+              }}
+              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-bold rounded-lg transition-colors"
+            >
               Cancelar Cobranças
             </button>
           </div>
