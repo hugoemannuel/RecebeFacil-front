@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/Icons';
 import { logoutAction } from '@/app/actions/auth';
 import { UpgradeModal } from '@/components/ui/UpgradeModal';
+import { NewChargeDrawer } from '@/components/forms/NewChargeDrawer';
 
 // ─── Tipos ──────────────────────────────────────────────────────
 export interface SubscriptionStatus {
@@ -54,6 +55,7 @@ const PLAN_BADGE: Record<string, { label: string; color: string }> = {
 export function DashboardLayout({ children, subscription }: DashboardLayoutProps) {
   const pathname = usePathname();
   const [lockedModule, setLockedModule] = useState<string | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const planBadge = PLAN_BADGE[subscription.plan] ?? PLAN_BADGE.FREE;
   const userName = subscription.userName ?? 'Usuário';
@@ -171,7 +173,9 @@ export function DashboardLayout({ children, subscription }: DashboardLayoutProps
               <IconBell className="w-5 h-5" />
               <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
             </button>
-            <button className="bg-[#0b1521] hover:bg-[#152336] text-white font-bold py-2.5 px-6 rounded-full text-sm transition-all shadow-md flex items-center gap-2 group">
+            <button
+              onClick={() => setDrawerOpen(true)}
+              className="bg-[#0b1521] hover:bg-[#152336] text-white font-bold py-2.5 px-6 rounded-full text-sm transition-all shadow-md flex items-center gap-2 group">
               <IconPlus className="w-4 h-4" />
               <span className="hidden sm:inline">Nova Cobrança</span>
             </button>
@@ -191,6 +195,12 @@ export function DashboardLayout({ children, subscription }: DashboardLayoutProps
           onClose={() => setLockedModule(null)}
         />
       )}
+
+      <NewChargeDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        userName={subscription.userName}
+      />
     </div>
   );
 }

@@ -168,3 +168,115 @@ O front-end **não processa** dados de cartão diretamente. O papel do front-end
 - O status real da assinatura só deve ser atualizado após a confirmação via webhook no back-end — **não confiar apenas no redirect do Asaas**.
 - Usar polling ou Server-Sent Events (SSE) para verificar se o plano foi confirmado no banco antes de liberar os módulos.
 
+---
+
+## 10. Criação de Cobrança — Fluxo de UI (MVP Core)
+
+A criação de cobrança é a funcionalidade **mais crítica do produto** e deve ser extremamente fluida. O botão "Nova Cobrança" no header abre um **modal lateral (drawer)** — não uma nova página — para manter o contexto do lojista.
+
+### 10.1. Estrutura do Drawer de Nova Cobrança
+
+**Componente:** `components/forms/NewChargeDrawer.tsx` (`"use client"`)
+
+O drawer desliza da direita com `translate-x` animado. Tem 4 **etapas (steps)** com indicador de progresso no topo:
+
+```
+[1 Devedor] → [2 Cobrança] → [3 Mensagem WhatsApp] → [4 Confirmar & Enviar]
+```
+
+#### Step 1 — Quem vai receber?
+- Campo de busca inteligente: digitar nome ou telefone busca clientes existentes no banco
+- Se não encontrar, exibe opção "➕ Cadastrar novo contato"
+- Mini-formulário inline: `Nome`, `Telefone` (máscara: +55 (11) 99999-9999)
+- Seleção exibe card do cliente com avatar e histórico resumido
+
+#### Step 2 — Dados da Cobrança
+- **Valor** (campo com máscara monetária BRL, ex: `R$ 150,00`)
+- **Data de vencimento** (date picker com destaque do dia atual)
+- **Descrição** (textarea, max 200 chars, ex: "Corte de cabelo - Abril/2026")
+- **Recorrência** (toggle): Única | Mensal | Semanal | Anual
+
+#### Step 3 — Personalizar Mensagem WhatsApp ⭐ (Diferencial)
+
+Esta é a tela de **maior valor percebido** do produto. Dividida em 2 colunas:
+
+**Coluna esquerda — Editor:**
+- Selector de **template base** (dropdown): "Cobrança Inicial" | "Lembrete Amigável" | "Urgente" | "Personalizado"
+- **Textarea editável** com o template populado e destaque de variáveis `{{nome}}` em chips coloridos
+- Toolbar de formatação: **N** (negrito) | _I_ (itálico) | botões de emoji populares (💰 📅 ✅ ⚠️)
+- Toggle "Incluir QR Code como imagem" (se lojista tem QR Code salvo)
+- Toggle "Incluir botão PIX nativo" (se lojista tem chave PIX configurada) — **recomendado, marcado por padrão**
+
+**Coluna direita — Preview ao vivo:**
+- Simulação visual da **tela do WhatsApp** com as mensagens que serão enviadas
+- Exibe em ordem: 1) Texto, 2) Imagem QR (se ativado), 3) Botão PIX (se ativado)
+- Preview atualiza em tempo real conforme o lojista edita
+- Estilo: fundo `#e5ddd5` (cor do fundo do WhatsApp), balões de mensagem verdes/brancos
+
+#### Step 4 — Confirmar & Enviar
+- Resumo compacto: nome do devedor, valor, vencimento, tipo de mensagem
+- Seletor: **"Enviar agora"** ou **"Agendar para"** (date/time picker)
+- Botão principal: `Enviar Cobrança via WhatsApp 🚀` (verde, full-width, com loading state)
+- Ao confirmar: toast de sucesso + drawer fecha + lista de cobranças atualiza
+
+### 10.2. Validações com Zod
+
+```typescript
+const chargeSchema = z.object({
+  debtor_name: z.string().min(2, 'Nome obrigatório'),
+  debtor_phone: z.string().min(10, 'Telefone obrigatório'),
+  amount_display: z.string().min(1, 'Valor obrigatório').refine((val) => parseMoney(val) >= 100, { message: 'Valor mínimo R$ 1,00' }),
+  due_date: z.date({ error: 'Data obrigatória' }).refine((val) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return val >= today;
+  }, { message: 'A data deve ser futura ou hoje' }),
+  description: z.string().min(3, 'Descrição obrigatória').max(200),
+  recurrence: z.enum(['ONCE', 'WEEKLY', 'MONTHLY', 'YEARLY']),
+  custom_message: z.string().min(5, 'Mensagem obrigatória'),
+  send_pix_button: z.boolean().default(true),
+  pix_key: z.string().optional(),
+  pix_key_type: z.enum(['CPF', 'CNPJ', 'PHONE', 'EMAIL', 'EVP']).optional(),
+});
+```
+
+### 10.3. Estados da UI do Drawer
+
+| Estado | Comportamento |
+|---|---|
+| Fechado | `translate-x-full` — invisível |
+| Abrindo | Animação slide-in + overlay escurecido |
+| Salvando | Botão com spinner, campos desabilitados |
+| Sucesso | Toast verde "Cobrança enviada! ✅" + drawer fecha |
+| Erro API | Toast vermelho "Erro ao enviar. Tente novamente." |
+| Sem PIX configurado | Banner amarelo no Step 3 "Configure sua chave PIX nas configurações para ativar o botão nativo" |
+
+---
+
+## 11. Configurações de WhatsApp do Lojista
+
+**Rota:** `/dashboard/configuracoes` (tab "WhatsApp & PIX")
+**Componente:** `components/forms/WhatsappSettingsForm.tsx`
+
+### 11.1. Campos
+
+| Campo | UI | Notas |
+|---|---|---|
+| Chave PIX | Input | Formato varia por tipo |
+| Tipo da chave PIX | Select | CPF / CNPJ / Telefone / E-mail / Aleatória (EVP) |
+| Nome no pagamento | Input (max 25 chars) | Contador de caracteres visível, ex: "João Barbearia" |
+| QR Code PIX | Upload de imagem | Preview circular + botão remover |
+| Template padrão | Textarea | Com variáveis destacadas em chips |
+
+### 11.2. Preview do QR Code
+
+- Ao fazer upload, exibir preview circular (como avatar) com a imagem do QR Code
+- Botão "Testar envio" → envia uma mensagem de teste para o próprio WhatsApp do lojista
+
+### 11.3. Regras de Negócio
+
+- Se o lojista não tiver chave PIX configurada, a opção "Botão PIX nativo" fica desabilitada no Step 3 do drawer (com tooltip explicativo)
+- Se não tiver QR Code, a opção "Incluir QR Code" fica desabilitada
+- O `pix_merchant_name` tem limite **rígido de 25 caracteres** (protocolo PIX — exibido no app de pagamento do cliente)
+
+
