@@ -28,7 +28,7 @@ export default function Home() {
         </div>
       </header>
 
-
+      <main>
       <section className="px-6 py-12 md:py-24 max-w-7xl mx-auto flex flex-col items-center text-center relative overflow-hidden">
         <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-blue-50 to-green-50 rounded-[100%] blur-3xl -z-10 opacity-50"></div>
 
@@ -298,7 +298,7 @@ export default function Home() {
           </p>
         </div>
       </section>
-
+      </main>
 
       <footer className="border-t border-zinc-100 py-12 px-6 bg-zinc-50">
         <div className="max-w-7xl mx-auto flex flex-col items-center">

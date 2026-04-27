@@ -66,9 +66,10 @@ interface Props {
   userName?: string; 
   hasPixKey?: boolean;
   planType?: 'FREE' | 'STARTER' | 'PRO' | 'UNLIMITED';
+  onSuccess?: () => void;
 }
 
-export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', hasPixKey = false, planType = 'FREE' }: Props) {
+export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', hasPixKey = false, planType = 'FREE', onSuccess }: Props) {
   const [step, setStep] = useState(0);
   const [showCalendar, setShowCalendar] = useState(false);
   const [sending, setSending] = useState(false);
@@ -148,6 +149,7 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
       if (result.success) {
         toast.success('Cobrança enviada via WhatsApp! ✅');
         handleClose();
+        if (onSuccess) onSuccess();
       } else {
         toast.error(result.error ?? 'Erro ao enviar. Tente novamente.');
       }

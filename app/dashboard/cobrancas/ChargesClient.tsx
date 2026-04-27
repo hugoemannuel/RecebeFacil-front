@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -12,7 +12,7 @@ import {
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   IconPlus,
   IconSearch,
@@ -58,6 +58,31 @@ export function ChargesClient({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const router = useRouter();
   const [rowSelection, setRowSelection] = useState({});
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [dateFilter, setDateFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    setData(initialData);
+  }, [initialData]);
+
+  useEffect(() => {
+    if (searchParams.get('new') === 'true') {
+      // Small timeout to ensure the UI is loaded before opening the drawer
+      setTimeout(() => setDrawerOpen(true), 100);
+    }
+  }, [searchParams]);
+
+  const filteredData = useMemo(() => {
+    return data.filter(c => {
+      if (statusFilter !== 'ALL' && c.status !== statusFilter) return false;
+      if (dateFilter && !c.dueDate.startsWith(dateFilter)) return false;
+      if (searchQuery && !c.debtorName.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      return true;
+    });
+  }, [data, statusFilter, dateFilter, searchQuery]);
 
   const columns = [
     columnHelper.display({
@@ -202,11 +227,12 @@ export function ChargesClient({
   ];
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     state: { rowSelection },
     enableRowSelection: plan !== 'FREE' && plan !== 'STARTER',
     onRowSelectionChange: setRowSelection,
+    getRowId: row => row.id,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -224,8 +250,14 @@ export function ChargesClient({
           <p className="text-zinc-500 mt-1">Gerencie seus recebimentos e automações.</p>
         </div>
         <button
-          onClick={() => setDrawerOpen(true)}
-          className="flex items-center justify-center gap-2 bg-zinc-900 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-zinc-900/20 hover:bg-zinc-800 transition-all active:scale-95"
+          onClick={() => {
+            if (usage.count >= usage.limit) {
+              toast.error(`Você atingiu o limite de ${usage.limit} cobranças do plano ${plan}. Faça upgrade para continuar!`);
+            } else {
+              setDrawerOpen(true);
+            }
+          }}
+          className={`flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold transition-all ${usage.count >= usage.limit ? 'bg-zinc-200 text-zinc-400 cursor-not-allowed' : 'bg-zinc-900 text-white shadow-lg shadow-zinc-900/20 hover:bg-zinc-800 active:scale-95'}`}
         >
           <IconPlus className="w-5 h-5" /> Nova Cobrança
         </button>
@@ -264,13 +296,22 @@ export function ChargesClient({
           <input
             type="text"
             placeholder="Buscar cliente..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
             className="w-full sm:w-80 pl-10 pr-4 py-2.5 bg-white border border-zinc-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow shadow-sm"
           />
         </div>
         <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
-          <button className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-sm font-bold whitespace-nowrap shadow-sm shadow-zinc-900/20">Todas</button>
-          <button className="px-4 py-2 bg-white text-zinc-600 border border-zinc-200 rounded-lg text-sm font-bold hover:bg-zinc-50 whitespace-nowrap shadow-sm">Pendentes</button>
-          <button className="px-4 py-2 bg-white text-zinc-600 border border-zinc-200 rounded-lg text-sm font-bold hover:bg-zinc-50 whitespace-nowrap shadow-sm">Atrasadas</button>
+          <input 
+            type="date" 
+            value={dateFilter}
+            onChange={e => setDateFilter(e.target.value)}
+            className="px-4 py-2 bg-white text-zinc-600 border border-zinc-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm mr-2"
+          />
+          <button onClick={() => setStatusFilter('ALL')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'ALL' ? 'bg-zinc-900 text-white shadow-zinc-900/20' : 'bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50'}`}>Todas</button>
+          <button onClick={() => setStatusFilter('PENDING')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'PENDING' ? 'bg-amber-100 text-amber-800' : 'bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50'}`}>Pendentes</button>
+          <button onClick={() => setStatusFilter('OVERDUE')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'OVERDUE' ? 'bg-red-100 text-red-800' : 'bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50'}`}>Atrasadas</button>
+          <button onClick={() => setStatusFilter('PAID')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'PAID' ? 'bg-emerald-100 text-emerald-800' : 'bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50'}`}>Pagas</button>
         </div>
       </div>
 
@@ -308,8 +349,26 @@ export function ChargesClient({
               ))}
               {table.getRowModel().rows.length === 0 && (
                 <tr>
-                  <td colSpan={columns.length} className="px-5 py-16 text-center text-zinc-500">
-                    Nenhuma cobrança encontrada.
+                  <td colSpan={columns.length} className="px-5 py-24 text-center">
+                    <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
+                      <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mb-4">
+                        <IconSearch className="w-8 h-8 text-zinc-300" />
+                      </div>
+                      <h3 className="text-lg font-bold text-zinc-900 mb-1">Nenhuma cobrança encontrada</h3>
+                      <p className="text-sm text-zinc-500 mb-6">Você ainda não possui cobranças que correspondam a este filtro. Que tal criar uma nova?</p>
+                      <button 
+                        onClick={() => {
+                          if (usage.count >= usage.limit) {
+                            toast.error('Limite de cobranças atingido.');
+                          } else {
+                            setDrawerOpen(true);
+                          }
+                        }} 
+                        className={`px-4 py-2 font-bold text-sm rounded-lg transition-colors ${usage.count >= usage.limit ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed' : 'bg-green-50 text-green-700 hover:bg-green-100'}`}
+                      >
+                        Nova Cobrança
+                      </button>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -373,11 +432,14 @@ export function ChargesClient({
         </div>
       )}
 
-      {/* NEW CHARGE DRAWER */}
       <NewChargeDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         planType={plan}
+        onSuccess={() => {
+          setDrawerOpen(false);
+          router.refresh();
+        }}
       />
     </div>
   );

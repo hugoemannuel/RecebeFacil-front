@@ -104,7 +104,10 @@ Para justificar o valor dos planos mais altos, o módulo de cobranças terá sub
     *   Disparo de WhatsApp integrado (`wa.me` com template populado dinamicamente).
     *   Cópia de link PIX mapeando o `id` da cobrança.
 
-⏳ **Fase 5: Detalhes da Cobrança e Régua Global (Pendente)**
+⏳ **Fase 5: Detalhes da Cobrança e Inovações (Finalizado/Em Andamento)**
+    *   ✅ **Time Travel (Viagem no Tempo):** Gráfico interativo e relatórios diários/semanais.
+        *   *Regra de Semântica Temporal:* Para manter os dados alinhados e consistentes, **todas as métricas** (Total a Receber, Top Clientes e a lista de Atividade Recente) são ancoradas estritamente pelo `due_date` (Data de Vencimento). O Total Pago usa o `payment_date`. Assim, a tabela exibe exatamente os itens que compõem os valores financeiros daquele dia.
+    *   ✅ Filtros nativos nas telas (Por data e status combinados sem recarregar API indevidamente).
     *   Criar o componente `ChargeDetailsDrawer` focado na visão da Timeline do WhatsApp.
     *   Tela de Régua de Automação Global (`/dashboard/cobrancas/automation`).
 

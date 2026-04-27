@@ -20,6 +20,7 @@ export default async function Dashboard(props: any) {
   const searchParams = await props.searchParams;
   const period = searchParams?.period || '7days';
   const status = searchParams?.status;
+  const targetDate = searchParams?.targetDate;
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;
 
@@ -32,6 +33,7 @@ export default async function Dashboard(props: any) {
   const queryParams = new URLSearchParams();
   if (period) queryParams.set('period', period);
   if (status) queryParams.set('status', status);
+  if (targetDate) queryParams.set('targetDate', targetDate);
 
   // Busca métricas e assinatura em paralelo para melhor performance
   const [metricsRes, subscriptionRes] = await Promise.allSettled([
@@ -75,6 +77,23 @@ export default async function Dashboard(props: any) {
   return (
     <DashboardLayout subscription={subscription}>
       <div className="p-8 max-w-[1600px] mx-auto space-y-6">
+
+        {targetDate && (
+          <div className="fixed bottom-6 right-6 z-50 bg-amber-50 border border-amber-200 text-amber-800 px-6 py-4 rounded-2xl flex flex-col gap-4 shadow-xl shadow-amber-900/10 max-w-sm animate-in slide-in-from-bottom-5 fade-in duration-300">
+            <div className="flex items-start gap-3">
+              <IconAlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-base">Modo Viagem no Tempo</p>
+                <p className="text-sm opacity-80 mt-0.5 leading-relaxed">
+                  Vendo métricas {period === 'month' ? 'da semana iniciada em' : 'como se hoje fosse o dia'} <strong>{new Date(targetDate + 'T00:00:00').toLocaleDateString('pt-BR')}</strong>.
+                </p>
+              </div>
+            </div>
+            <Link href="/dashboard" className="w-full text-center bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-5 py-2.5 rounded-xl text-sm transition-colors shadow-sm">
+              Voltar ao Presente
+            </Link>
+          </div>
+        )}
 
         <div className="bg-[#0b1521] rounded-[2rem] p-8 lg:p-10 text-white relative overflow-hidden shadow-xl shadow-slate-200/50">
           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-green-500/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
@@ -170,18 +189,19 @@ export default async function Dashboard(props: any) {
 
               <div className="h-48 flex items-end justify-between gap-2 mt-10">
                 {chartData.map((d: any, i: number) => {
-                  const isToday = i === chartData.length - 1;
+                  const isSelected = targetDate ? d.date === targetDate : d.isToday;
                   return (
-                    <div 
+                    <Link 
+                      href={d.isToday ? `/dashboard?period=${period}` : `/dashboard?targetDate=${d.date}&period=${period}`}
                       key={i} 
-                      className={`w-full transition-colors rounded-t-lg relative group flex items-end justify-center pb-2 ${isToday ? 'bg-green-500 hover:bg-green-400' : 'bg-green-100 hover:bg-green-200'}`}
+                      className={`w-full transition-colors rounded-t-lg relative group flex items-end justify-center pb-2 cursor-pointer ${isSelected ? 'bg-green-500 hover:bg-green-400' : 'bg-green-100 hover:bg-green-200'}`}
                       style={{ height: `${d.heightPercentage}%` }}
                       title={`${d.count || 0} cobrança(s)\n${formatMoney(d.amount)}`}
                     >
-                      <span className={`absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold ${isToday ? 'text-green-600' : 'text-slate-400'}`}>
+                      <span className={`absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold ${isSelected ? 'text-green-600' : 'text-slate-400'}`}>
                         {d.label}
                       </span>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
@@ -269,8 +289,17 @@ export default async function Dashboard(props: any) {
               <tbody className="divide-y divide-zinc-100 text-sm">
                 {recentActivity.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-zinc-500">
-                      Nenhuma atividade recente encontrada.
+                    <td colSpan={5} className="py-16 text-center">
+                      <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
+                        <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mb-4">
+                          <IconSend className="w-8 h-8 text-zinc-300" />
+                        </div>
+                        <h3 className="text-lg font-bold text-zinc-900 mb-1">Nenhuma atividade recente</h3>
+                        <p className="text-sm text-zinc-500 mb-6">Você ainda não tem cobranças movimentadas no período selecionado.</p>
+                        <Link href="/dashboard/cobrancas?new=true" className="px-4 py-2 bg-green-50 text-green-700 hover:bg-green-100 font-bold text-sm rounded-lg transition-colors">
+                          Nova Cobrança
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ) : (
