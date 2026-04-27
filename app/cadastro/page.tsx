@@ -1,14 +1,149 @@
 "use client";
 
+import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { registerAction } from '@/app/actions/auth';
+import { toast, Toaster } from 'react-hot-toast';
+import {
+  IconMessageCircle,
+  IconTrendingUp,
+  IconZap,
+  IconUser,
+  IconMail,
+  IconPhone,
+  IconLock,
+  IconEye,
+  IconEyeOff,
+  IconArrowLeft,
+  IconArrowRight
+} from '@/components/ui/Icons';
+import { AuthLayout } from '@/components/layout/AuthLayout';
+
+const registerSchema = z.object({
+  name: z.string().min(3, 'O nome deve ter no mínimo 3 caracteres'),
+  email: z.string().email('E-mail inválido'),
+  phone: z.string().min(10, 'Telefone inválido'),
+  password: z.string().min(8, 'A senha deve ter no mínimo 8 caracteres'),
+});
+
+type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function Cadastro() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterForm>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const { onChange: onPhoneChange, ...phoneRest } = register('phone');
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let v = e.target.value.replace(/\D/g, "");
+    if (v.length > 2 && v.length <= 7) {
+      v = v.replace(/^(\d{2})(\d+)/, "($1) $2");
+    } else if (v.length > 7) {
+      v = v.replace(/^(\d{2})(\d{5})(\d{1,4}).*/, "($1) $2-$3");
+    } else if (v.length > 0) {
+      v = v.replace(/^(\d{1,2})/, "($1");
+    }
+    e.target.value = v;
+    onPhoneChange(e);
+  };
+
+  async function onSubmit(data: RegisterForm) {
+    setIsLoading(true);
+    const toastId = toast.loading('Criando sua conta...');
+
+    const result = await registerAction(data);
+
+    if (result.success) {
+      toast.success('Conta criada com sucesso!', { id: toastId });
+      router.push('/dashboard');
+    } else {
+      toast.error(result.error || 'Falha ao criar conta', { id: toastId });
+      setIsLoading(false);
+    }
+  }
   return (
-    <div className="min-h-screen bg-white text-zinc-900 font-sans flex selection:bg-green-200">
+    <AuthLayout
+      rightPanel={
+        <>
+          {/* Subtle background glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-green-500/10 rounded-full blur-3xl -z-10"></div>
+          
+          <div className="max-w-md z-10 relative w-full">
+            <div className="text-green-400 text-xs font-bold uppercase tracking-widest mb-4">
+              Fintech de Performance
+            </div>
+            <h2 className="text-4xl xl:text-5xl font-extrabold tracking-tight mb-6 leading-[1.1]">
+              Comece a receber agora.
+            </h2>
+            <p className="text-slate-400 text-lg mb-12 leading-relaxed">
+              Sua operação financeira em piloto automático, do checkout à conciliação.
+            </p>
+
+            <div className="space-y-4">
+              {/* Feature 1 */}
+              <div className="bg-[#152336]/60 backdrop-blur-sm border border-[#1e3046] p-6 rounded-2xl flex gap-5 items-start hover:border-green-500/30 transition-colors">
+                <div className="w-12 h-12 rounded-xl bg-[#1e3046] flex items-center justify-center shrink-0">
+                  <IconMessageCircle className="w-6 h-6 text-green-500" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-lg mb-1">Automação via WhatsApp</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">Envio automático de cobranças e lembretes direto no app favorito do seu cliente.</p>
+                </div>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="bg-[#152336]/60 backdrop-blur-sm border border-[#1e3046] p-6 rounded-2xl flex gap-5 items-start hover:border-green-500/30 transition-colors">
+                <div className="w-12 h-12 rounded-xl bg-[#1e3046] flex items-center justify-center shrink-0">
+                  <IconTrendingUp className="w-6 h-6 text-green-500" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-lg mb-1">Recuperação de Inadimplência</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">Régua de cobrança inteligente que recupera até 40% das faturas atrasadas.</p>
+                </div>
+              </div>
+
+              {/* Feature 3 (Active style) */}
+              <div className="bg-[#152336] border border-green-500/40 p-6 rounded-2xl flex gap-5 items-start shadow-[0_0_30px_rgba(34,197,94,0.05)] relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>
+                <div className="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center shrink-0 shadow-lg shadow-green-500/20">
+                  <IconZap className="w-6 h-6 text-white fill-white/20" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-lg mb-1">Configuração em 5 minutos</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">Sem burocracia bancária. Integre, configure e venda no mesmo dia.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Social Proof */}
+            <div className="mt-16 flex items-center gap-4">
+              <div className="flex -space-x-3">
+                <img src="https://i.pravatar.cc/100?img=11" alt="User 1" className="w-10 h-10 rounded-full border-2 border-[#0b1521] object-cover" />
+                <img src="https://i.pravatar.cc/100?img=5" alt="User 2" className="w-10 h-10 rounded-full border-2 border-[#0b1521] object-cover" />
+                <img src="https://i.pravatar.cc/100?img=8" alt="User 3" className="w-10 h-10 rounded-full border-2 border-[#0b1521] object-cover" />
+              </div>
+              <p className="text-xs text-slate-500 font-medium">+ de 2.000 empresas acelerando com a RecebeFácil</p>
+            </div>
+          </div>
+        </>
+      }
+    >
+      <Toaster position="top-right" />
       
-      {/* LEFT SIDE - Form (Visible on all screens, full width on mobile) */}
-      <div className="w-full lg:w-1/2 flex flex-col min-h-screen relative">
-        {/* Mobile Header */}
+      {/* Mobile Header */}
         <div className="lg:hidden flex items-center justify-between p-6">
           <Link href="/" className="text-zinc-400 hover:text-zinc-900 transition-colors">
             <IconArrowLeft className="w-6 h-6" />
@@ -47,7 +182,7 @@ export default function Cadastro() {
             <span className="lg:hidden">Comece a receber pagamentos em segundos com a tecnologia RecebeFácil.</span>
           </p>
 
-          <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
             
             {/* Nome Completo */}
             <div className="space-y-1.5">
@@ -58,10 +193,12 @@ export default function Cadastro() {
                 </div>
                 <input 
                   type="text" 
+                  {...register('name')}
                   placeholder="Como quer ser chamado?"
                   className="w-full pl-11 pr-4 py-3.5 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all font-medium shadow-sm hover:border-zinc-300"
                 />
               </div>
+              {errors.name && <p className="text-red-500 text-xs font-bold mt-1">{errors.name.message}</p>}
             </div>
 
             {/* E-mail Corporativo */}
@@ -76,10 +213,12 @@ export default function Cadastro() {
                 </div>
                 <input 
                   type="email" 
+                  {...register('email')}
                   placeholder="seu@email.com"
                   className="w-full pl-11 pr-4 py-3.5 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all font-medium shadow-sm hover:border-zinc-300"
                 />
               </div>
+              {errors.email && <p className="text-red-500 text-xs font-bold mt-1">{errors.email.message}</p>}
             </div>
 
             {/* WhatsApp */}
@@ -91,10 +230,13 @@ export default function Cadastro() {
                 </div>
                 <input 
                   type="tel" 
-                  placeholder="+55 (00) 00000-0000"
+                  {...phoneRest}
+                  onChange={handlePhoneChange}
+                  placeholder="(00) 00000-0000"
                   className="w-full pl-11 pr-4 py-3.5 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all font-medium shadow-sm hover:border-zinc-300"
                 />
               </div>
+              {errors.phone && <p className="text-red-500 text-xs font-bold mt-1">{errors.phone.message}</p>}
             </div>
 
             {/* Senha */}
@@ -105,14 +247,20 @@ export default function Cadastro() {
                   <IconLock className="w-5 h-5 text-zinc-400" />
                 </div>
                 <input 
-                  type="password" 
+                  type={showPassword ? "text" : "password"} 
+                  {...register('password')}
                   placeholder="Mínimo 8 caracteres"
                   className="w-full pl-11 pr-12 py-3.5 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all font-medium shadow-sm hover:border-zinc-300"
                 />
-                <button type="button" className="absolute inset-y-0 right-0 pr-4 flex items-center text-zinc-400 hover:text-zinc-600 transition-colors">
-                   <IconEye className="w-5 h-5" />
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-zinc-400 hover:text-zinc-600 transition-colors"
+                >
+                   {showPassword ? <IconEyeOff className="w-5 h-5" /> : <IconEye className="w-5 h-5" />}
                 </button>
               </div>
+              {errors.password && <p className="text-red-500 text-xs font-bold mt-1">{errors.password.message}</p>}
             </div>
 
             {/* Checkbox */}
@@ -129,10 +277,18 @@ export default function Cadastro() {
               </label>
             </div>
 
-            <button type="submit" className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl mt-8 transition-all hover:scale-[1.02] shadow-xl shadow-green-500/20 flex items-center justify-center gap-2">
-              <span className="hidden lg:inline">COMEÇAR AGORA</span>
-              <span className="lg:hidden">Criar minha conta</span>
-              <IconArrowRight className="w-5 h-5 lg:hidden" />
+            <button 
+              type="submit" 
+              disabled={isLoading}
+              className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl mt-8 transition-all hover:scale-[1.02] shadow-xl shadow-green-500/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:hover:scale-100"
+            >
+              {isLoading ? 'Criando...' : (
+                <>
+                  <span className="hidden lg:inline">COMEÇAR AGORA</span>
+                  <span className="lg:hidden">Criar minha conta</span>
+                  <IconArrowRight className="w-5 h-5 lg:hidden" />
+                </>
+              )}
             </button>
           </form>
 
@@ -147,109 +303,8 @@ export default function Cadastro() {
             <p className="text-[10px] text-zinc-400 font-medium tracking-wide">© 2024 RecebeFácil. Aceleração Financeira.</p>
           </div>
         </div>
-      </div>
-
-      {/* RIGHT SIDE - Features (Desktop only) */}
-      <div className="hidden lg:flex w-1/2 bg-[#0b1521] text-white p-12 xl:p-24 flex-col justify-center relative overflow-hidden">
-        {/* Subtle background glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-green-500/10 rounded-full blur-3xl -z-10"></div>
-        
-        <div className="max-w-md z-10 relative">
-          <div className="text-green-400 text-xs font-bold uppercase tracking-widest mb-4">
-            Fintech de Performance
-          </div>
-          <h2 className="text-4xl xl:text-5xl font-extrabold tracking-tight mb-6 leading-[1.1]">
-            Comece a receber agora.
-          </h2>
-          <p className="text-slate-400 text-lg mb-12 leading-relaxed">
-            Sua operação financeira em piloto automático, do checkout à conciliação.
-          </p>
-
-          <div className="space-y-4">
-            {/* Feature 1 */}
-            <div className="bg-[#152336]/60 backdrop-blur-sm border border-[#1e3046] p-6 rounded-2xl flex gap-5 items-start hover:border-green-500/30 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-[#1e3046] flex items-center justify-center shrink-0">
-                <IconMessageCircle className="w-6 h-6 text-green-500" />
-              </div>
-              <div>
-                <h3 className="font-bold text-white text-lg mb-1">Automação via WhatsApp</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">Envio automático de cobranças e lembretes direto no app favorito do seu cliente.</p>
-              </div>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="bg-[#152336]/60 backdrop-blur-sm border border-[#1e3046] p-6 rounded-2xl flex gap-5 items-start hover:border-green-500/30 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-[#1e3046] flex items-center justify-center shrink-0">
-                <IconTrendingUp className="w-6 h-6 text-green-500" />
-              </div>
-              <div>
-                <h3 className="font-bold text-white text-lg mb-1">Recuperação de Inadimplência</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">Régua de cobrança inteligente que recupera até 40% das faturas atrasadas.</p>
-              </div>
-            </div>
-
-            {/* Feature 3 (Active style) */}
-            <div className="bg-[#152336] border border-green-500/40 p-6 rounded-2xl flex gap-5 items-start shadow-[0_0_30px_rgba(34,197,94,0.05)] relative overflow-hidden">
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>
-              <div className="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center shrink-0 shadow-lg shadow-green-500/20">
-                <IconZap className="w-6 h-6 text-white fill-white/20" />
-              </div>
-              <div>
-                <h3 className="font-bold text-white text-lg mb-1">Configuração em 5 minutos</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">Sem burocracia bancária. Integre, configure e venda no mesmo dia.</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Social Proof */}
-          <div className="mt-16 flex items-center gap-4">
-            <div className="flex -space-x-3">
-              <img src="https://i.pravatar.cc/100?img=11" alt="User 1" className="w-10 h-10 rounded-full border-2 border-[#0b1521] object-cover" />
-              <img src="https://i.pravatar.cc/100?img=5" alt="User 2" className="w-10 h-10 rounded-full border-2 border-[#0b1521] object-cover" />
-              <img src="https://i.pravatar.cc/100?img=8" alt="User 3" className="w-10 h-10 rounded-full border-2 border-[#0b1521] object-cover" />
-            </div>
-            <p className="text-xs text-slate-500 font-medium">+ de 2.000 empresas acelerando com a RecebeFácil</p>
-          </div>
-        </div>
-      </div>
-    </div>
+    </AuthLayout>
   );
 }
 
-// Icons
-function IconMessageCircle({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" /></svg>;
-}
-function IconTrendingUp({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /><polyline points="16 7 22 7 22 13" /></svg>;
-}
-function IconZap({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>;
-}
-function IconUser({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>;
-}
-function IconMail({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>;
-}
-function IconPhone({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>;
-}
-function IconLock({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>;
-}
-function IconEye({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>;
-}
-function IconArrowLeft({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7" /><path d="M19 12H5" /></svg>;
-}
-function IconArrowRight({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>;
-}
-function IconLogIn({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><polyline points="10 17 15 12 10 7" /><line x1="15" x2="3" y1="12" y2="12" /></svg>;
-}
-function IconUserPlus({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" x2="19" y1="8" y2="14" /><line x1="22" x2="16" y1="11" y2="11" /></svg>;
-}
+

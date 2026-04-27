@@ -55,3 +55,35 @@ Todo botão de ação que faz requisição à API (ex: `onSubmit`) deve ter:
 - Estado de "Loading" (spinner ou skeleton).
 - Feedback visual claro em caso de Sucesso (Toast verde).
 - Tratamento de Erro humanizado (Toast vermelho). Não mostrar "Error 500", mas sim "Ops, algo deu errado. Tente novamente."
+
+---
+
+## 5. Padrões de Implementação (Forms, Auth e APIs)
+
+### 5.1. Formulários e Validação
+- **React Hook Form + Zod:** Todos os formulários devem obrigatoriamente usar `react-hook-form` para controle de estado de alta performance e `zod` (`@hookform/resolvers/zod`) para validação rigorosa de schemas e tipagem estática (TypeScript).
+- **Máscaras Leves:** Evitamos bibliotecas pesadas de máscaras (ex: `react-input-mask`). Utilizamos funções utilitárias nativas interceptando o `onChange` do RHF (como fizemos na máscara de telefone e alternância visual de senhas).
+
+### 5.2. Autenticação e Segurança
+- **Server Actions:** O fluxo de autenticação e rotas críticas utiliza Next.js Server Actions (`/app/actions`) para orquestrar a comunicação de forma segura com o Back-End sem expor a lógica no navegador.
+- **Cookies HttpOnly:** Os tokens JWT **não** devem ser guardados em `localStorage` (prevenção contra XSS). Eles são salvos via Server Actions em cookies `HttpOnly` e validados globalmente pelo `middleware.ts`.
+
+### 5.3. Requisições (HTTP)
+- **Axios:** Utilizamos uma instância padronizada do `axios` (`services/api.ts`) para realizar as chamadas REST ao Back-End.
+
+---
+
+## 6. Arquitetura de Componentização (Clean Code)
+
+Para evitar arquivos gigantes ("Spaghetti Code") e garantir a escalabilidade do Front-End, adotamos a seguinte estrutura de diretórios e divisão de responsabilidades:
+
+### 6.1. Estrutura de Pastas (`/components`)
+- `/components/ui`: Componentes genéricos, atômicos e reaproveitáveis (ex: `Input.tsx`, `Button.tsx`, `Icons.tsx`). Eles são "burros": apenas recebem props (inclusive `forwardRef` para forms) e não possuem regras de negócio profundas.
+- `/components/layout`: Componentes de estrutura visual e "cascas" das páginas (ex: `AuthLayout.tsx`, `DashboardLayout.tsx`). Servem para não repetirmos HTML de estrutura.
+- `/components/forms`: Componentes específicos de formulários de negócio (ex: `LoginForm.tsx`, `RegisterForm.tsx`). Estes contêm a lógica do `react-hook-form`, os schemas do Zod e chamam as Server Actions.
+- `/utils` ou `/lib`: Funções utilitárias puras (ex: `formatters.ts` para máscaras de input).
+
+### 6.2. Regras de Clean Code no Next.js
+- **Páginas Enxutas:** Os arquivos em `/app/.../page.tsx` devem ser meros orquestradores. Eles instanciam Layouts e importam os componentes menores, raramente ultrapassando 50 linhas.
+- **Isolamento de SVGs:** Todos os ícones em SVG devem estar extraídos, preferencialmente centralizados num único arquivo de biblioteca de ícones (`components/ui/Icons.tsx`), para não poluir a lógica dos componentes visuais.
+- **DRY (Don't Repeat Yourself):** Se uma estrutura visual se repete (como o painel escuro das telas de login/cadastro), ela deve ser extraída para um componente de Layout comum imediatamente.

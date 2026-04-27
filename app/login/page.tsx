@@ -1,14 +1,161 @@
 "use client";
 
+import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { loginAction } from '@/app/actions/auth';
+import { toast, Toaster } from 'react-hot-toast';
+import {
+  IconMessageCircle,
+  IconMail,
+  IconLock,
+  IconEye,
+  IconEyeOff,
+  IconArrowRight,
+  IconTrendingUp,
+  IconCheck
+} from '@/components/ui/Icons';
+import { AuthLayout } from '@/components/layout/AuthLayout';
+
+const loginSchema = z.object({
+  email: z.string().email('E-mail inválido'),
+  password: z.string().min(8, 'A senha deve ter no mínimo 8 caracteres'),
+});
+
+type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  async function onSubmit(data: LoginForm) {
+    setIsLoading(true);
+    const toastId = toast.loading('Autenticando...');
+
+    const result = await loginAction(data);
+
+    if (result.success) {
+      toast.success('Bem-vindo de volta!', { id: toastId });
+      router.push('/dashboard');
+    } else {
+      toast.error(result.error || 'Falha ao fazer login', { id: toastId });
+      setIsLoading(false);
+    }
+  }
   return (
-    <div className="min-h-screen bg-white text-zinc-900 font-sans flex selection:bg-green-200">
+    <AuthLayout 
+      rightPanel={
+        <>
+          {/* Deep subtle background gradient */}
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-green-500/10 rounded-full blur-[100px] -z-10"></div>
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[80px] -z-10"></div>
+
+          {/* Top Centered Logo in Dark Side */}
+          <div className="absolute top-12 flex items-center justify-center gap-3 w-full opacity-90">
+            <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/20">
+              <IconMessageCircle className="w-6 h-6 text-white" />
+            </div>
+            <span className="font-bold text-2xl tracking-tight">RecebeFácil</span>
+          </div>
+
+          <div className="w-full max-w-lg flex flex-col items-center z-10 mt-8 scale-95 origin-center">
+            <h2 className="text-4xl xl:text-5xl font-semibold tracking-tight mb-8 text-center leading-[1.1]">
+               Acelere seus <br />
+               <span className="text-green-400 italic font-medium">recebíveis</span> hoje.
+            </h2>
+
+            {/* Stats Row */}
+            <div className="flex gap-4 mb-4 w-full justify-center">
+              <div className="bg-[#152336]/80 backdrop-blur-md border border-[#1e3046] rounded-2xl p-4 flex flex-col items-center justify-center w-36 hover:border-green-500/20 transition-colors">
+                <span className="text-2xl font-bold text-green-400 mb-1">+10k</span>
+                <span className="text-xs text-slate-400">Cobranças Ativas</span>
+              </div>
+              <div className="bg-[#152336]/80 backdrop-blur-md border border-[#1e3046] rounded-2xl p-4 flex flex-col items-center justify-center w-36 hover:border-green-500/20 transition-colors">
+                <span className="text-2xl font-bold text-green-400 mb-1">98%</span>
+                <span className="text-xs text-slate-400">Conversão de Pix</span>
+              </div>
+            </div>
+            <div className="flex gap-4 mb-8 w-full justify-center">
+              <div className="bg-[#152336]/80 backdrop-blur-md border border-[#1e3046] rounded-2xl p-4 flex flex-col items-center justify-center w-36 hover:border-green-500/20 transition-colors">
+                <span className="text-2xl font-bold text-green-400 mb-1">0.1s</span>
+                <span className="text-xs text-slate-400 text-center">Tempo de<br/>Resposta</span>
+              </div>
+            </div>
+
+            {/* Mockup Dashboard Card */}
+            <div className="bg-gradient-to-b from-[#111e2f] to-[#0a121c] border border-[#1e3046] rounded-3xl p-6 w-full max-w-md shadow-2xl relative overflow-hidden">
+              {/* Soft highlight */}
+              <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-green-500/30 to-transparent"></div>
+              
+              <div className="flex justify-between items-start mb-6">
+                 <div>
+                    <p className="text-slate-400 text-sm mb-1">Saldo Disponível</p>
+                    <p className="text-3xl font-bold text-white tracking-tight">R$ 42.850,00</p>
+                 </div>
+                 <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center border border-green-500/20">
+                    <IconTrendingUp className="w-5 h-5 text-green-400" />
+                 </div>
+              </div>
+
+              <div className="space-y-3">
+                 {/* Activity Row 1 */}
+                 <div className="bg-[#152336] rounded-2xl p-3 flex items-center justify-between border border-[#1e3046]/50">
+                    <div className="flex items-center gap-3">
+                       <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
+                          <IconCheck className="w-4 h-4 text-green-400" />
+                       </div>
+                       <div>
+                          <p className="text-sm font-bold text-slate-200">Venda Realizada</p>
+                          <p className="text-[10px] text-slate-500">João Silva • Pix</p>
+                       </div>
+                    </div>
+                    <span className="text-sm font-bold text-green-400">+R$ 297,00</span>
+                 </div>
+                 
+                 {/* Activity Row 2 */}
+                 <div className="bg-[#152336] rounded-2xl p-3 flex items-center justify-between border border-[#1e3046]/50">
+                    <div className="flex items-center gap-3">
+                       <div className="w-8 h-8 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center shrink-0">
+                          <IconCheck className="w-4 h-4 text-green-500" />
+                       </div>
+                       <div>
+                          <p className="text-sm font-bold text-slate-200">Mensagem Enviada</p>
+                          <p className="text-[10px] text-slate-500">Automação WhatsApp</p>
+                       </div>
+                    </div>
+                    <span className="text-xs font-bold tracking-widest text-green-500 uppercase">SUCESSO</span>
+                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Social Proof */}
+          <div className="absolute bottom-8 flex items-center gap-4 text-slate-400 text-sm">
+            <div className="flex -space-x-2">
+              <img src="https://i.pravatar.cc/100?img=33" alt="User" className="w-8 h-8 rounded-full border-2 border-[#0b1521] object-cover opacity-80" />
+              <img src="https://i.pravatar.cc/100?img=12" alt="User" className="w-8 h-8 rounded-full border-2 border-[#0b1521] object-cover opacity-80" />
+              <img src="https://i.pravatar.cc/100?img=47" alt="User" className="w-8 h-8 rounded-full border-2 border-[#0b1521] object-cover opacity-80" />
+            </div>
+            <p>Junte-se a <span className="font-bold text-white">1.200+ empresas</span> que automatizam suas cobranças</p>
+          </div>
+        </>
+      }
+    >
+      <Toaster position="top-right" />
       
-      {/* LEFT SIDE - Form */}
-      <div className="w-full lg:w-1/2 flex flex-col min-h-screen relative">
-        {/* Mobile Header (Centered) */}
+      {/* Mobile Header (Centered) */}
         <div className="lg:hidden flex flex-col items-center justify-center pt-12 pb-6">
           <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center shadow-sm mb-4">
             <IconMessageCircle className="w-6 h-6 text-white" />
@@ -37,7 +184,7 @@ export default function Login() {
             <span className="lg:hidden">Gerencie suas cobranças automáticas no WhatsApp</span>
           </p>
 
-          <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
             
             {/* E-mail */}
             <div className="space-y-1.5">
@@ -48,10 +195,12 @@ export default function Login() {
                 </div>
                 <input 
                   type="email" 
+                  {...register('email')}
                   placeholder="nome@empresa.com"
                   className="w-full pl-11 pr-4 py-3.5 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all font-medium shadow-sm hover:border-zinc-300"
                 />
               </div>
+              {errors.email && <p className="text-red-500 text-xs font-bold mt-1">{errors.email.message}</p>}
             </div>
 
             {/* Senha */}
@@ -67,14 +216,20 @@ export default function Login() {
                   <IconLock className="w-5 h-5 text-zinc-400" />
                 </div>
                 <input 
-                  type="password" 
+                  type={showPassword ? "text" : "password"} 
+                  {...register('password')}
                   placeholder="••••••••"
                   className="w-full pl-11 pr-12 py-3.5 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all font-medium shadow-sm hover:border-zinc-300 tracking-widest"
                 />
-                <button type="button" className="absolute inset-y-0 right-0 pr-4 flex items-center text-zinc-400 hover:text-zinc-600 transition-colors">
-                   <IconEye className="w-5 h-5" />
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-zinc-400 hover:text-zinc-600 transition-colors"
+                >
+                   {showPassword ? <IconEyeOff className="w-5 h-5" /> : <IconEye className="w-5 h-5" />}
                 </button>
               </div>
+              {errors.password && <p className="text-red-500 text-xs font-bold mt-1">{errors.password.message}</p>}
             </div>
 
             {/* Checkbox (Visible mainly on desktop or both depending on need, keeping for both for UX) */}
@@ -91,10 +246,18 @@ export default function Login() {
               </label>
             </div>
 
-            <button type="submit" className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl mt-6 transition-all hover:scale-[1.02] shadow-xl shadow-green-500/20 flex items-center justify-center gap-2">
-              <span className="hidden lg:inline">Entrar na plataforma</span>
-              <span className="lg:hidden">Entrar</span>
-              <IconArrowRight className="w-5 h-5" />
+            <button 
+              type="submit" 
+              disabled={isLoading}
+              className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl mt-6 transition-all hover:scale-[1.02] shadow-xl shadow-green-500/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:hover:scale-100"
+            >
+              {isLoading ? 'Entrando...' : (
+                <>
+                  <span className="hidden lg:inline">Entrar na plataforma</span>
+                  <span className="lg:hidden">Entrar</span>
+                  <IconArrowRight className="w-5 h-5" />
+                </>
+              )}
             </button>
           </form>
 
@@ -121,131 +284,13 @@ export default function Login() {
             </p>
           </div>
 
-          {/* Desktop Footer text */}
-          <div className="mt-auto pt-8 hidden lg:block text-center lg:text-left">
-            <p className="text-[10px] text-zinc-400 font-medium tracking-wide">© 2024 RecebeFácil Pagamentos LTDA. CNPJ: 00.000.000/0001-00</p>
-          </div>
-        </div>
-      </div>
-
-      {/* RIGHT SIDE - Data Showcase (Desktop only) */}
-      <div className="hidden lg:flex w-1/2 bg-[#0b1521] text-white flex-col justify-center items-center relative overflow-hidden p-12">
-        {/* Deep subtle background gradient */}
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-green-500/10 rounded-full blur-[100px] -z-10"></div>
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[80px] -z-10"></div>
-
-        {/* Top Centered Logo in Dark Side */}
-        <div className="absolute top-12 flex items-center justify-center gap-3 w-full opacity-90">
-          <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/20">
-            <IconMessageCircle className="w-6 h-6 text-white" />
-          </div>
-          <span className="font-bold text-2xl tracking-tight">RecebeFácil</span>
-        </div>
-
-        <div className="w-full max-w-lg flex flex-col items-center z-10 mt-8 scale-95 origin-center">
-          <h2 className="text-4xl xl:text-5xl font-semibold tracking-tight mb-8 text-center leading-[1.1]">
-             Acelere seus <br />
-             <span className="text-green-400 italic font-medium">recebíveis</span> hoje.
-          </h2>
-
-          {/* Stats Row */}
-          <div className="flex gap-4 mb-4 w-full justify-center">
-            <div className="bg-[#152336]/80 backdrop-blur-md border border-[#1e3046] rounded-2xl p-4 flex flex-col items-center justify-center w-36 hover:border-green-500/20 transition-colors">
-              <span className="text-2xl font-bold text-green-400 mb-1">+10k</span>
-              <span className="text-xs text-slate-400">Cobranças Ativas</span>
-            </div>
-            <div className="bg-[#152336]/80 backdrop-blur-md border border-[#1e3046] rounded-2xl p-4 flex flex-col items-center justify-center w-36 hover:border-green-500/20 transition-colors">
-              <span className="text-2xl font-bold text-green-400 mb-1">98%</span>
-              <span className="text-xs text-slate-400">Conversão de Pix</span>
-            </div>
-          </div>
-          <div className="flex gap-4 mb-8 w-full justify-center">
-            <div className="bg-[#152336]/80 backdrop-blur-md border border-[#1e3046] rounded-2xl p-4 flex flex-col items-center justify-center w-36 hover:border-green-500/20 transition-colors">
-              <span className="text-2xl font-bold text-green-400 mb-1">0.1s</span>
-              <span className="text-xs text-slate-400 text-center">Tempo de<br/>Resposta</span>
-            </div>
-          </div>
-
-          {/* Mockup Dashboard Card */}
-          <div className="bg-gradient-to-b from-[#111e2f] to-[#0a121c] border border-[#1e3046] rounded-3xl p-6 w-full max-w-md shadow-2xl relative overflow-hidden">
-            {/* Soft highlight */}
-            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-green-500/30 to-transparent"></div>
-            
-            <div className="flex justify-between items-start mb-6">
-               <div>
-                  <p className="text-slate-400 text-sm mb-1">Saldo Disponível</p>
-                  <p className="text-3xl font-bold text-white tracking-tight">R$ 42.850,00</p>
-               </div>
-               <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center border border-green-500/20">
-                  <IconTrendingUp className="w-5 h-5 text-green-400" />
-               </div>
-            </div>
-
-            <div className="space-y-3">
-               {/* Activity Row 1 */}
-               <div className="bg-[#152336] rounded-2xl p-3 flex items-center justify-between border border-[#1e3046]/50">
-                  <div className="flex items-center gap-3">
-                     <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
-                        <IconCheck className="w-4 h-4 text-green-400" />
-                     </div>
-                     <div>
-                        <p className="text-sm font-bold text-slate-200">Venda Realizada</p>
-                        <p className="text-[10px] text-slate-500">João Silva • Pix</p>
-                     </div>
-                  </div>
-                  <span className="text-sm font-bold text-green-400">+R$ 297,00</span>
-               </div>
-               
-               {/* Activity Row 2 */}
-               <div className="bg-[#152336] rounded-2xl p-3 flex items-center justify-between border border-[#1e3046]/50">
-                  <div className="flex items-center gap-3">
-                     <div className="w-8 h-8 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center shrink-0">
-                        <IconCheck className="w-4 h-4 text-green-500" />
-                     </div>
-                     <div>
-                        <p className="text-sm font-bold text-slate-200">Mensagem Enviada</p>
-                        <p className="text-[10px] text-slate-500">Automação WhatsApp</p>
-                     </div>
-                  </div>
-                  <span className="text-xs font-bold tracking-widest text-green-500 uppercase">SUCESSO</span>
-               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Social Proof */}
-        <div className="absolute bottom-8 flex items-center gap-4 text-slate-400 text-sm">
-          <div className="flex -space-x-2">
-            <img src="https://i.pravatar.cc/100?img=33" alt="User" className="w-8 h-8 rounded-full border-2 border-[#0b1521] object-cover opacity-80" />
-            <img src="https://i.pravatar.cc/100?img=12" alt="User" className="w-8 h-8 rounded-full border-2 border-[#0b1521] object-cover opacity-80" />
-            <img src="https://i.pravatar.cc/100?img=47" alt="User" className="w-8 h-8 rounded-full border-2 border-[#0b1521] object-cover opacity-80" />
-          </div>
-          <p>Junte-se a <span className="font-bold text-white">1.200+ empresas</span> que automatizam suas cobranças</p>
-        </div>
+      {/* Desktop Footer text */}
+      <div className="mt-auto pt-8 hidden lg:block text-center lg:text-left">
+        <p className="text-[10px] text-zinc-400 font-medium tracking-wide">© 2024 RecebeFácil Pagamentos LTDA. CNPJ: 00.000.000/0001-00</p>
       </div>
     </div>
-  );
+  </AuthLayout>
+);
 }
 
-// Icons
-function IconMessageCircle({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" /></svg>;
-}
-function IconMail({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>;
-}
-function IconLock({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>;
-}
-function IconEye({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>;
-}
-function IconArrowRight({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>;
-}
-function IconTrendingUp({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /><polyline points="16 7 22 7 22 13" /></svg>;
-}
-function IconCheck({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>;
-}
+
