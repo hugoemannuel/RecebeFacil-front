@@ -87,3 +87,84 @@ Para evitar arquivos gigantes ("Spaghetti Code") e garantir a escalabilidade do 
 - **Páginas Enxutas:** Os arquivos em `/app/.../page.tsx` devem ser meros orquestradores. Eles instanciam Layouts e importam os componentes menores, raramente ultrapassando 50 linhas.
 - **Isolamento de SVGs:** Todos os ícones em SVG devem estar extraídos, preferencialmente centralizados num único arquivo de biblioteca de ícones (`components/ui/Icons.tsx`), para não poluir a lógica dos componentes visuais.
 - **DRY (Don't Repeat Yourself):** Se uma estrutura visual se repete (como o painel escuro das telas de login/cadastro), ela deve ser extraída para um componente de Layout comum imediatamente.
+
+---
+
+## 7. Controle de Acesso por Módulo (Plan Gating — Front-End)
+
+O menu lateral do `DashboardLayout` e as rotas da área logada devem refletir exatamente a matriz de planos definida no `backend-specification.md` (Seção 9).
+
+### 7.1. Matriz de Módulos por Plano
+
+| Módulo               | FREE | STARTER | PRO |
+|----------------------|:----:|:-------:|:---:|
+| Home (Dashboard)     | ✅   | ✅      | ✅  |
+| Cobranças            | ✅   | ✅      | ✅  |
+| Clientes             | ❌   | ✅      | ✅  |
+| Relatórios           | ❌   | ✅      | ✅  |
+| Importação via Excel | ❌   | ✅      | ✅  |
+
+### 7.2. Como Implementar
+
+1. **Fonte da Verdade:** O plano do usuário (`plan_type`) deve ser lido uma única vez e armazenado num React Context (`UserPlanContext`) ou passado como prop para o `DashboardLayout`.
+2. **Menu Dinâmico:** O array `menuItems` do `DashboardLayout` deve ter um campo `requiredPlan`, e a lista renderizada filtra os itens de acordo com o plano atual.
+3. **Paywall — Nunca Bloquear com Erro:** Se o usuário tentar acessar uma rota de módulo bloqueado, **não** redirecionar para uma página de erro. Em vez disso:
+   - Exibir um modal ou banner de upgrade com a mensagem clara do benefício desbloqueado.
+   - Botão de ação: **"Fazer upgrade para [STARTER/PRO]"** → redireciona para `/planos`.
+4. **Itens de Menu Bloqueados:** Em vez de esconder completamente, itens bloqueados podem ser exibidos com opacidade reduzida e um ícone de cadeado 🔒, incentivando o upgrade (Product-Led Growth).
+
+### 7.3. Página `/planos`
+
+- Deve exibir os 3 planos (FREE, STARTER, PRO) com tabela comparativa de recursos.
+- Toggle **Mensal / Anual** com destaque do desconto (ex: badge "Economize 20%").
+- O plano atual do usuário deve estar visualmente destacado (borda verde, badge "Plano Atual").
+- Ao clicar em "Assinar": chamar a Server Action que aciona o back-end para gerar o link de checkout do Asaas e redirecionar o usuário.
+
+---
+
+## 8. Importação de Clientes via Excel (UI — Plano STARTER+)
+
+### 8.1. Componente de Upload
+
+- Localização: `/components/forms/ExcelImportForm.tsx`
+- Interface de **drag & drop** com fallback de botão "Selecionar arquivo".
+- Aceitar apenas `.xlsx` e `.csv`.
+- Exibir preview das primeiras linhas do arquivo antes de confirmar o envio.
+- Após o envio, exibir um relatório de resultado: `X cadastros criados com sucesso` e, se houver, a lista de linhas com erro e o motivo.
+
+### 8.2. Arquivo de Exemplo para Download
+
+- Um link fixo "📥 Baixar modelo de planilha" deve estar visível na tela de importação.
+- Este link aponta para `GET /charges/import/template` no back-end (retorna o `.xlsx` modelo).
+- Colunas obrigatórias no modelo: `nome`, `telefone`, `valor`, `data_vencimento`, `descricao`.
+
+### 8.3. Estados da UI
+
+| Estado        | Comportamento                                                                 |
+|---------------|-------------------------------------------------------------------------------|
+| Idle          | Área de drag & drop com instrução e botão de download do modelo               |
+| Selecionado   | Preview da tabela com as primeiras 5 linhas do arquivo                        |
+| Enviando      | Spinner + "Importando X linhas..."                                            |
+| Sucesso       | Card verde: "X cobranças criadas com sucesso"                                 |
+| Erro parcial  | Card amarelo com accordion mostrando cada linha com erro e o motivo           |
+| Erro total    | Toast vermelho: "Arquivo inválido. Verifique o formato e tente novamente."    |
+
+---
+
+## 9. Fluxo de Checkout e Assinatura (UI)
+
+O front-end **não processa** dados de cartão diretamente. O papel do front-end é:
+
+1. Apresentar os planos na página `/planos`.
+2. Chamar a Server Action `createCheckout(planType, period)`.
+3. A Server Action faz `POST /subscription/checkout` no back-end e recebe o `invoiceUrl` do Asaas.
+4. Front-end redireciona para o `invoiceUrl` (checkout hospedado e seguro do Asaas).
+
+> ⚠️ Nunca criar formulários de cartão de crédito no front-end próprio. O checkout é sempre externo (Asaas), que é certificado PCI DSS.
+
+### 9.1. Feedback pós-pagamento
+
+- Após o retorno do Asaas, exibir uma tela de confirmação: **"Seu plano foi ativado! 🎉"**
+- O status real da assinatura só deve ser atualizado após a confirmação via webhook no back-end — **não confiar apenas no redirect do Asaas**.
+- Usar polling ou Server-Sent Events (SSE) para verificar se o plano foi confirmado no banco antes de liberar os módulos.
+

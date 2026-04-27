@@ -1,38 +1,70 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  IconLayoutGrid, 
-  IconDollarSign, 
-  IconUsers, 
-  IconFileText, 
+import {
+  IconLayoutGrid,
+  IconDollarSign,
+  IconUsers,
+  IconFileText,
   IconSettings,
   IconSearch,
   IconBell,
   IconPlus,
   IconLogOut,
-  IconMessageCircle
+  IconMessageCircle,
+  IconLock,
 } from '@/components/ui/Icons';
 import { logoutAction } from '@/app/actions/auth';
+import { UpgradeModal } from '@/components/ui/UpgradeModal';
 
-export function DashboardLayout({ children }: { children: React.ReactNode }) {
+// ─── Tipos ──────────────────────────────────────────────────────
+export interface SubscriptionStatus {
+  plan: 'FREE' | 'STARTER' | 'PRO' | 'UNLIMITED';
+  status: 'ACTIVE' | 'CANCELED' | 'PAST_DUE' | 'NONE';
+  allowed_modules: string[];
+  current_period_end: string | null;
+  userName?: string;
+}
+
+interface DashboardLayoutProps {
+  children: React.ReactNode;
+  subscription: SubscriptionStatus;
+}
+
+// ─── Configuração dos itens do menu ────────────────────────────
+const MENU_ITEMS = [
+  { name: 'INÍCIO',         path: '/dashboard',                  icon: IconLayoutGrid, module: 'HOME'         },
+  { name: 'COBRANÇAS',      path: '/dashboard/cobrancas',        icon: IconDollarSign, module: 'CHARGES'      },
+  { name: 'CLIENTES',       path: '/dashboard/clientes',         icon: IconUsers,      module: 'CLIENTS'      },
+  { name: 'RELATÓRIOS',     path: '/dashboard/relatorios',       icon: IconFileText,   module: 'REPORTS'      },
+  { name: 'CONFIGURAÇÕES',  path: '/dashboard/configuracoes',    icon: IconSettings,   module: 'HOME'         },
+];
+
+// Badge visual de plano
+const PLAN_BADGE: Record<string, { label: string; color: string }> = {
+  FREE:      { label: 'Plano Free',      color: 'text-zinc-500'  },
+  STARTER:   { label: 'Plano Starter',   color: 'text-blue-500'  },
+  PRO:       { label: 'Plano Pro',       color: 'text-green-600' },
+  UNLIMITED: { label: 'Plano Unlimited', color: 'text-purple-600'},
+};
+
+// ─── Componente ────────────────────────────────────────────────
+export function DashboardLayout({ children, subscription }: DashboardLayoutProps) {
   const pathname = usePathname();
+  const [lockedModule, setLockedModule] = useState<string | null>(null);
 
-  const menuItems = [
-    { name: 'INÍCIO', path: '/dashboard', icon: IconLayoutGrid },
-    { name: 'COBRANÇAS', path: '/dashboard/cobrancas', icon: IconDollarSign },
-    { name: 'CLIENTES', path: '/dashboard/clientes', icon: IconUsers },
-    { name: 'RELATÓRIOS', path: '/dashboard/relatorios', icon: IconFileText },
-    { name: 'CONFIGURAÇÕES', path: '/dashboard/configuracoes', icon: IconSettings },
-  ];
+  const planBadge = PLAN_BADGE[subscription.plan] ?? PLAN_BADGE.FREE;
+  const userName = subscription.userName ?? 'Usuário';
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-zinc-900 font-sans flex overflow-hidden selection:bg-green-200">
-      
-      {/* Sidebar */}
+
+      {/* ── Sidebar ────────────────────────────────────────── */}
       <aside className="w-[280px] bg-white border-r border-zinc-200 flex flex-col h-screen shrink-0 hidden md:flex">
+
+        {/* Logo */}
         <div className="p-8 pb-10">
           <Link href="/dashboard" className="flex items-center gap-2 group w-max">
             <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center shadow-md shadow-green-500/20 group-hover:scale-110 transition-transform">
@@ -44,17 +76,35 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </Link>
         </div>
 
+        {/* Navigation */}
         <nav className="flex-1 px-4 space-y-1">
-          {menuItems.map((item) => {
+          {MENU_ITEMS.map((item) => {
             const isActive = pathname === item.path;
+            const isLocked = !subscription.allowed_modules.includes(item.module);
             const Icon = item.icon;
+
+            if (isLocked) {
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => setLockedModule(item.module)}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-sm transition-all text-zinc-400 hover:bg-amber-50 hover:text-amber-600 group"
+                  title={`Disponível no plano STARTER ou superior`}
+                >
+                  <Icon className="w-5 h-5 text-zinc-300 group-hover:text-amber-400" />
+                  <span className="flex-1 text-left">{item.name}</span>
+                  <IconLock className="w-3.5 h-3.5 text-zinc-300 group-hover:text-amber-400 shrink-0" />
+                </button>
+              );
+            }
+
             return (
               <Link
                 key={item.path}
                 href={item.path}
                 className={`flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-sm transition-all ${
-                  isActive 
-                    ? 'bg-green-100 text-green-700' 
+                  isActive
+                    ? 'bg-green-100 text-green-700'
                     : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900'
                 }`}
               >
@@ -65,31 +115,53 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
+        {/* Upgrade banner para plano FREE */}
+        {subscription.plan === 'FREE' && (
+          <div className="mx-4 mb-4 bg-gradient-to-br from-[#0b1521] to-[#0b3d2e] rounded-2xl p-4">
+            <p className="text-white font-bold text-xs mb-1">Desbloqueie mais poder</p>
+            <p className="text-slate-400 text-[11px] mb-3 leading-relaxed">Clientes, relatórios e importação de Excel no plano Starter.</p>
+            <Link
+              href="/planos"
+              className="block w-full bg-green-500 hover:bg-green-400 text-white font-bold text-xs py-2 rounded-xl text-center transition-colors"
+            >
+              Ver planos →
+            </Link>
+          </div>
+        )}
+
         {/* User Profile & Logout */}
-        <div className="p-4 border-t border-zinc-100 m-4 rounded-2xl bg-[#f8fafc] flex items-center gap-3">
-          <img src="https://i.pravatar.cc/100?img=11" alt="User" className="w-10 h-10 rounded-full bg-zinc-200 object-cover" />
+        <div className="p-4 border-t border-zinc-100 m-4 mt-0 rounded-2xl bg-[#f8fafc] flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center font-bold text-green-700 text-sm shrink-0">
+            {userName.charAt(0).toUpperCase()}
+          </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-zinc-900 truncate">João Silva</p>
-            <p className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider truncate">Plano Premium</p>
+            <p className="text-sm font-bold text-zinc-900 truncate">{userName}</p>
+            <p className={`text-[10px] uppercase font-bold tracking-wider truncate ${planBadge.color}`}>
+              {planBadge.label}
+            </p>
           </div>
           <form action={logoutAction}>
-            <button type="submit" className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Sair da conta">
+            <button
+              type="submit"
+              className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+              title="Sair da conta"
+            >
               <IconLogOut className="w-5 h-5" />
             </button>
           </form>
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* ── Main Content ───────────────────────────────────── */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        
+
         {/* Top Header */}
         <header className="h-20 bg-white border-b border-zinc-200/60 flex items-center justify-between px-8 shrink-0 z-10 sticky top-0">
           <div className="w-full max-w-md relative group">
             <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-green-500 transition-colors" />
-            <input 
-              type="text" 
-              placeholder="Buscar cobranças ou clientes..." 
+            <input
+              type="text"
+              placeholder="Buscar cobranças ou clientes..."
               className="w-full bg-[#f4f7fb] border-none rounded-full pl-11 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:bg-white transition-all text-zinc-700 font-medium placeholder:font-normal placeholder:text-zinc-400"
             />
           </div>
@@ -106,12 +178,19 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        {/* Dashboard Scrollable Area */}
+        {/* Scrollable Area */}
         <main className="flex-1 overflow-y-auto">
           {children}
         </main>
-        
       </div>
+
+      {/* ── Upgrade Modal ──────────────────────────────────── */}
+      {lockedModule && (
+        <UpgradeModal
+          moduleName={lockedModule}
+          onClose={() => setLockedModule(null)}
+        />
+      )}
     </div>
   );
 }
