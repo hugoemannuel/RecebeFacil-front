@@ -20,9 +20,14 @@ export async function loginAction(data: any) {
     return { success: true, user: response.data.user };
   } catch (error) {
     if (isAxiosError(error)) {
-      return { success: false, error: error.response?.data?.message || 'E-mail ou senha inválidos.' };
+      const data = error.response?.data;
+      let errorMessage = 'E-mail ou senha inválidos.';
+      if (data?.message) {
+        errorMessage = Array.isArray(data.message) ? data.message[0] : data.message;
+      }
+      return { success: false, error: errorMessage };
     }
-    return { success: false, error: 'Erro de comunicação com o servidor.' };
+    return { success: false, error: 'Erro de comunicação com o servidor. Tente novamente mais tarde.' };
   }
 }
 
@@ -42,8 +47,21 @@ export async function registerAction(data: any) {
     return { success: true, user: response.data.user };
   } catch (error) {
     if (isAxiosError(error)) {
-      return { success: false, error: error.response?.data?.message || 'Erro ao realizar o cadastro.' };
+      const data = error.response?.data;
+      let errorMessage = 'Erro ao realizar o cadastro.';
+      if (data?.message) {
+        errorMessage = Array.isArray(data.message) ? data.message[0] : data.message;
+      }
+      return { success: false, error: errorMessage };
     }
-    return { success: false, error: 'Erro de comunicação com o servidor.' };
+    return { success: false, error: 'Erro de comunicação com o servidor. Tente novamente mais tarde.' };
   }
+}
+
+import { redirect } from 'next/navigation';
+
+export async function logoutAction() {
+  const cookieStore = await cookies();
+  cookieStore.delete('recebefacil_token');
+  redirect('/login');
 }
