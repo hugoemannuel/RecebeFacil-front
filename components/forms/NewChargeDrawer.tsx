@@ -60,9 +60,15 @@ const baseSchema = z.object({
 export type ChargeFormData = z.infer<typeof baseSchema>;
 
 // ── Component ────────────────────────────────────────────────────────────────
-interface Props { open: boolean; onClose: () => void; userName?: string; hasPixKey?: boolean; }
+interface Props { 
+  open: boolean; 
+  onClose: () => void; 
+  userName?: string; 
+  hasPixKey?: boolean;
+  planType?: 'FREE' | 'STARTER' | 'PRO' | 'UNLIMITED';
+}
 
-export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', hasPixKey = false }: Props) {
+export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', hasPixKey = false, planType = 'FREE' }: Props) {
   const [step, setStep] = useState(0);
   const [showCalendar, setShowCalendar] = useState(false);
   const [sending, setSending] = useState(false);
@@ -213,6 +219,7 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
                   <StepChargeDetails 
                     showCalendar={showCalendar} 
                     setShowCalendar={setShowCalendar} 
+                    planType={planType}
                   />
                 )}
 
@@ -322,9 +329,16 @@ function StepDebtor() {
   );
 }
 
-function StepChargeDetails({ showCalendar, setShowCalendar }: { showCalendar: boolean, setShowCalendar: (v: boolean) => void }) {
+function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCalendar: boolean, setShowCalendar: (v: boolean) => void, planType: 'FREE' | 'STARTER' | 'PRO' | 'UNLIMITED' }) {
   const { register, watch, setValue, formState: { errors } } = useFormContext<ChargeFormData>();
   const values = watch();
+
+  const allowedRecurrences = {
+    FREE: ['ONCE'],
+    STARTER: ['ONCE', 'WEEKLY'],
+    PRO: ['ONCE', 'WEEKLY', 'MONTHLY', 'YEARLY'],
+    UNLIMITED: ['ONCE', 'WEEKLY', 'MONTHLY', 'YEARLY'],
+  }[planType] || ['ONCE'];
 
   return (
     <>
@@ -379,11 +393,20 @@ function StepChargeDetails({ showCalendar, setShowCalendar }: { showCalendar: bo
           <div className="grid grid-cols-2 gap-2">
             {(['ONCE', 'WEEKLY', 'MONTHLY', 'YEARLY'] as const).map((r) => {
               const labels = { ONCE: '1× Única', WEEKLY: 'Semanal', MONTHLY: 'Mensal', YEARLY: 'Anual' };
+              const isAllowed = allowedRecurrences.includes(r);
+              
               return (
-                <button key={r} type="button" onClick={() => setValue('recurrence', r)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all ${values.recurrence === r ? 'bg-green-50 border-green-400 text-green-700' : 'border-zinc-200 text-zinc-500 hover:border-zinc-300'}`}>
+                <button 
+                  key={r} 
+                  type="button" 
+                  onClick={() => {
+                    if (isAllowed) setValue('recurrence', r);
+                    else toast.error(`O plano ${planType} não permite recorrência ${labels[r]}. Faça upgrade!`);
+                  }}
+                  className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all overflow-hidden ${!isAllowed ? 'opacity-50 cursor-not-allowed bg-zinc-50 border-zinc-200 text-zinc-400' : values.recurrence === r ? 'bg-green-50 border-green-400 text-green-700' : 'border-zinc-200 text-zinc-500 hover:border-zinc-300'}`}>
                   <IconRepeat className="w-3.5 h-3.5" />
                   {labels[r]}
+                  {!isAllowed && <span className="absolute top-0 right-0 bg-amber-100 text-amber-700 text-[8px] uppercase px-1.5 py-0.5 rounded-bl-lg font-extrabold">Pro</span>}
                 </button>
               );
             })}

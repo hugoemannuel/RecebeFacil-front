@@ -35,17 +35,35 @@ export async function createChargeAction(
     return { success: false, error: 'Sessão expirada. Faça login novamente.' };
   }
 
-  // TODO: conectar ao back-end real
-  // const res = await api.post('/charges', payload, {
-  //   headers: { Authorization: `Bearer ${token}` },
-  // });
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/charges`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
 
-  // Mock para desenvolvimento — simula delay de rede
-  await new Promise((r) => setTimeout(r, 1500));
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => null);
+      if (res.status === 403) {
+        if (errorData?.message === 'LIMIT_REACHED') {
+          return { success: false, error: 'Limite do seu plano atingido. Faça upgrade para continuar enviando cobranças.' };
+        }
+        if (errorData?.message === 'RECURRENCE_NOT_ALLOWED') {
+          return { success: false, error: 'O seu plano atual não permite este tipo de recorrência. Faça upgrade para liberar.' };
+        }
+      }
+      return { success: false, error: errorData?.message || 'Erro ao processar cobrança no servidor.' };
+    }
 
-  // Simula sucesso
-  return {
-    success: true,
-    chargeId: `mock-${Date.now()}`,
-  };
+    const data = await res.json();
+    return {
+      success: true,
+      chargeId: data.chargeId,
+    };
+  } catch (error) {
+    return { success: false, error: 'Servidor indisponível no momento.' };
+  }
 }
