@@ -67,3 +67,66 @@ export async function createChargeAction(
     return { success: false, error: 'Servidor indisponível no momento.' };
   }
 }
+
+export async function getChargeDetailsAction(chargeId: string) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('recebefacil_token')?.value;
+
+  if (!token) return { success: false, error: 'Não autorizado' };
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/charges/${chargeId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => null);
+      return { success: false, error: errorData?.message || 'Erro ao buscar cobrança' };
+    }
+
+    const data = await res.json();
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: 'Servidor indisponível' };
+  }
+}
+
+export async function bulkCancelAction(chargeIds: string[]) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('recebefacil_token')?.value;
+
+  if (!token) return { success: false, error: 'Não autorizado' };
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/charges/bulk/cancel`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ chargeIds }),
+    });
+
+    if (!res.ok) return { success: false, error: 'Erro ao cancelar cobranças' };
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: 'Servidor indisponível' };
+  }
+}
+
+export async function bulkRemindAction(chargeIds: string[]) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('recebefacil_token')?.value;
+
+  if (!token) return { success: false, error: 'Não autorizado' };
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/charges/bulk/remind`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ chargeIds }),
+    });
+
+    if (!res.ok) return { success: false, error: 'Erro ao enviar lembretes' };
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: 'Servidor indisponível' };
+  }
+}

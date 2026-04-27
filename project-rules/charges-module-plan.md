@@ -56,6 +56,13 @@ Para gerar desejo no usuário, as funcionalidades dos planos maiores devem estar
 *   **Cobrança em Massa:** Checkboxes da tabela totalmente liberados. O lojista pode selecionar dezenas de devedores e executar comandos, e também tem acesso à importação de planilhas.
 *   **Drawer de Nova Cobrança:** Todas as recorrências liberadas.
 
+### Ouro da Arquitetura: Server Actions & HttpOnly
+Para proteger a plataforma contra ataques de XSS, o token JWT do usuário (`recebefacil_token`) é armazenado como um cookie **HttpOnly**. 
+Isto significa que requisições client-side nativas (via axios no navegador) **não podem e não devem** interceptar esse token.
+Sempre que o Client precisar enviar dados ou buscar detalhes protegidos:
+*   Utilizar **Server Actions** no diretório `/app/actions/` (ex: `charges.ts`).
+*   A Action roda no Node.js (Servidor), lê o cookie de forma segura via `cookies().get()`, e repassa ao Back-End (NestJS).
+
 ---
 
 ## 3. Telas e Recursos Exclusivos (Premium - PRO e UNLIMITED)
@@ -108,7 +115,7 @@ Para justificar o valor dos planos mais altos, o módulo de cobranças terá sub
     *   ✅ **Time Travel (Viagem no Tempo):** Gráfico interativo e relatórios diários/semanais.
         *   *Regra de Semântica Temporal:* Para manter os dados alinhados e consistentes, **todas as métricas** (Total a Receber, Top Clientes e a lista de Atividade Recente) são ancoradas estritamente pelo `due_date` (Data de Vencimento). O Total Pago usa o `payment_date`. Assim, a tabela exibe exatamente os itens que compõem os valores financeiros daquele dia.
     *   ✅ Filtros nativos nas telas (Por data e status combinados sem recarregar API indevidamente).
-    *   Criar o componente `ChargeDetailsDrawer` focado na visão da Timeline do WhatsApp.
+    *   ✅ Criar o componente `ChargeDetailsDrawer` focado na visão da Timeline do WhatsApp com segurança e riqueza de dados.
     *   Tela de Régua de Automação Global (`/dashboard/cobrancas/automation`).
 
 ---

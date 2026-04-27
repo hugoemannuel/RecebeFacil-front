@@ -30,8 +30,9 @@ import {
 } from '@/components/ui/Icons';
 import { formatMoney, maskPhone } from '@/lib/formatters';
 import { NewChargeDrawer } from '@/components/forms/NewChargeDrawer';
+import { ChargeDetailsDrawer } from '@/components/dashboard/ChargeDetailsDrawer';
 import { toast } from 'sonner';
-import { api } from '@/services/api';
+import { bulkCancelAction, bulkRemindAction } from '@/app/actions/charges';
 
 type Charge = {
   id: string;
@@ -56,6 +57,7 @@ export function ChargesClient({
 }) {
   const [data, setData] = useState(initialData);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [detailsChargeId, setDetailsChargeId] = useState<string | null>(null);
   const router = useRouter();
   const [rowSelection, setRowSelection] = useState({});
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -207,9 +209,13 @@ export function ChargesClient({
                     className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-red-50 rounded-lg text-red-600 font-medium"
                     onClick={async () => {
                       try {
-                        await api.delete(`/charges/${row.original.id}`);
-                        setData(prev => prev.map(c => c.id === row.original.id ? { ...c, status: 'CANCELED' } : c));
-                        toast.success('Cobrança cancelada.');
+                        const res = await bulkCancelAction([row.original.id]);
+                        if (res.success) {
+                          setData(prev => prev.map(c => c.id === row.original.id ? { ...c, status: 'CANCELED' } : c));
+                          toast.success('Cobrança cancelada.');
+                        } else {
+                          toast.error(res.error || 'Erro ao cancelar.');
+                        }
                       } catch {
                         toast.error('Erro ao cancelar.');
                       }
@@ -337,7 +343,7 @@ export function ChargesClient({
                   className={`border-b border-zinc-100 transition-colors hover:bg-zinc-50/80 cursor-pointer ${row.getIsSelected() ? 'bg-green-50/40' : ''}`}
                   onClick={(e) => {
                     if ((e.target as HTMLElement).closest('input[type="checkbox"]')) return;
-                    router.push(`/dashboard/charges/${row.original.id}`);
+                    setDetailsChargeId(row.original.id);
                   }}
                 >
                   {row.getVisibleCells().map(cell => (
@@ -401,9 +407,13 @@ export function ChargesClient({
               onClick={async () => {
                 const ids = selectedRows.map(r => r.original.id);
                 try {
-                  await api.post('/charges/bulk/remind', { chargeIds: ids });
-                  toast.success(`${ids.length} lembretes disparados via WhatsApp!`);
-                  table.resetRowSelection();
+                  const res = await bulkRemindAction(ids);
+                  if (res.success) {
+                    toast.success(`${ids.length} lembretes disparados via WhatsApp!`);
+                    table.resetRowSelection();
+                  } else {
+                    toast.error(res.error || 'Erro ao disparar.');
+                  }
                 } catch {
                   toast.error('Erro ao disparar.');
                 }
@@ -416,10 +426,14 @@ export function ChargesClient({
               onClick={async () => {
                 const ids = selectedRows.map(r => r.original.id);
                 try {
-                  await api.post('/charges/bulk/cancel', { chargeIds: ids });
-                  setData(prev => prev.map(c => ids.includes(c.id) ? { ...c, status: 'CANCELED' } : c));
-                  toast.success(`${ids.length} cobranças canceladas.`);
-                  table.resetRowSelection();
+                  const res = await bulkCancelAction(ids);
+                  if (res.success) {
+                    setData(prev => prev.map(c => ids.includes(c.id) ? { ...c, status: 'CANCELED' } : c));
+                    toast.success(`${ids.length} cobranças canceladas.`);
+                    table.resetRowSelection();
+                  } else {
+                    toast.error(res.error || 'Erro ao cancelar.');
+                  }
                 } catch {
                   toast.error('Erro ao cancelar.');
                 }
@@ -440,6 +454,11 @@ export function ChargesClient({
           setDrawerOpen(false);
           router.refresh();
         }}
+      />
+
+      <ChargeDetailsDrawer
+        chargeId={detailsChargeId}
+        onClose={() => setDetailsChargeId(null)}
       />
     </div>
   );
