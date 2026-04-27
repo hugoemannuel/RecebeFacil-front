@@ -4,17 +4,14 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="min-h-screen bg-white text-zinc-900 font-sans selection:bg-green-200">
-      {/* Navbar - Adaptado para Mobile/Desktop */}
       <header className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full border-b border-zinc-100/50 md:border-none">
         <div className="flex items-center gap-2">
-          {/* Logo Icon */}
           <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center shadow-sm">
             <IconMessageCircle className="w-5 h-5 text-white" />
           </div>
           <div className="font-bold text-xl tracking-tight text-zinc-900">RecebeFácil</div>
         </div>
 
-        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-600">
           <a href="#" className="text-green-500 font-semibold border-b-2 border-green-500 pb-1">INÍCIO</a>
           <a href="#" className="hover:text-zinc-900 transition-colors">COMO FUNCIONA</a>
@@ -22,7 +19,7 @@ export default function Home() {
           <a href="#" className="hover:text-zinc-900 transition-colors">DEPOIMENTOS</a>
         </nav>
 
-        {/* Buttons */}
+
         <div className="flex items-center gap-4">
           <Link href="/login" className="text-sm font-bold text-zinc-600 hover:text-green-500 transition-colors hidden md:block tracking-wide">ENTRAR</Link>
           <Link href="/cadastro" className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-full text-sm font-bold transition-colors shadow-md shadow-green-500/20">
@@ -31,9 +28,8 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero Section - Focado no Mobile */}
+
       <section className="px-6 py-12 md:py-24 max-w-7xl mx-auto flex flex-col items-center text-center relative overflow-hidden">
-        {/* Decorative subtle background elements */}
         <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-blue-50 to-green-50 rounded-[100%] blur-3xl -z-10 opacity-50"></div>
 
         <div className="bg-blue-50 text-blue-600 text-[10px] md:text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-6 flex items-center gap-2 border border-blue-100">
@@ -57,7 +53,6 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Dashboard image mockup */}
         <div className="mt-12 w-full max-w-4xl rounded-xl md:rounded-2xl shadow-2xl overflow-hidden border border-zinc-200/60 bg-slate-900 p-2 md:p-4">
           <div className="bg-[#0f172a] rounded-lg md:rounded-xl overflow-hidden relative">
             <div className="flex border-b border-slate-800 p-3 items-center gap-4">
@@ -69,7 +64,6 @@ export default function Home() {
               <div className="h-4 w-32 bg-slate-800 rounded-md"></div>
             </div>
             <div className="p-4 md:p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-              {/* Mockup Metrics */}
               <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 col-span-2 md:col-span-1">
                 <div className="h-3 w-20 bg-slate-700 rounded mb-3"></div>
                 <div className="h-6 w-24 bg-green-500/20 rounded"></div>
@@ -87,7 +81,6 @@ export default function Home() {
                 <div className="h-6 w-16 bg-slate-600 rounded"></div>
               </div>
             </div>
-            {/* Mockup Chart Area */}
             <div className="px-4 md:px-6 pb-6">
               <div className="w-full h-32 md:h-48 bg-slate-800/30 rounded-xl border border-slate-700/50 relative overflow-hidden flex items-end justify-between px-4 pb-4">
                 {[40, 60, 30, 80, 50, 90, 70].map((h, i) => (
@@ -99,7 +92,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Como funciona - Cards Stacked no Mobile */}
+
       <section className="py-16 px-6 max-w-7xl mx-auto">
         <div className="text-left md:text-center mb-10 md:mb-16">
           <h2 className="text-[2rem] md:text-4xl font-extrabold text-zinc-900 mb-3 md:mb-4">Como funciona</h2>
@@ -109,7 +102,7 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8">
-          {/* Card 1 */}
+
           <div className="border border-zinc-200 rounded-2xl p-6 md:p-8 shadow-sm bg-white hover:border-green-200 transition-colors">
             <div className="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center mb-6">
               <IconBuilding className="w-6 h-6" />
@@ -119,7 +112,7 @@ export default function Home() {
               Vincule sua conta bancária de forma segura e configure seu Pix para recebimentos automáticos.
             </p>
           </div>
-          {/* Card 2 */}
+
           <div className="border border-zinc-200 rounded-2xl p-6 md:p-8 shadow-sm bg-white hover:border-yellow-200 transition-colors">
             <div className="w-12 h-12 bg-yellow-50 text-yellow-600 rounded-xl flex items-center justify-center mb-6">
               <IconBell className="w-6 h-6" />
@@ -129,7 +122,6 @@ export default function Home() {
               Defina quando o cliente deve ser avisado: 3 dias antes, no dia do vencimento e após o atraso.
             </p>
           </div>
-          {/* Card 3 */}
           <div className="border border-zinc-200 rounded-2xl p-6 md:p-8 shadow-sm bg-white hover:border-green-200 transition-colors">
             <div className="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center mb-6">
               <IconMessageCircle className="w-6 h-6" />
@@ -142,10 +134,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Feature List + WhatsApp Mockup */}
+
       <section className="py-16 md:py-24 px-6 max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 lg:gap-24 items-center overflow-hidden">
 
-        {/* WhatsApp Mobile App Mockup */}
+
         <div className="w-full lg:w-1/2 flex justify-center lg:justify-start relative">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-green-100 rounded-full blur-3xl -z-10"></div>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[180px] h-[400px] bg-green-50 rounded-full -z-10"></div>
@@ -169,7 +161,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Floating Notification Component */}
+
             <div className="absolute bottom-5 left-1/2 -translate-x-1/2 w-[90%] bg-white rounded-xl p-3 flex items-center gap-3 shadow-xl border border-zinc-100 animate-bounce">
               <div className="bg-green-100 p-2 rounded-lg">
                 <IconCheckCircle2 className="text-green-600 w-5 h-5" />
@@ -182,7 +174,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Feature List */}
+
         <div className="w-full lg:w-1/2 space-y-10">
           <div className="flex gap-5 items-start">
             <div className="mt-1 w-12 h-12 shrink-0 rounded-2xl bg-green-500 flex items-center justify-center text-white shadow-lg shadow-green-500/30">
@@ -222,7 +214,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials - Dark Background */}
+
       <section className="bg-[#0b1521] py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-left md:text-center mb-12">
@@ -289,7 +281,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Final CTA */}
+
       <section className="py-16 md:py-24 px-6 max-w-4xl mx-auto">
         <div className="bg-[#eafbf3] rounded-[2.5rem] p-8 md:p-16 text-center shadow-sm">
           <h2 className="text-3xl md:text-5xl font-extrabold text-zinc-900 mb-6 tracking-tight">
@@ -307,7 +299,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
+
       <footer className="border-t border-zinc-100 py-12 px-6 bg-zinc-50">
         <div className="max-w-7xl mx-auto flex flex-col items-center">
           <div className="font-bold text-2xl tracking-tight text-zinc-900 mb-8 flex items-center gap-2">
