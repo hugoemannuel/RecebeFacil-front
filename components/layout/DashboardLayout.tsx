@@ -34,7 +34,9 @@ export interface SubscriptionStatus {
 interface DashboardLayoutProps {
   children: React.ReactNode;
   subscription: SubscriptionStatus;
+  sentThisMonth?: number;
 }
+
 
 // ─── Configuração dos itens do menu ────────────────────────────
 const MENU_ITEMS = [
@@ -54,10 +56,13 @@ const PLAN_BADGE: Record<string, { label: string; color: string }> = {
 };
 
 // ─── Componente ────────────────────────────────────────────────
-export function DashboardLayout({ children, subscription }: DashboardLayoutProps) {
+export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: DashboardLayoutProps) {
+
   const pathname = usePathname();
   const [lockedModule, setLockedModule] = useState<string | null>(null);
+  const [limitReached, setLimitReached] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const planBadge = PLAN_BADGE[subscription.plan] ?? PLAN_BADGE.FREE;
@@ -268,11 +273,18 @@ export function DashboardLayout({ children, subscription }: DashboardLayoutProps
               <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
             </button>
             <button
-              onClick={() => setDrawerOpen(true)}
+              onClick={() => {
+                if (subscription.plan === 'FREE' && sentThisMonth >= 10) {
+                  setLimitReached(true);
+                } else {
+                  setDrawerOpen(true);
+                }
+              }}
               className="bg-[#0b1521] hover:bg-[#152336] text-white font-bold py-2.5 px-6 rounded-full text-sm transition-all shadow-md flex items-center gap-2 group">
               <IconPlus className="w-4 h-4" />
               <span className="hidden sm:inline">Nova Cobrança</span>
             </button>
+
           </div>
         </header>
 
@@ -290,11 +302,20 @@ export function DashboardLayout({ children, subscription }: DashboardLayoutProps
         />
       )}
 
+      {limitReached && (
+        <UpgradeModal
+          moduleName="LIMIT_REACHED"
+          onClose={() => setLimitReached(false)}
+        />
+      )}
+
       <NewChargeDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         userName={subscription.userName}
+        planType={subscription.plan}
       />
+
     </div>
   );
 }

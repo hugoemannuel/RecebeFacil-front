@@ -76,7 +76,8 @@ export default async function Dashboard(props: any) {
   };
 
   return (
-    <DashboardLayout subscription={subscription}>
+    <DashboardLayout subscription={subscription} sentThisMonth={summary.sentThisMonth}>
+
       <div className="p-8 max-w-[1600px] mx-auto space-y-6">
 
         {targetDate && (
