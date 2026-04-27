@@ -9,13 +9,7 @@ export const metadata = {
   title: 'Cobranças | RecebeFácil',
 };
 
-// Mock de dados para a Fase 1
-const MOCK_CHARGES = [
-  { id: '1', debtorName: 'Carlos Silva', phone: '5511999999999', amount: 15000, dueDate: '2023-11-20', status: 'PENDING', automationEnabled: false },
-  { id: '2', debtorName: 'Mariana Souza', phone: '5511888888888', amount: 25000, dueDate: '2023-11-10', status: 'OVERDUE', automationEnabled: true },
-  { id: '3', debtorName: 'Roberto Alves', phone: '5511777777777', amount: 9900, dueDate: '2023-11-05', status: 'PAID', automationEnabled: false },
-  { id: '4', debtorName: 'Juliana Costa', phone: '5511666666666', amount: 45000, dueDate: '2023-11-25', status: 'PENDING', automationEnabled: false },
-];
+
 
 export default async function ChargesPage() {
   // Simulando contexto do servidor
@@ -26,18 +20,23 @@ export default async function ChargesPage() {
   if (!token) {
     redirect('/login');
   }
-  const userPlan: 'FREE' | 'STARTER' | 'PRO' | 'UNLIMITED' = 'FREE';
-  const usageCount = 8;
-  const usageLimit = 10;
 
   const authHeaders = { Authorization: `Bearer ${token}` };
-  const [metricsRes, subscriptionRes] = await Promise.allSettled([
+  const [metricsRes, subscriptionRes, chargesRes] = await Promise.allSettled([
     api.get('/dashboard/metrics', { headers: authHeaders }),
     api.get('/subscription/status', { headers: authHeaders }),
+    api.get('/charges', { headers: authHeaders }),
   ]);
   const metrics = metricsRes.status === 'fulfilled' ? metricsRes.value.data : null;
 
   const subscriptionData = subscriptionRes.status === 'fulfilled' ? subscriptionRes.value.data : null;
+  const chargesData = chargesRes.status === 'fulfilled' ? chargesRes.value.data : [];
+  
+  const limits: Record<string, number> = { FREE: 10, STARTER: 50, PRO: 200, UNLIMITED: 999999 };
+  const userPlan = subscriptionData?.plan ?? 'FREE';
+  const usageCount = metrics?.summary?.sentThisMonth || 0;
+  const usageLimit = limits[userPlan] || 10;
+
   const userName = metrics?.user?.name || 'Usuário';
 
   const subscription: SubscriptionStatus = {
@@ -51,7 +50,7 @@ export default async function ChargesPage() {
   return (
     <DashboardLayout subscription={subscription} >
       <ChargesClient
-        initialData={MOCK_CHARGES}
+        initialData={chargesData}
         plan={userPlan}
         usage={{ count: usageCount, limit: usageLimit }}
       />
