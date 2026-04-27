@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useForm, FormProvider, useFormContext } from 'react-hook-form';
+import { useForm, FormProvider, useFormContext, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
@@ -295,7 +295,7 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
 // ── Sub-componentes dos Steps ───────────────────────────────────────────────
 
 function StepDebtor() {
-  const { register, watch, setValue, formState: { errors } } = useFormContext<ChargeFormData>();
+  const { control, watch, setValue, formState: { errors } } = useFormContext<ChargeFormData>();
   const values = watch();
 
   return (
@@ -306,8 +306,17 @@ function StepDebtor() {
           <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider block mb-1.5">Nome</label>
           <div className="relative">
             <IconUser className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-            <input {...register('debtor_name')} placeholder="Ex: João Silva"
-              className="w-full pl-10 pr-4 py-3 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all" />
+            <Controller
+              name="debtor_name"
+              control={control}
+              render={({ field }) => (
+                <input
+                  {...field}
+                  placeholder="Ex: João Silva"
+                  className="w-full pl-10 pr-4 py-3 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all"
+                />
+              )}
+            />
           </div>
           {errors.debtor_name && <p className="text-red-500 text-xs mt-1">{errors.debtor_name.message}</p>}
         </div>
@@ -318,7 +327,7 @@ function StepDebtor() {
             <input
               placeholder="(11) 99999-9999"
               value={values.debtor_phone}
-              onChange={(e) => setValue('debtor_phone', maskPhone(e.target.value))}
+              onChange={(e) => setValue('debtor_phone', maskPhone(e.target.value), { shouldValidate: true })}
               className="w-full pl-10 pr-4 py-3 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all"
             />
           </div>
@@ -330,7 +339,7 @@ function StepDebtor() {
 }
 
 function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCalendar: boolean, setShowCalendar: (v: boolean) => void, planType: 'FREE' | 'STARTER' | 'PRO' | 'UNLIMITED' }) {
-  const { register, watch, setValue, formState: { errors } } = useFormContext<ChargeFormData>();
+  const { control, watch, setValue, formState: { errors } } = useFormContext<ChargeFormData>();
   const values = watch();
 
   const allowedRecurrences = {
@@ -351,7 +360,7 @@ function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCa
             <input
               placeholder="R$ 0,00"
               value={values.amount_display}
-              onChange={(e) => setValue('amount_display', maskMoney(e.target.value))}
+              onChange={(e) => setValue('amount_display', maskMoney(e.target.value), { shouldValidate: true })}
               className="w-full pl-10 pr-4 py-3 border border-zinc-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all"
             />
           </div>
@@ -361,13 +370,22 @@ function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCa
         <div>
           <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider block mb-1.5">Vencimento</label>
           <div className="relative">
-            <button type="button" onClick={() => setShowCalendar(!showCalendar)}
-              className="w-full flex items-center gap-3 pl-10 pr-4 py-3 border border-zinc-200 rounded-xl text-sm text-left focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all">
-              <IconCalendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-              <span className={values.due_date ? 'text-zinc-900 font-medium' : 'text-zinc-400'}>
-                {values.due_date ? format(values.due_date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : 'Selecionar data'}
-              </span>
-            </button>
+            <Controller
+              name="due_date"
+              control={control}
+              render={({ field }) => (
+                <button
+                  type="button"
+                  onClick={() => setShowCalendar(!showCalendar)}
+                  className="w-full flex items-center gap-3 pl-10 pr-4 py-3 border border-zinc-200 rounded-xl text-sm text-left focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all"
+                >
+                  <IconCalendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                  <span className={field.value ? 'text-zinc-900 font-medium' : 'text-zinc-400'}>
+                    {field.value ? format(field.value, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : 'Selecionar data'}
+                  </span>
+                </button>
+              )}
+            />
           </div>
           {showCalendar && (
             <div className="mt-2 border border-zinc-200 rounded-2xl overflow-hidden shadow-lg bg-white">
@@ -383,8 +401,18 @@ function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCa
 
         <div>
           <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider block mb-1.5">Descrição</label>
-          <textarea {...register('description')} rows={2} placeholder="Ex: Corte de cabelo — Abril/2026"
-            className="w-full px-4 py-3 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all resize-none" />
+          <Controller
+            name="description"
+            control={control}
+            render={({ field }) => (
+              <textarea
+                {...field}
+                rows={2}
+                placeholder="Ex: Corte de cabelo — Abril/2026"
+                className="w-full px-4 py-3 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all resize-none"
+              />
+            )}
+          />
           {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>}
         </div>
 
@@ -394,11 +422,11 @@ function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCa
             {(['ONCE', 'WEEKLY', 'MONTHLY', 'YEARLY'] as const).map((r) => {
               const labels = { ONCE: '1× Única', WEEKLY: 'Semanal', MONTHLY: 'Mensal', YEARLY: 'Anual' };
               const isAllowed = allowedRecurrences.includes(r);
-              
+
               return (
-                <button 
-                  key={r} 
-                  type="button" 
+                <button
+                  key={r}
+                  type="button"
                   onClick={() => {
                     if (isAllowed) setValue('recurrence', r);
                     else toast.error(`O plano ${planType} não permite recorrência ${labels[r]}. Faça upgrade!`);
@@ -418,7 +446,7 @@ function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCa
 }
 
 function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: boolean, textareaRef: React.RefObject<HTMLTextAreaElement | null>, insertVariable: (v: string) => void }) {
-  const { register, watch, setValue, formState: { errors } } = useFormContext<ChargeFormData>();
+  const { control, watch, setValue, formState: { errors } } = useFormContext<ChargeFormData>();
   const values = watch();
 
   return (
@@ -428,7 +456,8 @@ function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: bo
         {/* Template selector */}
         <div>
           <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider block mb-1.5">Template base</label>
-          <select onChange={(e) => setValue('custom_message', e.target.value)}
+          <select onChange={(e) => setValue('custom_message', e.target.value, { shouldValidate: true })}
+            value={values.custom_message}
             className="w-full px-4 py-2.5 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all bg-white">
             {TEMPLATE_OPTIONS.map((t) => <option key={t.label} value={t.value}>{t.label}</option>)}
           </select>
@@ -460,15 +489,22 @@ function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: bo
               ))}
             </div>
           </div>
-          <textarea 
-            {...register('custom_message')} 
-            ref={(e) => {
-              register('custom_message').ref(e);
-              // @ts-ignore
-              textareaRef.current = e;
-            }}
-            rows={9}
-            className="w-full px-4 py-3 border border-zinc-200 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all resize-none leading-relaxed" />
+          <Controller
+            name="custom_message"
+            control={control}
+            render={({ field }) => (
+              <textarea
+                {...field}
+                ref={(e) => {
+                  field.ref(e);
+                  // @ts-ignore
+                  textareaRef.current = e;
+                }}
+                rows={9}
+                className="w-full px-4 py-3 border border-zinc-200 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all resize-none leading-relaxed"
+              />
+            )}
+          />
           {errors.custom_message && <p className="text-red-500 text-xs mt-1">{errors.custom_message.message}</p>}
         </div>
 
@@ -498,19 +534,34 @@ function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: bo
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-1">
                   <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Tipo</label>
-                  <select {...register('pix_key_type')} className="w-full px-3 py-2 border border-zinc-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500/50">
-                    <option value="CPF">CPF</option>
-                    <option value="CNPJ">CNPJ</option>
-                    <option value="PHONE">Celular</option>
-                    <option value="EMAIL">E-mail</option>
-                    <option value="EVP">Aleatória</option>
-                  </select>
+                  <Controller
+                    name="pix_key_type"
+                    control={control}
+                    render={({ field }) => (
+                      <select {...field} className="w-full px-3 py-2 border border-zinc-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500/50">
+                        <option value="CPF">CPF</option>
+                        <option value="CNPJ">CNPJ</option>
+                        <option value="PHONE">Celular</option>
+                        <option value="EMAIL">E-mail</option>
+                        <option value="EVP">Aleatória</option>
+                      </select>
+                    )}
+                  />
                   {errors.pix_key_type && <p className="text-red-500 text-[10px] mt-1">{errors.pix_key_type.message}</p>}
                 </div>
                 <div className="col-span-2">
                   <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Chave PIX</label>
-                  <input {...register('pix_key')} placeholder="Ex: 123.456.789-00"
-                    className="w-full px-3 py-2 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50" />
+                  <Controller
+                    name="pix_key"
+                    control={control}
+                    render={({ field }) => (
+                      <input
+                        {...field}
+                        placeholder="Ex: 123.456.789-00"
+                        className="w-full px-3 py-2 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                      />
+                    )}
+                  />
                   {errors.pix_key && <p className="text-red-500 text-[10px] mt-1">{errors.pix_key.message}</p>}
                 </div>
               </div>
