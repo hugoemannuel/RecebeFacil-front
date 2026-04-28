@@ -1,4 +1,4 @@
-import { DashboardLayout, SubscriptionStatus } from '@/components/layout/DashboardLayout';
+import { DashboardLayout, SubscriptionStatus } from '@/components/layout/DashboardLayout/DashboardLayout';
 import { ChargesClient } from './ChargesClient';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -31,7 +31,7 @@ export default async function ChargesPage() {
 
   const subscriptionData = subscriptionRes.status === 'fulfilled' ? subscriptionRes.value.data : null;
   const chargesData = chargesRes.status === 'fulfilled' ? chargesRes.value.data : [];
-  
+
   const limits: Record<string, number> = { FREE: 10, STARTER: 50, PRO: 200, UNLIMITED: 999999 };
   const userPlan = subscriptionData?.plan ?? 'FREE';
   const usageCount = metrics?.summary?.sentThisMonth || 0;

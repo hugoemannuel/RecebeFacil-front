@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { api } from '@/services/api';
-import { DashboardLayout, SubscriptionStatus } from '@/components/layout/DashboardLayout';
+import { DashboardLayout, SubscriptionStatus } from '@/components/layout/DashboardLayout/DashboardLayout';
 import { ConfiguracoesClient } from './ConfiguracoesClient';
 
 export default async function ConfiguracoesPage() {

@@ -7,8 +7,8 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useTheme } from '@/components/layout/ThemeContext';
-import { ThemeToggle } from '@/components/layout/ThemeToggle';
+import { useTheme } from '@/context/ThemeContext';
+import { ThemeToggle } from '@/components/layout/ThemeToggle/ThemeToggle';
 import {
   IconUser, IconMail, IconPhone, IconCamera, IconShieldCheck,
   IconCreditCard, IconTrash, IconEye, IconEyeOff, IconCheck,
@@ -156,11 +156,10 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
           <button
             key={id}
             onClick={() => setTab(id)}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold transition-all ${
-              tab === id
-                ? 'bg-white dark:bg-[#1a2d42] text-zinc-800 dark:text-zinc-100 shadow-sm'
-                : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
-            }`}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold transition-all ${tab === id
+              ? 'bg-white dark:bg-[#1a2d42] text-zinc-800 dark:text-zinc-100 shadow-sm'
+              : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+              }`}
           >
             <Icon className="w-4 h-4" />
             <span className="hidden sm:inline">{label}</span>

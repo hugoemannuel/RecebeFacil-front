@@ -21,42 +21,11 @@ import {
 import { logoutAction } from '@/app/actions/auth';
 import { UpgradeModal } from '@/components/ui/UpgradeModal';
 import { NewChargeDrawer } from '@/components/forms/NewChargeDrawer';
-import { ThemeToggle } from '@/components/layout/ThemeToggle';
-
-// ─── Tipos ──────────────────────────────────────────────────────
-export interface SubscriptionStatus {
-  plan: 'FREE' | 'STARTER' | 'PRO' | 'UNLIMITED';
-  status: 'ACTIVE' | 'CANCELED' | 'PAST_DUE' | 'NONE';
-  allowed_modules: string[];
-  current_period_end: string | null;
-  userName?: string;
-}
-
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-  subscription: SubscriptionStatus;
-  sentThisMonth?: number;
-}
+import { ThemeToggle } from '@/components/layout/ThemeToggle/ThemeToggle';
+import { DashboardLayoutProps } from './interface';
+import { MENU_ITEMS, PLAN_BADGE } from './mock';
 
 
-// ─── Configuração dos itens do menu ────────────────────────────
-const MENU_ITEMS = [
-  { name: 'INÍCIO',         path: '/dashboard',                  icon: IconLayoutGrid, module: 'HOME'         },
-  { name: 'COBRANÇAS',      path: '/dashboard/cobrancas',        icon: IconDollarSign, module: 'CHARGES'      },
-  { name: 'CLIENTES',       path: '/dashboard/clientes',         icon: IconUsers,      module: 'CLIENTS'      },
-  { name: 'RELATÓRIOS',     path: '/dashboard/relatorios',       icon: IconFileText,   module: 'REPORTS'      },
-  { name: 'CONFIGURAÇÕES',  path: '/dashboard/configuracoes',    icon: IconSettings,   module: 'HOME'         },
-];
-
-// Badge visual de plano
-const PLAN_BADGE: Record<string, { label: string; color: string }> = {
-  FREE:      { label: 'Plano Free',      color: 'text-zinc-500'  },
-  STARTER:   { label: 'Plano Starter',   color: 'text-blue-500'  },
-  PRO:       { label: 'Plano Pro',       color: 'text-green-600' },
-  UNLIMITED: { label: 'Plano Unlimited', color: 'text-purple-600'},
-};
-
-// ─── Componente ────────────────────────────────────────────────
 export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: DashboardLayoutProps) {
 
   const pathname = usePathname();
@@ -113,11 +82,10 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
               <Link
                 key={item.path}
                 href={item.path}
-                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-sm transition-all ${
-                  isActive
-                    ? 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400'
-                    : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-zinc-100'
-                }`}
+                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-sm transition-all ${isActive
+                  ? 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400'
+                  : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-zinc-100'
+                  }`}
               >
                 <Icon className={`w-5 h-5 ${isActive ? 'text-green-600 dark:text-green-400' : 'text-zinc-400 dark:text-zinc-500'}`} />
                 {item.name}
@@ -165,12 +133,12 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
 
       {/* ── Mobile Sidebar Overlay ─────────────────────────── */}
       {mobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
-      
+
       {/* ── Mobile Sidebar ─────────────────────────────────── */}
       <aside className={`fixed inset-y-0 left-0 w-[280px] bg-white dark:bg-[#152336] border-r border-zinc-200 dark:border-white/5 flex flex-col h-screen shrink-0 z-50 md:hidden transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         {/* Logo & Close */}
@@ -214,11 +182,10 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
                 key={item.path}
                 href={item.path}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-sm transition-all ${
-                  isActive
-                    ? 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400'
-                    : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-zinc-100'
-                }`}
+                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-sm transition-all ${isActive
+                  ? 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400'
+                  : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-zinc-100'
+                  }`}
               >
                 <Icon className={`w-5 h-5 ${isActive ? 'text-green-600 dark:text-green-400' : 'text-zinc-400 dark:text-zinc-500'}`} />
                 {item.name}

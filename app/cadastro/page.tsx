@@ -21,7 +21,7 @@ import {
   IconArrowLeft,
   IconArrowRight
 } from '@/components/ui/Icons';
-import { AuthLayout } from '@/components/layout/AuthLayout';
+import { AuthLayout } from '@/components/layout/AuthLayout/AuthLayout';
 
 const registerSchema = z.object({
   name: z.string().min(3, 'O nome deve ter no mínimo 3 caracteres'),

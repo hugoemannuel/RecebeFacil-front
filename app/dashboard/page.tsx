@@ -1,4 +1,4 @@
-import { DashboardLayout, SubscriptionStatus } from '@/components/layout/DashboardLayout';
+import { DashboardLayout, SubscriptionStatus } from '@/components/layout/DashboardLayout/DashboardLayout';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -8,11 +8,6 @@ import {
   IconAlertTriangle,
   IconSend,
   IconZap,
-  IconMoreVertical,
-  IconFilter,
-  IconCheckCircle,
-  IconAlertCircle,
-  IconClock
 } from '@/components/ui/Icons';
 import { PeriodSelect } from '@/components/dashboard/PeriodSelect';
 import { RecentActivityClient } from '@/components/dashboard/RecentActivityClient';

@@ -1,6 +1,6 @@
 "use client";
 
-import { useTheme } from "./ThemeContext";
+import { useTheme } from "../../../context/ThemeContext";
 import { IconSun, IconMoon } from "@/components/ui/Icons";
 
 export function ThemeToggle() {

@@ -53,7 +53,7 @@ export const metadata: Metadata = {
   },
 };
 
-import { ThemeProvider } from "@/components/layout/ThemeContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 export default function RootLayout({
   children,

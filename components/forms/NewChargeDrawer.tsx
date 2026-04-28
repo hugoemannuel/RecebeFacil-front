@@ -19,6 +19,12 @@ import {
   IconX, IconUser, IconPhone, IconDollarSign, IconCalendar,
   IconRepeat, IconSparkles, IconSend, IconChevronRight,
 } from '@/components/ui/Icons';
+import { FormField } from './FormField/FormField';
+import { RHFTextarea } from './rhf/RHFTextarea';
+import { RHFInput } from './rhf/RHFInput';
+import { DatePickerField } from '../patterns/DatePickerField/DatePickerField';
+import { Select } from '../ui/Select/Select';
+import { Chip } from '../ui/Chip';
 
 const DEFAULT_TEMPLATE = `Olá *{{nome}}*! 👋
 
@@ -60,10 +66,10 @@ const baseSchema = z.object({
 export type ChargeFormData = z.infer<typeof baseSchema>;
 
 // ── Component ────────────────────────────────────────────────────────────────
-interface Props { 
-  open: boolean; 
-  onClose: () => void; 
-  userName?: string; 
+interface Props {
+  open: boolean;
+  onClose: () => void;
+  userName?: string;
   hasPixKey?: boolean;
   planType?: 'FREE' | 'STARTER' | 'PRO' | 'UNLIMITED';
   onSuccess?: () => void;
@@ -207,60 +213,60 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
           <FormProvider {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-hidden flex">
 
-            {/* ── Step content + preview ── */}
-            <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+              {/* ── Step content + preview ── */}
+              <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
 
-              {/* Steps */}
-              <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
+                {/* Steps */}
+                <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
 
-                {/* STEP 0 — Devedor */}
-                {step === 0 && <StepDebtor />}
+                  {/* STEP 0 — Devedor */}
+                  {step === 0 && <StepDebtor />}
 
-                {/* STEP 1 — Cobrança */}
-                {step === 1 && (
-                  <StepChargeDetails 
-                    showCalendar={showCalendar} 
-                    setShowCalendar={setShowCalendar} 
-                    planType={planType}
-                  />
-                )}
+                  {/* STEP 1 — Cobrança */}
+                  {step === 1 && (
+                    <StepChargeDetails
+                      showCalendar={showCalendar}
+                      setShowCalendar={setShowCalendar}
+                      planType={planType}
+                    />
+                  )}
 
-                {/* STEP 2 — Mensagem WhatsApp */}
+                  {/* STEP 2 — Mensagem WhatsApp */}
+                  {step === 2 && (
+                    <StepMessage
+                      hasPixKey={hasPixKey}
+                      textareaRef={textareaRef}
+                      insertVariable={insertVariable}
+                    />
+                  )}
+
+                  {/* STEP 3 — Confirmar */}
+                  {step === 3 && <StepConfirm hasPixKey={hasPixKey} />}
+                </div>
+
+                {/* Preview WhatsApp — só no step 2 */}
                 {step === 2 && (
-                  <StepMessage 
-                    hasPixKey={hasPixKey} 
-                    textareaRef={textareaRef} 
-                    insertVariable={insertVariable} 
-                  />
-                )}
-
-                {/* STEP 3 — Confirmar */}
-                {step === 3 && <StepConfirm hasPixKey={hasPixKey} />}
-              </div>
-
-              {/* Preview WhatsApp — só no step 2 */}
-              {step === 2 && (
-                <div className="w-full md:w-[380px] border-t md:border-t-0 md:border-l border-zinc-100 dark:border-white/[0.07] flex flex-col bg-zinc-50 dark:bg-[#0b1521] shrink-0">
-                  <div className="px-5 py-4 border-b border-zinc-100 dark:border-white/[0.07]">
-                    <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <IconSparkles className="w-3.5 h-3.5 text-green-500" /> Preview ao vivo
-                    </p>
-                  </div>
-                  <div className="flex-1 p-4 overflow-hidden">
-                    <div className="h-full rounded-2xl overflow-hidden shadow-md">
-                      <WhatsAppPreview
-                        senderName={userName}
-                        message={previewMessage}
-                        showQrCode={false}
-                        showPixButton={values.send_pix_button}
-                        amount={values.amount_display}
-                      />
+                  <div className="w-full md:w-[380px] border-t md:border-t-0 md:border-l border-zinc-100 dark:border-white/[0.07] flex flex-col bg-zinc-50 dark:bg-[#0b1521] shrink-0">
+                    <div className="px-5 py-4 border-b border-zinc-100 dark:border-white/[0.07]">
+                      <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <IconSparkles className="w-3.5 h-3.5 text-green-500" /> Preview ao vivo
+                      </p>
+                    </div>
+                    <div className="flex-1 p-4 overflow-hidden">
+                      <div className="h-full rounded-2xl overflow-hidden shadow-md">
+                        <WhatsAppPreview
+                          senderName={userName}
+                          message={previewMessage}
+                          showQrCode={false}
+                          showPixButton={values.send_pix_button}
+                          amount={values.amount_display}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
-          </form>
+                )}
+              </div>
+            </form>
           </FormProvider>
 
           {/* Footer */}
@@ -304,37 +310,21 @@ function StepDebtor() {
     <>
       <p className="text-sm text-zinc-500">Quem vai receber a cobrança?</p>
       <div className="space-y-4">
-        <div>
-          <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider block mb-1.5">Nome</label>
-          <div className="relative">
-            <IconUser className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-            <Controller
-              name="debtor_name"
-              control={control}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  placeholder="Ex: João Silva"
-                  className="w-full pl-10 pr-4 py-3 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 dark:focus:border-green-500/40 transition-all"
-                />
-              )}
-            />
-          </div>
-          {errors.debtor_name && <p className="text-red-500 text-xs mt-1">{errors.debtor_name.message}</p>}
-        </div>
-        <div>
-          <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider block mb-1.5">WhatsApp</label>
-          <div className="relative">
-            <IconPhone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-            <input
-              placeholder="(11) 99999-9999"
-              value={values.debtor_phone}
-              onChange={(e) => setValue('debtor_phone', maskPhone(e.target.value), { shouldValidate: true })}
-              className="w-full pl-10 pr-4 py-3 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 dark:focus:border-green-500/40 transition-all"
-            />
-          </div>
-          {errors.debtor_phone && <p className="text-red-500 text-xs mt-1">{errors.debtor_phone.message}</p>}
-        </div>
+        <RHFInput
+          name="debtor_name"
+          control={control}
+          label="Nome"
+          placeholder="Ex: João Silva"
+          icon={<IconUser />}
+        />
+        <RHFInput
+          name="debtor_phone"
+          control={control}
+          label="WhatsApp"
+          placeholder="(11) 99999-9999"
+          icon={<IconPhone />}
+          mask={maskPhone}
+        />
       </div>
     </>
   );
@@ -355,68 +345,34 @@ function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCa
     <>
       <p className="text-sm text-zinc-500">Detalhes da cobrança</p>
       <div className="space-y-4">
-        <div>
-          <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider block mb-1.5">Valor</label>
-          <div className="relative">
-            <IconDollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-            <input
-              placeholder="R$ 0,00"
-              value={values.amount_display}
-              onChange={(e) => setValue('amount_display', maskMoney(e.target.value), { shouldValidate: true })}
-              className="w-full pl-10 pr-4 py-3 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 dark:focus:border-green-500/40 transition-all"
-            />
-          </div>
-          {errors.amount_display && <p className="text-red-500 text-xs mt-1">{errors.amount_display.message}</p>}
-        </div>
+        <RHFInput
+          name="amount_display"
+          control={control}
+          label="Valor"
+          placeholder="R$ 0,00"
+          icon={<IconDollarSign />}
+          mask={maskMoney}
+        />
 
-        <div>
-          <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider block mb-1.5">Vencimento</label>
-          <div className="relative">
-            <Controller
-              name="due_date"
-              control={control}
-              render={({ field }) => (
-                <button
-                  type="button"
-                  onClick={() => setShowCalendar(!showCalendar)}
-                  className="w-full flex items-center gap-3 pl-10 pr-4 py-3 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-xl text-sm text-left focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 dark:focus:border-green-500/40 transition-all"
-                >
-                  <IconCalendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                  <span className={field.value ? 'text-zinc-900 font-medium' : 'text-zinc-400'}>
-                    {field.value ? format(field.value, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : 'Selecionar data'}
-                  </span>
-                </button>
-              )}
-            />
-          </div>
-          {showCalendar && (
-            <div className="mt-2 border border-zinc-200 dark:border-white/[0.07] rounded-2xl overflow-hidden shadow-lg bg-white dark:bg-[#152336]">
-              <DayPicker mode="single" locale={ptBR} selected={values.due_date}
-                disabled={{ before: new Date() }}
-                onSelect={(d) => { if (d) { setValue('due_date', d); setShowCalendar(false); } }}
-                classNames={{ today: 'text-green-600 font-bold', selected: 'bg-green-500 text-white rounded-lg' }}
-              />
-            </div>
-          )}
-          {errors.due_date && <p className="text-red-500 text-xs mt-1">{errors.due_date.message}</p>}
-        </div>
+        <DatePickerField
+          name="due_date"
+          control={control}
+          label="Vencimento"
+          icon={<IconCalendar />}
+          disabled={{ before: new Date() }}
+        />
 
-        <div>
-          <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider block mb-1.5">Descrição</label>
-          <Controller
+        <FormField
+          label="Descrição"
+          error={errors.description?.message}
+        >
+          <RHFTextarea
             name="description"
             control={control}
-            render={({ field }) => (
-              <textarea
-                {...field}
-                rows={2}
-                placeholder="Ex: Corte de cabelo — Abril/2026"
-                className="w-full px-4 py-3 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 transition-all resize-none"
-              />
-            )}
+            rows={2}
+            placeholder="Ex: Corte de cabelo — Abril/2026"
           />
-          {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>}
-        </div>
+        </FormField>
 
         <div>
           <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider block mb-1.5">Recorrência</label>
@@ -455,25 +411,30 @@ function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: bo
     <>
       <p className="text-sm text-zinc-500">Personalize a mensagem que será enviada</p>
       <div className="space-y-4">
-        {/* Template selector */}
-        <div>
-          <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider block mb-1.5">Template base</label>
-          <select onChange={(e) => setValue('custom_message', e.target.value, { shouldValidate: true })}
-            value={values.custom_message}
-            className="w-full px-4 py-2.5 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 transition-all">
-            {TEMPLATE_OPTIONS.map((t) => <option key={t.label} value={t.value}>{t.label}</option>)}
-          </select>
-        </div>
+        <Select
+          label="Template base"
+          value={values.custom_message}
+          onChange={(value) =>
+            setValue("custom_message", value, {
+              shouldValidate: true,
+            })
+          }
+          options={TEMPLATE_OPTIONS}
+        />
 
         {/* Chips de variáveis */}
         <div>
-          <p className="text-xs text-zinc-400 mb-2">Clique para inserir no cursor:</p>
+          <p className="text-xs text-zinc-400 mb-2">
+            Clique para inserir no cursor:
+          </p>
+
           <div className="flex flex-wrap gap-1.5">
             {VARIABLES.map((v) => (
-              <button key={v} type="button" onClick={() => insertVariable(v)}
-                className="text-[11px] font-mono bg-green-50 text-green-700 border border-green-200 px-2 py-1 rounded-lg hover:bg-green-100 transition-colors">
-                {v}
-              </button>
+              <Chip
+                key={v}
+                label={v}
+                onClick={() => insertVariable(v)}
+              />
             ))}
           </div>
         </div>
@@ -551,6 +512,7 @@ function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: bo
                   />
                   {errors.pix_key_type && <p className="text-red-500 text-[10px] mt-1">{errors.pix_key_type.message}</p>}
                 </div>
+
                 <div className="col-span-2">
                   <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Chave PIX</label>
                   <Controller
