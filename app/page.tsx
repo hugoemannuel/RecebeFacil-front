@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { DemoButton } from "@/components/landing/DemoButton";
 
 export default function Home() {
   return (
@@ -48,9 +48,7 @@ export default function Home() {
           <Link href="/cadastro" className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl md:rounded-full font-bold text-lg transition-transform hover:scale-105 shadow-xl shadow-green-500/20 text-center flex items-center justify-center">
             Começar grátis
           </Link>
-          <button className="w-full sm:w-auto bg-white hover:bg-zinc-50 border border-zinc-200 text-zinc-900 px-8 py-4 rounded-xl md:rounded-full font-bold text-lg flex items-center justify-center gap-2 transition-colors shadow-sm">
-            <IconPlayCircle className="w-5 h-5 text-zinc-700" /> Ver demonstração
-          </button>
+          <DemoButton />
         </div>
 
         <div className="mt-12 w-full max-w-4xl rounded-xl md:rounded-2xl shadow-2xl overflow-hidden border border-zinc-200/60 bg-slate-900 p-2 md:p-4">
@@ -324,9 +322,6 @@ export default function Home() {
 }
 
 
-function IconPlayCircle({ className }: { className?: string }) {
-  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polygon points="10 8 16 12 10 16 10 8" /></svg>;
-}
 function IconBuilding({ className }: { className?: string }) {
   return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2" /><path d="M9 22v-4h6v4" /><path d="M8 6h.01" /><path d="M16 6h.01" /><path d="M12 6h.01" /><path d="M12 10h.01" /><path d="M12 14h.01" /><path d="M16 10h.01" /><path d="M16 14h.01" /><path d="M8 10h.01" /><path d="M8 14h.01" /></svg>;
 }
