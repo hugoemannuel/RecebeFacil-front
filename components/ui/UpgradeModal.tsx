@@ -32,27 +32,27 @@ export function UpgradeModal({ moduleName, onClose }: UpgradeModalProps) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative"
+        className="bg-white dark:bg-[#152336] rounded-3xl p-8 max-w-md w-full shadow-2xl relative border border-transparent dark:border-white/[0.07]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-zinc-400 hover:text-zinc-700 transition-colors text-xl font-bold w-8 h-8 flex items-center justify-center rounded-lg hover:bg-zinc-100"
+          className="absolute top-5 right-5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors text-xl font-bold w-8 h-8 flex items-center justify-center rounded-lg hover:bg-zinc-100 dark:hover:bg-white/5"
         >
           ✕
         </button>
 
         {/* Icon */}
-        <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mb-6">
+        <div className="w-14 h-14 bg-amber-50 dark:bg-amber-500/10 rounded-2xl flex items-center justify-center mb-6">
           <IconLock className="w-7 h-7 text-amber-500" />
         </div>
 
-        <h2 className="text-2xl font-extrabold text-zinc-900 tracking-tight mb-2">
+        <h2 className="text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight mb-2">
           Módulo bloqueado
         </h2>
-        <p className="text-zinc-500 mb-6 leading-relaxed">
-          <span className="font-bold text-zinc-800">{info.label}</span> está disponível a partir do plano{' '}
+        <p className="text-zinc-500 dark:text-zinc-400 mb-6 leading-relaxed">
+          <span className="font-bold text-zinc-800 dark:text-zinc-200">{info.label}</span> está disponível a partir do plano{' '}
           <span className="font-bold text-green-600">{info.requiredPlan}</span>. Faça upgrade e desbloqueie mais poder para seu negócio.
         </p>
 
@@ -66,7 +66,7 @@ export function UpgradeModal({ moduleName, onClose }: UpgradeModalProps) {
           </Link>
           <button
             onClick={onClose}
-            className="w-full text-zinc-500 hover:text-zinc-700 font-medium py-2 text-sm transition-colors"
+            className="w-full text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 font-medium py-2 text-sm transition-colors"
           >
             Continuar no plano atual
           </button>

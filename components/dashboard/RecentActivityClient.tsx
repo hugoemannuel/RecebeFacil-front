@@ -17,24 +17,24 @@ export function RecentActivityClient({ recentActivity }: Props) {
     <>
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="bg-slate-50/50">
-            <th className="py-4 px-8 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-zinc-100">Cliente</th>
-            <th className="py-4 px-8 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-zinc-100">Valor</th>
-            <th className="py-4 px-8 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-zinc-100">Vencimento</th>
-            <th className="py-4 px-8 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-zinc-100">Status</th>
-            <th className="py-4 px-8 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-zinc-100 text-right">Ações</th>
+          <tr className="bg-zinc-100/50 dark:bg-white/[0.02]">
+            <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/[0.06]">Cliente</th>
+            <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/[0.06]">Valor</th>
+            <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/[0.06]">Vencimento</th>
+            <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/[0.06]">Status</th>
+            <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/[0.06] text-right">Ações</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-zinc-100 text-sm">
+        <tbody className="divide-y divide-zinc-100 dark:divide-white/[0.05] text-sm">
           {recentActivity.length === 0 ? (
             <tr>
               <td colSpan={5} className="py-16 text-center">
                 <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
-                  <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mb-4">
-                    <IconSend className="w-8 h-8 text-zinc-300" />
+                  <div className="w-16 h-16 bg-zinc-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
+                    <IconSend className="w-8 h-8 text-zinc-300 dark:text-zinc-600" />
                   </div>
-                  <h3 className="text-lg font-bold text-zinc-900 mb-1">Nenhuma atividade recente</h3>
-                  <p className="text-sm text-zinc-500 mb-6">Você ainda não tem cobranças movimentadas no período selecionado.</p>
+                  <h3 className="text-lg font-bold text-zinc-700 dark:text-zinc-200 mb-1">Nenhuma atividade recente</h3>
+                  <p className="text-sm text-zinc-400 dark:text-zinc-500 mb-6">Você ainda não tem cobranças movimentadas no período selecionado.</p>
                   <Link href="/dashboard/cobrancas?new=true" className="px-4 py-2 bg-green-50 text-green-700 hover:bg-green-100 font-bold text-sm rounded-lg transition-colors">
                     Nova Cobrança
                   </Link>
@@ -50,24 +50,24 @@ export function RecentActivityClient({ recentActivity }: Props) {
               return (
                 <tr 
                   key={activity.id} 
-                  className="hover:bg-slate-50/50 transition-colors cursor-pointer"
+                  className="hover:bg-zinc-100/60 dark:hover:bg-white/[0.03] transition-colors cursor-pointer"
                   onClick={() => setDetailsChargeId(activity.id)}
                 >
                   <td className="py-5 px-8">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs">
+                      <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-white/10 flex items-center justify-center text-zinc-500 dark:text-zinc-400 font-bold text-xs">
                         {activity.debtorName.substring(0, 2).toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-bold text-zinc-900">{activity.debtorName}</p>
-                        <p className="text-[11px] text-zinc-400">{activity.debtorEmail}</p>
+                        <p className="font-bold text-zinc-700 dark:text-zinc-200">{activity.debtorName}</p>
+                        <p className="text-[11px] text-zinc-400 dark:text-zinc-500">{activity.debtorEmail}</p>
                       </div>
                     </div>
                   </td>
                   <td className="py-5 px-8">
-                    <span className="font-bold text-zinc-900 text-base">{formatMoney(activity.amount)}</span>
+                    <span className="font-bold text-zinc-700 dark:text-zinc-200 text-base">{formatMoney(activity.amount)}</span>
                   </td>
-                  <td className="py-5 px-8 text-slate-500">
+                  <td className="py-5 px-8 text-zinc-400 dark:text-zinc-500">
                     {new Date(activity.dueDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </td>
                   <td className="py-5 px-8">
@@ -97,7 +97,7 @@ export function RecentActivityClient({ recentActivity }: Props) {
                         Cobrar
                       </Link>
                     )}
-                    <button className="p-2 text-zinc-400 hover:text-zinc-600 transition-colors">
+                    <button className="p-2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">
                       <IconMoreVertical className="w-5 h-5" />
                     </button>
                   </td>

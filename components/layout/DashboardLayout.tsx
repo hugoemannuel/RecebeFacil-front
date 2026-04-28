@@ -21,6 +21,7 @@ import {
 import { logoutAction } from '@/app/actions/auth';
 import { UpgradeModal } from '@/components/ui/UpgradeModal';
 import { NewChargeDrawer } from '@/components/forms/NewChargeDrawer';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 
 // ─── Tipos ──────────────────────────────────────────────────────
 export interface SubscriptionStatus {
@@ -69,10 +70,10 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
   const userName = subscription.userName ?? 'Usuário';
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-zinc-900 font-sans flex overflow-hidden selection:bg-green-200">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0b1521] text-zinc-900 dark:text-zinc-50 font-sans flex overflow-hidden selection:bg-green-200 transition-colors duration-300">
 
       {/* ── Sidebar ────────────────────────────────────────── */}
-      <aside className="w-[280px] bg-white border-r border-zinc-200 flex flex-col h-screen shrink-0 hidden md:flex">
+      <aside className="w-[280px] bg-white dark:bg-[#152336] border-r border-zinc-200 dark:border-white/5 flex flex-col h-screen shrink-0 hidden md:flex transition-colors duration-300">
 
         {/* Logo */}
         <div className="p-8 pb-10">
@@ -80,7 +81,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
             <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center shadow-md shadow-green-500/20 group-hover:scale-110 transition-transform">
               <IconMessageCircle className="w-5 h-5 text-white" />
             </div>
-            <div className="font-extrabold text-2xl tracking-tight text-zinc-900">
+            <div className="font-extrabold text-2xl tracking-tight text-zinc-900 dark:text-zinc-50">
               Recebe<span className="text-green-500">Fácil</span>
             </div>
           </Link>
@@ -114,11 +115,11 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
                 href={item.path}
                 className={`flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-sm transition-all ${
                   isActive
-                    ? 'bg-green-100 text-green-700'
-                    : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900'
+                    ? 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400'
+                    : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-zinc-100'
                 }`}
               >
-                <Icon className={`w-5 h-5 ${isActive ? 'text-green-600' : 'text-zinc-400'}`} />
+                <Icon className={`w-5 h-5 ${isActive ? 'text-green-600 dark:text-green-400' : 'text-zinc-400 dark:text-zinc-500'}`} />
                 {item.name}
               </Link>
             );
@@ -140,12 +141,12 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
         )}
 
         {/* User Profile & Logout */}
-        <div className="p-4 border-t border-zinc-100 m-4 mt-0 rounded-2xl bg-[#f8fafc] flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center font-bold text-green-700 text-sm shrink-0">
+        <div className="p-4 border-t border-zinc-100 dark:border-white/5 m-4 mt-0 rounded-2xl bg-[#f8fafc] dark:bg-[#0b1521] flex items-center gap-3 transition-colors duration-300">
+          <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center font-bold text-green-700 dark:text-green-400 text-sm shrink-0">
             {userName.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-zinc-900 truncate">{userName}</p>
+            <p className="text-sm font-bold text-zinc-900 dark:text-zinc-50 truncate">{userName}</p>
             <p className={`text-[10px] uppercase font-bold tracking-wider truncate ${planBadge.color}`}>
               {planBadge.label}
             </p>
@@ -153,7 +154,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
           <form action={logoutAction}>
             <button
               type="submit"
-              className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+              className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
               title="Sair da conta"
             >
               <IconLogOut className="w-5 h-5" />
@@ -171,7 +172,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
       )}
       
       {/* ── Mobile Sidebar ─────────────────────────────────── */}
-      <aside className={`fixed inset-y-0 left-0 w-[280px] bg-white border-r border-zinc-200 flex flex-col h-screen shrink-0 z-50 md:hidden transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`fixed inset-y-0 left-0 w-[280px] bg-white dark:bg-[#152336] border-r border-zinc-200 dark:border-white/5 flex flex-col h-screen shrink-0 z-50 md:hidden transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         {/* Logo & Close */}
         <div className="p-6 pb-6 flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
@@ -215,11 +216,11 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-sm transition-all ${
                   isActive
-                    ? 'bg-green-100 text-green-700'
-                    : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900'
+                    ? 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400'
+                    : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-zinc-100'
                 }`}
               >
-                <Icon className={`w-5 h-5 ${isActive ? 'text-green-600' : 'text-zinc-400'}`} />
+                <Icon className={`w-5 h-5 ${isActive ? 'text-green-600 dark:text-green-400' : 'text-zinc-400 dark:text-zinc-500'}`} />
                 {item.name}
               </Link>
             );
@@ -227,7 +228,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
         </nav>
 
         {/* User Profile & Logout */}
-        <div className="p-4 border-t border-zinc-100 mt-auto bg-[#f8fafc] flex items-center gap-3">
+        <div className="p-4 border-t border-zinc-100 dark:border-white/5 mt-auto bg-[#f8fafc] dark:bg-[#0b1521] flex items-center gap-3 transition-colors duration-300">
           <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center font-bold text-green-700 text-sm shrink-0">
             {userName.charAt(0).toUpperCase()}
           </div>
@@ -249,11 +250,11 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
 
         {/* Top Header */}
-        <header className="h-20 bg-white border-b border-zinc-200/60 flex items-center justify-between px-4 sm:px-8 shrink-0 z-10 sticky top-0">
+        <header className="h-20 bg-white dark:bg-[#152336] border-b border-zinc-200/60 dark:border-white/5 flex items-center justify-between px-4 sm:px-8 shrink-0 z-10 sticky top-0 transition-colors duration-300">
           <div className="flex items-center gap-3 w-full max-w-md">
-            <button 
+            <button
               onClick={() => setMobileMenuOpen(true)}
-              className="md:hidden p-2 -ml-2 text-zinc-500 hover:text-zinc-900 rounded-lg hover:bg-zinc-50"
+              className="md:hidden p-2 -ml-2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 rounded-lg hover:bg-zinc-50 dark:hover:bg-white/5"
             >
               <IconMenu className="w-6 h-6" />
             </button>
@@ -262,15 +263,16 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
               <input
                 type="text"
                 placeholder="Buscar cobranças ou clientes..."
-                className="w-full bg-[#f4f7fb] border-none rounded-full pl-11 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:bg-white transition-all text-zinc-700 font-medium placeholder:font-normal placeholder:text-zinc-400"
+                className="w-full bg-[#f4f7fb] dark:bg-[#0b1521] border-none rounded-full pl-11 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:bg-white dark:focus:bg-[#0b1521] transition-all text-zinc-700 dark:text-zinc-200 font-medium placeholder:font-normal placeholder:text-zinc-400"
               />
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
-            <button className="relative text-zinc-400 hover:text-zinc-600 transition-colors p-2">
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <button className="relative text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors p-2">
               <IconBell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-[#152336]"></span>
             </button>
             <button
               onClick={() => {
@@ -280,16 +282,15 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
                   setDrawerOpen(true);
                 }
               }}
-              className="bg-[#0b1521] hover:bg-[#152336] text-white font-bold py-2.5 px-6 rounded-full text-sm transition-all shadow-md flex items-center gap-2 group">
+              className="bg-[#0b1521] dark:bg-green-500 hover:bg-[#152336] dark:hover:bg-green-600 text-white font-bold py-2.5 px-6 rounded-full text-sm transition-all shadow-md flex items-center gap-2">
               <IconPlus className="w-4 h-4" />
               <span className="hidden sm:inline">Nova Cobrança</span>
             </button>
-
           </div>
         </header>
 
         {/* Scrollable Area */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto bg-[#f8fafc] dark:bg-[#0b1521] transition-colors duration-300">
           {children}
         </main>
       </div>

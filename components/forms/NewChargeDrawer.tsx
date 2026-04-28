@@ -180,15 +180,15 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
       <div className={`fixed top-0 right-0 h-full z-50 flex transition-transform duration-300 ease-out ${open ? 'translate-x-0' : 'translate-x-full'}`}
         style={{ width: '100%', maxWidth: step === 2 ? '900px' : '480px' }}>
 
-        <div className="flex-1 bg-white flex flex-col shadow-2xl overflow-hidden">
+        <div className="flex-1 bg-[#f8fafc] dark:bg-[#152336] flex flex-col shadow-2xl overflow-hidden transition-colors duration-300">
 
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-100 shrink-0">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-200/80 dark:border-white/[0.07] shrink-0">
             <div>
-              <h2 className="text-lg font-extrabold text-zinc-900 tracking-tight">Nova Cobrança</h2>
-              <p className="text-xs text-zinc-400 mt-0.5">Etapa {step + 1} de {STEPS.length}</p>
+              <h2 className="text-lg font-extrabold text-zinc-800 dark:text-zinc-100 tracking-tight">Nova Cobrança</h2>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">Etapa {step + 1} de {STEPS.length}</p>
             </div>
-            <button onClick={handleClose} className="p-2 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 rounded-lg transition-colors">
+            <button onClick={handleClose} className="p-2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg transition-colors">
               <IconX className="w-5 h-5" />
             </button>
           </div>
@@ -197,8 +197,8 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
           <div className="flex gap-1 px-6 pt-4 shrink-0">
             {STEPS.map((s, i) => (
               <div key={s} className="flex-1 flex flex-col items-center gap-1">
-                <div className={`h-1.5 w-full rounded-full transition-all duration-300 ${i <= step ? 'bg-green-500' : 'bg-zinc-100'}`} />
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${i === step ? 'text-green-600' : 'text-zinc-300'}`}>{s}</span>
+                <div className={`h-1.5 w-full rounded-full transition-all duration-300 ${i <= step ? 'bg-green-500' : 'bg-zinc-200 dark:bg-white/10'}`} />
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${i === step ? 'text-green-600 dark:text-green-400' : 'text-zinc-300 dark:text-zinc-600'}`}>{s}</span>
               </div>
             ))}
           </div>
@@ -240,9 +240,9 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
 
               {/* Preview WhatsApp — só no step 2 */}
               {step === 2 && (
-                <div className="w-full md:w-[380px] border-t md:border-t-0 md:border-l border-zinc-100 flex flex-col bg-zinc-50 shrink-0">
-                  <div className="px-5 py-4 border-b border-zinc-100">
-                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
+                <div className="w-full md:w-[380px] border-t md:border-t-0 md:border-l border-zinc-100 dark:border-white/[0.07] flex flex-col bg-zinc-50 dark:bg-[#0b1521] shrink-0">
+                  <div className="px-5 py-4 border-b border-zinc-100 dark:border-white/[0.07]">
+                    <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
                       <IconSparkles className="w-3.5 h-3.5 text-green-500" /> Preview ao vivo
                     </p>
                   </div>
@@ -264,10 +264,10 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
           </FormProvider>
 
           {/* Footer */}
-          <div className="px-6 py-5 border-t border-zinc-100 flex gap-3 shrink-0">
+          <div className="px-6 py-5 border-t border-zinc-100 dark:border-white/[0.07] flex gap-3 shrink-0">
             {step > 0 && (
               <button type="button" onClick={() => setStep((s) => s - 1)}
-                className="flex-1 border border-zinc-200 text-zinc-600 font-bold py-3 rounded-xl hover:bg-zinc-50 transition-colors text-sm">
+                className="flex-1 border border-zinc-200 dark:border-white/[0.08] text-zinc-600 dark:text-zinc-300 font-bold py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors text-sm">
                 Voltar
               </button>
             )}
@@ -315,7 +315,7 @@ function StepDebtor() {
                 <input
                   {...field}
                   placeholder="Ex: João Silva"
-                  className="w-full pl-10 pr-4 py-3 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all"
+                  className="w-full pl-10 pr-4 py-3 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 dark:focus:border-green-500/40 transition-all"
                 />
               )}
             />
@@ -330,7 +330,7 @@ function StepDebtor() {
               placeholder="(11) 99999-9999"
               value={values.debtor_phone}
               onChange={(e) => setValue('debtor_phone', maskPhone(e.target.value), { shouldValidate: true })}
-              className="w-full pl-10 pr-4 py-3 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all"
+              className="w-full pl-10 pr-4 py-3 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 dark:focus:border-green-500/40 transition-all"
             />
           </div>
           {errors.debtor_phone && <p className="text-red-500 text-xs mt-1">{errors.debtor_phone.message}</p>}
@@ -363,7 +363,7 @@ function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCa
               placeholder="R$ 0,00"
               value={values.amount_display}
               onChange={(e) => setValue('amount_display', maskMoney(e.target.value), { shouldValidate: true })}
-              className="w-full pl-10 pr-4 py-3 border border-zinc-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all"
+              className="w-full pl-10 pr-4 py-3 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 dark:focus:border-green-500/40 transition-all"
             />
           </div>
           {errors.amount_display && <p className="text-red-500 text-xs mt-1">{errors.amount_display.message}</p>}
@@ -379,7 +379,7 @@ function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCa
                 <button
                   type="button"
                   onClick={() => setShowCalendar(!showCalendar)}
-                  className="w-full flex items-center gap-3 pl-10 pr-4 py-3 border border-zinc-200 rounded-xl text-sm text-left focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all"
+                  className="w-full flex items-center gap-3 pl-10 pr-4 py-3 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-xl text-sm text-left focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 dark:focus:border-green-500/40 transition-all"
                 >
                   <IconCalendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                   <span className={field.value ? 'text-zinc-900 font-medium' : 'text-zinc-400'}>
@@ -390,7 +390,7 @@ function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCa
             />
           </div>
           {showCalendar && (
-            <div className="mt-2 border border-zinc-200 rounded-2xl overflow-hidden shadow-lg bg-white">
+            <div className="mt-2 border border-zinc-200 dark:border-white/[0.07] rounded-2xl overflow-hidden shadow-lg bg-white dark:bg-[#152336]">
               <DayPicker mode="single" locale={ptBR} selected={values.due_date}
                 disabled={{ before: new Date() }}
                 onSelect={(d) => { if (d) { setValue('due_date', d); setShowCalendar(false); } }}
@@ -411,7 +411,7 @@ function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCa
                 {...field}
                 rows={2}
                 placeholder="Ex: Corte de cabelo — Abril/2026"
-                className="w-full px-4 py-3 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all resize-none"
+                className="w-full px-4 py-3 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 transition-all resize-none"
               />
             )}
           />
@@ -460,7 +460,7 @@ function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: bo
           <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider block mb-1.5">Template base</label>
           <select onChange={(e) => setValue('custom_message', e.target.value, { shouldValidate: true })}
             value={values.custom_message}
-            className="w-full px-4 py-2.5 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all bg-white">
+            className="w-full px-4 py-2.5 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 transition-all">
             {TEMPLATE_OPTIONS.map((t) => <option key={t.label} value={t.value}>{t.label}</option>)}
           </select>
         </div>
@@ -503,7 +503,7 @@ function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: bo
                   textareaRef.current = e;
                 }}
                 rows={9}
-                className="w-full px-4 py-3 border border-zinc-200 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-all resize-none leading-relaxed"
+                className="w-full px-4 py-3 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 dark:focus:border-green-500/40 transition-all resize-none leading-relaxed"
               />
             )}
           />
@@ -513,7 +513,7 @@ function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: bo
         {/* Toggles PIX Simples */}
         <div className="space-y-3 pt-2">
           <button type="button" onClick={() => setValue('send_pix_button', !values.send_pix_button)}
-            className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all text-left ${values.send_pix_button ? 'bg-green-50 border-green-300' : 'border-zinc-200 bg-white hover:border-zinc-300'}`}>
+            className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all text-left ${values.send_pix_button ? 'bg-green-50 dark:bg-green-500/10 border-green-300 dark:border-green-500/30' : 'border-zinc-200 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] hover:border-zinc-300 dark:hover:border-white/[0.12]'}`}>
             <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${values.send_pix_button ? 'bg-green-100' : 'bg-zinc-100'}`}>
               <IconDollarSign className={`w-4 h-4 ${values.send_pix_button ? 'text-green-600' : 'text-zinc-400'}`} />
             </div>
@@ -528,10 +528,10 @@ function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: bo
 
           {/* Campos de PIX Inline (se não tiver configurado globalmente) */}
           {values.send_pix_button && !hasPixKey && (
-            <div className="bg-zinc-50 border border-zinc-200 p-4 rounded-xl space-y-3 animate-in fade-in slide-in-from-top-2">
+            <div className="bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/[0.07] p-4 rounded-xl space-y-3 animate-in fade-in slide-in-from-top-2">
               <div className="flex items-start gap-2 mb-2">
                 <IconSparkles className="w-4 h-4 text-zinc-400 mt-0.5 shrink-0" />
-                <p className="text-xs text-zinc-600">Como você não possui uma chave salva, insira abaixo para onde o dinheiro deve ir nesta cobrança:</p>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">Como você não possui uma chave salva, insira abaixo para onde o dinheiro deve ir nesta cobrança:</p>
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-1">
@@ -540,7 +540,7 @@ function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: bo
                     name="pix_key_type"
                     control={control}
                     render={({ field }) => (
-                      <select {...field} className="w-full px-3 py-2 border border-zinc-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500/50">
+                      <select {...field} className="w-full px-3 py-2 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30">
                         <option value="CPF">CPF</option>
                         <option value="CNPJ">CNPJ</option>
                         <option value="PHONE">Celular</option>
@@ -560,7 +560,7 @@ function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: bo
                       <input
                         {...field}
                         placeholder="Ex: 123.456.789-00"
-                        className="w-full px-3 py-2 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                        className="w-full px-3 py-2 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30"
                       />
                     )}
                   />
@@ -582,7 +582,7 @@ function StepConfirm({ hasPixKey }: { hasPixKey: boolean }) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-zinc-500">Revise e confirme o envio</p>
-      <div className="bg-zinc-50 rounded-2xl p-5 space-y-3">
+      <div className="bg-zinc-50 dark:bg-white/5 rounded-2xl p-5 space-y-3 border border-transparent dark:border-white/[0.06]">
         {[
           { label: 'Para', value: `${values.debtor_name} • ${values.debtor_phone}` },
           { label: 'Valor', value: values.amount_display },
@@ -591,14 +591,14 @@ function StepConfirm({ hasPixKey }: { hasPixKey: boolean }) {
           { label: 'Recorrência', value: { ONCE: 'Única', WEEKLY: 'Semanal', MONTHLY: 'Mensal', YEARLY: 'Anual' }[values.recurrence as string] || values.recurrence },
         ].map(({ label, value }) => (
           <div key={label} className="flex items-start justify-between gap-4">
-            <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider shrink-0 pt-0.5">{label}</span>
-            <span className="text-sm font-semibold text-zinc-800 text-right">{value}</span>
+            <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider shrink-0 pt-0.5">{label}</span>
+            <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 text-right">{value}</span>
           </div>
         ))}
         {values.send_pix_button && !hasPixKey && values.pix_key && (
-          <div className="flex items-start justify-between gap-4 border-t border-zinc-200 pt-3 mt-1">
-            <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider shrink-0 pt-0.5">Pagamento para</span>
-            <span className="text-sm font-semibold text-zinc-800 text-right">{values.pix_key_type}: {values.pix_key}</span>
+          <div className="flex items-start justify-between gap-4 border-t border-zinc-200 dark:border-white/[0.07] pt-3 mt-1">
+            <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider shrink-0 pt-0.5">Pagamento para</span>
+            <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 text-right">{values.pix_key_type}: {values.pix_key}</span>
           </div>
         )}
       </div>

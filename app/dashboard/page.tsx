@@ -97,7 +97,7 @@ export default async function Dashboard(props: any) {
           </div>
         )}
 
-        <div className="bg-[#0b1521] rounded-[2rem] p-8 lg:p-10 text-white relative overflow-hidden shadow-xl shadow-slate-200/50">
+        <div className="bg-[#0b1521] rounded-[2rem] p-8 lg:p-10 text-white relative overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-black/20">
           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-green-500/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
 
           <div className="inline-block bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-6">
@@ -116,23 +116,23 @@ export default async function Dashboard(props: any) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
 
-          <div className="bg-white p-6 rounded-3xl border border-zinc-100 shadow-sm flex flex-col justify-between h-40">
+          <div className="bg-[#f8fafc] dark:bg-[#152336] p-6 rounded-3xl border border-zinc-100 dark:border-white/[0.07] shadow-sm flex flex-col justify-between h-40">
             <div className="flex justify-between items-start">
               <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
                 <IconWallet className="w-5 h-5" />
               </div>
-              <span className={`text-xs font-bold px-2 py-1 rounded-lg ${summary.pendingVariation?.startsWith('+') ? 'bg-green-50 text-green-700' : 'bg-slate-50 text-slate-700'}`}>
+              <span className={`text-xs font-bold px-2 py-1 rounded-lg ${summary.pendingVariation?.startsWith('+') ? 'bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-400'}`}>
                 {summary.pendingVariation || '0%'} hoje
               </span>
             </div>
             <div>
-              <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Total a Receber</p>
-              <p className="text-2xl font-bold text-zinc-900 tracking-tight">{formatMoney(summary.totalPending)}</p>
+              <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Total a Receber</p>
+              <p className="text-2xl font-bold text-zinc-700 dark:text-zinc-100 tracking-tight">{formatMoney(summary.totalPending)}</p>
             </div>
           </div>
 
 
-          <div className="bg-white p-6 rounded-3xl border border-zinc-100 shadow-sm flex flex-col justify-between h-40 relative overflow-hidden">
+          <div className="bg-[#f8fafc] dark:bg-[#152336] p-6 rounded-3xl border border-zinc-100 dark:border-white/[0.07] shadow-sm flex flex-col justify-between h-40 relative overflow-hidden">
             <div className="absolute left-0 top-6 bottom-6 w-1 bg-red-500 rounded-r-full"></div>
             <div className="flex justify-between items-start pl-2">
               <div className="w-10 h-10 bg-red-50 text-red-500 rounded-xl flex items-center justify-center">
@@ -141,25 +141,25 @@ export default async function Dashboard(props: any) {
               <span className="bg-red-50 text-red-600 text-xs font-bold px-2 py-1 rounded-lg">Alerta</span>
             </div>
             <div className="pl-2">
-              <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Atrasados</p>
+              <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Atrasados</p>
               <p className="text-2xl font-bold text-red-500 tracking-tight">{formatMoney(summary.totalOverdue)}</p>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl border border-zinc-100 shadow-sm flex flex-col justify-between h-40">
+          <div className="bg-[#f8fafc] dark:bg-[#152336] p-6 rounded-3xl border border-zinc-100 dark:border-white/[0.07] shadow-sm flex flex-col justify-between h-40">
             <div className="flex justify-between items-start">
               <div className="w-10 h-10 bg-slate-100 text-slate-500 rounded-xl flex items-center justify-center">
                 <IconSend className="w-5 h-5" />
               </div>
             </div>
             <div>
-              <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Cobranças Enviadas</p>
-              <p className="text-2xl font-bold text-zinc-900 tracking-tight">{summary.sentThisMonth} <span className="text-sm font-medium text-zinc-400">este mês</span></p>
+              <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Cobranças Enviadas</p>
+              <p className="text-2xl font-bold text-zinc-700 dark:text-zinc-100 tracking-tight">{summary.sentThisMonth} <span className="text-sm font-medium text-zinc-400 dark:text-zinc-500">este mês</span></p>
             </div>
           </div>
 
 
-          <div className="bg-white p-6 rounded-3xl border border-zinc-100 shadow-sm flex flex-col justify-between h-40">
+          <div className="bg-[#f8fafc] dark:bg-[#152336] p-6 rounded-3xl border border-zinc-100 dark:border-white/[0.07] shadow-sm flex flex-col justify-between h-40">
             <div className="flex justify-between items-start">
               <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
                 <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" /></svg>
@@ -167,8 +167,8 @@ export default async function Dashboard(props: any) {
               <span className="bg-green-50 text-green-700 text-xs font-bold px-2 py-1 rounded-lg">Alta</span>
             </div>
             <div>
-              <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Conversão WhatsApp</p>
-              <p className="text-2xl font-bold text-zinc-900 tracking-tight">{summary.conversionRate}%</p>
+              <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Conversão WhatsApp</p>
+              <p className="text-2xl font-bold text-zinc-700 dark:text-zinc-100 tracking-tight">{summary.conversionRate}%</p>
             </div>
           </div>
 
@@ -179,11 +179,11 @@ export default async function Dashboard(props: any) {
 
           <div className="lg:col-span-2 space-y-6">
 
-            <div className="bg-white p-8 rounded-3xl border border-zinc-100 shadow-sm">
+            <div className="bg-[#f8fafc] dark:bg-[#152336] p-8 rounded-3xl border border-zinc-100 dark:border-white/[0.07] shadow-sm">
               <div className="flex justify-between items-start mb-8">
                 <div>
-                  <h3 className="text-xl font-bold text-zinc-900 mb-1">Recebimentos por Dia</h3>
-                  <p className="text-sm text-zinc-500">Acompanhamento de fluxo de caixa em tempo real</p>
+                  <h3 className="text-xl font-bold text-zinc-700 dark:text-zinc-100 mb-1">Recebimentos por Dia</h3>
+                  <p className="text-sm text-zinc-400 dark:text-zinc-500">Acompanhamento de fluxo de caixa em tempo real</p>
                 </div>
                 <PeriodSelect />
               </div>
@@ -196,11 +196,11 @@ export default async function Dashboard(props: any) {
                     <Link
                       href={d.isToday ? `/dashboard?period=${period}` : `/dashboard?targetDate=${d.date}&period=${period}`}
                       key={i}
-                      className={`w-full transition-colors rounded-t-lg relative group flex items-end justify-center pb-2 cursor-pointer ${isSelected ? 'bg-green-500 hover:bg-green-400' : 'bg-green-100 hover:bg-green-200'}`}
+                      className={`w-full transition-colors rounded-t-lg relative group flex items-end justify-center pb-2 cursor-pointer ${isSelected ? 'bg-green-500 hover:bg-green-400' : 'bg-green-100 dark:bg-green-500/15 hover:bg-green-200 dark:hover:bg-green-500/25'}`}
                       style={{ height: `${d.heightPercentage}%` }}
                       title={`${d.count || 0} cobrança(s)\n${formatMoney(d.amount)}`}
                     >
-                      <span className={`absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold ${isSelected ? 'text-green-600' : 'text-slate-400'}`}>
+                      <span className={`absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold ${isSelected ? 'text-green-600 dark:text-green-400' : 'text-slate-400 dark:text-slate-500'}`}>
                         {d.label}
                       </span>
                     </Link>
@@ -229,12 +229,12 @@ export default async function Dashboard(props: any) {
             </div>
 
             {/* Top Clientes */}
-            <div className="bg-white p-8 rounded-3xl border border-zinc-100 shadow-sm">
-              <h3 className="text-sm font-bold text-zinc-500 uppercase tracking-widest mb-6">Top Clientes</h3>
+            <div className="bg-[#f8fafc] dark:bg-[#152336] p-8 rounded-3xl border border-zinc-100 dark:border-white/[0.07] shadow-sm">
+              <h3 className="text-sm font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-6">Top Clientes</h3>
 
               <div className="space-y-5">
                 {topClients.length === 0 ? (
-                  <p className="text-sm text-zinc-400">Nenhum cliente com pendências.</p>
+                  <p className="text-sm text-zinc-400 dark:text-zinc-500">Nenhum cliente com pendências.</p>
                 ) : (
                   topClients.map((client: any, i: number) => (
                     <div key={client.id} className="flex items-center justify-between">
@@ -242,9 +242,9 @@ export default async function Dashboard(props: any) {
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs ${i % 2 === 0 ? 'bg-[#c9e038] text-[#4d5c0b]' : 'bg-[#d6e4ff] text-[#1b3d8c]'}`}>
                           {client.initials}
                         </div>
-                        <span className="font-medium text-sm text-zinc-900">{client.name}</span>
+                        <span className="font-medium text-sm text-zinc-700 dark:text-zinc-200">{client.name}</span>
                       </div>
-                      <span className="font-bold text-sm text-zinc-900">{formatMoney(client.totalAmount)}</span>
+                      <span className="font-bold text-sm text-zinc-700 dark:text-zinc-200">{formatMoney(client.totalAmount)}</span>
                     </div>
                   ))
                 )}
@@ -255,23 +255,23 @@ export default async function Dashboard(props: any) {
         </div>
 
         {/* Atividade Recente Table */}
-        <div className="bg-white rounded-3xl border border-zinc-100 shadow-sm overflow-hidden">
-          <div className="p-8 border-b border-zinc-100 flex items-center justify-between">
+        <div className="bg-[#f8fafc] dark:bg-[#152336] rounded-3xl border border-zinc-100 dark:border-white/[0.07] shadow-sm overflow-hidden">
+          <div className="p-8 border-b border-zinc-100 dark:border-white/[0.06] flex items-center justify-between">
             <div>
-              <h3 className="text-xl font-bold text-zinc-900 mb-1">Atividade Recente</h3>
-              <p className="text-sm text-zinc-500">Gestão detalhada de entradas e pendências</p>
+              <h3 className="text-xl font-bold text-zinc-700 dark:text-zinc-100 mb-1">Atividade Recente</h3>
+              <p className="text-sm text-zinc-400 dark:text-zinc-500">Gestão detalhada de entradas e pendências</p>
             </div>
             <div className="flex gap-2">
-              <Link href={`/dashboard?period=${period}`} className={`py-2 px-3 rounded-xl text-xs font-bold transition-colors ${!status ? 'bg-zinc-800 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
+              <Link href={`/dashboard?period=${period}`} className={`py-2 px-3 rounded-xl text-xs font-bold transition-colors ${!status ? 'bg-zinc-800 dark:bg-green-500/20 text-white dark:text-green-400' : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10'}`}>
                 Todos
               </Link>
-              <Link href={`/dashboard?period=${period}&status=PENDING`} className={`py-2 px-3 rounded-xl text-xs font-bold transition-colors ${status === 'PENDING' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
+              <Link href={`/dashboard?period=${period}&status=PENDING`} className={`py-2 px-3 rounded-xl text-xs font-bold transition-colors ${status === 'PENDING' ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-400' : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10'}`}>
                 Pendente
               </Link>
-              <Link href={`/dashboard?period=${period}&status=OVERDUE`} className={`py-2 px-3 rounded-xl text-xs font-bold transition-colors ${status === 'OVERDUE' ? 'bg-red-100 text-red-800' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
+              <Link href={`/dashboard?period=${period}&status=OVERDUE`} className={`py-2 px-3 rounded-xl text-xs font-bold transition-colors ${status === 'OVERDUE' ? 'bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-400' : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10'}`}>
                 Atrasado
               </Link>
-              <Link href={`/dashboard?period=${period}&status=PAID`} className={`py-2 px-3 rounded-xl text-xs font-bold transition-colors ${status === 'PAID' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
+              <Link href={`/dashboard?period=${period}&status=PAID`} className={`py-2 px-3 rounded-xl text-xs font-bold transition-colors ${status === 'PAID' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-400' : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10'}`}>
                 Pago
               </Link>
             </div>

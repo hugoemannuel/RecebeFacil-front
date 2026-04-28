@@ -1,24 +1,48 @@
 @import "tailwindcss";
 
+/* Tailwind v4: usar classe .dark no <html> em vez de prefers-color-scheme */
+@variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background:   #edf1f7;   /* azul-cinza suave — fundo geral menos agressivo */
+  --foreground:   #1e293b;
+  /* superfícies */
+  --surface:      #f8fafc;   /* cards: off-white, não branco puro */
+  --surface-soft: #f1f5fb;   /* inputs */
+  --border:       #dde3ed;
+  --text-primary: #1e293b;
+  --text-muted:   #64748b;
+  --placeholder:  #94a3b8;
 }
 
 .dark {
-  --background: #0b1521;
-  --foreground: #f8fafc;
+  --background:   #0b1521;
+  --foreground:   #dde4ed;
+  /* superfícies dark - escalonadas para dar profundidade */
+  --surface:      #152336;   /* cards */
+  --surface-soft: #0f1c2b;   /* inputs dentro dos cards */
+  --border:       rgba(255,255,255,0.08);
+  --text-primary: #dde4ed;
+  --text-muted:   #7a90a8;
+  --placeholder:  #4e6480;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background:   var(--background);
+  --color-foreground:   var(--foreground);
+  --color-surface:      var(--surface);
+  --color-surface-soft: var(--surface-soft);
   --color-surface-dark: #152336;
 }
-
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Placeholder global — visível em ambos os modos */
+::placeholder {
+  color: var(--placeholder);
+  opacity: 1;
 }
