@@ -193,9 +193,9 @@ export default async function Dashboard(props: any) {
                 {chartData.map((d: any, i: number) => {
                   const isSelected = targetDate ? d.date === targetDate : d.isToday;
                   return (
-                    <Link 
+                    <Link
                       href={d.isToday ? `/dashboard?period=${period}` : `/dashboard?targetDate=${d.date}&period=${period}`}
-                      key={i} 
+                      key={i}
                       className={`w-full transition-colors rounded-t-lg relative group flex items-end justify-center pb-2 cursor-pointer ${isSelected ? 'bg-green-500 hover:bg-green-400' : 'bg-green-100 hover:bg-green-200'}`}
                       style={{ height: `${d.heightPercentage}%` }}
                       title={`${d.count || 0} cobrança(s)\n${formatMoney(d.amount)}`}
