@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useForm, FormProvider, useFormContext, Controller } from 'react-hook-form';
+import { useForm, FormProvider, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
@@ -19,9 +19,9 @@ import {
   IconX, IconUser, IconPhone, IconDollarSign, IconCalendar,
   IconRepeat, IconSparkles, IconSend, IconChevronRight,
 } from '@/components/ui/Icons';
-import { FormField } from './FormField/FormField';
 import { RHFTextarea } from './rhf/RHFTextarea';
 import { RHFInput } from './rhf/RHFInput';
+import { RHFSelect } from './rhf/RHFSelect';
 import { DatePickerField } from '../patterns/DatePickerField/DatePickerField';
 import { Select } from '../ui/Select/Select';
 import { Chip } from '../ui/Chip';
@@ -362,17 +362,13 @@ function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCa
           disabled={{ before: new Date() }}
         />
 
-        <FormField
+        <RHFTextarea
+          name="description"
+          control={control}
           label="Descrição"
-          error={errors.description?.message}
-        >
-          <RHFTextarea
-            name="description"
-            control={control}
-            rows={2}
-            placeholder="Ex: Corte de cabelo — Abril/2026"
-          />
-        </FormField>
+          rows={2}
+          placeholder="Ex: Corte de cabelo — Abril/2026"
+        />
 
         <div>
           <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider block mb-1.5">Recorrência</label>
@@ -452,23 +448,12 @@ function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: bo
               ))}
             </div>
           </div>
-          <Controller
+          <RHFTextarea
             name="custom_message"
             control={control}
-            render={({ field }) => (
-              <textarea
-                {...field}
-                ref={(e) => {
-                  field.ref(e);
-                  // @ts-ignore
-                  textareaRef.current = e;
-                }}
-                rows={9}
-                className="w-full px-4 py-3 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 dark:focus:border-green-500/40 transition-all resize-none leading-relaxed"
-              />
-            )}
+            inputRef={textareaRef}
+            rows={9}
           />
-          {errors.custom_message && <p className="text-red-500 text-xs mt-1">{errors.custom_message.message}</p>}
         </div>
 
         {/* Toggles PIX Simples */}
@@ -496,37 +481,27 @@ function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: bo
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-1">
-                  <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Tipo</label>
-                  <Controller
+                  <RHFSelect
                     name="pix_key_type"
                     control={control}
-                    render={({ field }) => (
-                      <select {...field} className="w-full px-3 py-2 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30">
-                        <option value="CPF">CPF</option>
-                        <option value="CNPJ">CNPJ</option>
-                        <option value="PHONE">Celular</option>
-                        <option value="EMAIL">E-mail</option>
-                        <option value="EVP">Aleatória</option>
-                      </select>
-                    )}
+                    label="Tipo"
+                    options={[
+                      { label: 'CPF', value: 'CPF' },
+                      { label: 'CNPJ', value: 'CNPJ' },
+                      { label: 'Celular', value: 'PHONE' },
+                      { label: 'E-mail', value: 'EMAIL' },
+                      { label: 'Aleatória', value: 'EVP' },
+                    ]}
                   />
-                  {errors.pix_key_type && <p className="text-red-500 text-[10px] mt-1">{errors.pix_key_type.message}</p>}
                 </div>
 
                 <div className="col-span-2">
-                  <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Chave PIX</label>
-                  <Controller
+                  <RHFInput
                     name="pix_key"
                     control={control}
-                    render={({ field }) => (
-                      <input
-                        {...field}
-                        placeholder="Ex: 123.456.789-00"
-                        className="w-full px-3 py-2 border border-zinc-200/80 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] text-zinc-700 dark:text-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30"
-                      />
-                    )}
+                    label="Chave PIX"
+                    placeholder="Ex: 123.456.789-00"
                   />
-                  {errors.pix_key && <p className="text-red-500 text-[10px] mt-1">{errors.pix_key.message}</p>}
                 </div>
               </div>
             </div>

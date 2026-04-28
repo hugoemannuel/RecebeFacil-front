@@ -17,9 +17,23 @@ app/
   page.tsx          ← Landing Page (Server Component, sem 'use client')
 
 components/
-  ui/               ← Atômicos, sem negócio (Icons.tsx, UpgradeModal.tsx, WhatsAppPreview.tsx)
+  ui/
+    Icons.tsx            ← Todos os SVGs como React components — nunca instalar lib de ícones
+    UpgradeModal.tsx     ← Modal de upgrade de plano
+    WhatsAppPreview.tsx
+    Checkbox/index.tsx   ← Checkbox genérico: checked, onChange, indeterminate, size="sm"|"md"
+    ConfirmModal.tsx     ← Modal de confirmação destrutiva genérico
+    Input/Input.tsx      ← Base input: variant="default"|"auth", icon, rightSlot, label, error
+    Textarea/Textarea.tsx
+    Select/Select.tsx
   layout/           ← Cascas de página (DashboardLayout.tsx, AuthLayout.tsx, ThemeContext.tsx)
-  forms/            ← Formulários com RHF + Zod (NewChargeDrawer.tsx)
+  forms/
+    NewChargeDrawer.tsx  ← Formulário multi-step 4 passos
+    rhf/
+      RHFInput.tsx        ← Controller-wrapped Input (genérico tipado). Props: name, control, label, icon, mask, variant
+      RHFPasswordInput.tsx ← Senha com show/hide embutido. Props: name, control, label, placeholder, variant
+      RHFTextarea.tsx     ← Controller-wrapped Textarea. Props: name, control, label, rows, inputRef
+      RHFSelect.tsx       ← Controller-wrapped Select. Props: name, control, label, options
   dashboard/        ← Específicos do dashboard (ChargeDetailsDrawer.tsx, PeriodSelect.tsx)
 
 services/
@@ -102,3 +116,6 @@ api.interceptors.request.use((config) => {
 - Nunca JWT em `localStorage` — sempre cookie HttpOnly via Server Action
 - Nunca CSS global solto — 100% Tailwind utilitário
 - Nunca instalar lib de ícones externa
+- Nunca `<input>/<textarea>/<select>` raw fora de `components/ui/` — usar wrappers RHF ou componentes UI
+- Nunca `register()` em páginas — usar `control` + wrapper RHF
+- Nunca importar `react-hot-toast` — usar `sonner`

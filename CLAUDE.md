@@ -65,8 +65,22 @@ interface SubscriptionStatus {
 ```
 components/
   layout/     # DashboardLayout, AuthLayout, ThemeContext, ThemeToggle
-  ui/         # Icons (all SVGs as React components), UpgradeModal, WhatsAppPreview
-  forms/      # NewChargeDrawer (4-step multi-step form)
+  ui/
+    Icons.tsx           # All SVGs as React components — do not add icon libraries
+    UpgradeModal.tsx    # Plan upgrade modal
+    WhatsAppPreview.tsx
+    Checkbox/index.tsx  # Generic checkbox (tables, auth forms). Props: checked, onChange, indeterminate, size
+    ConfirmModal.tsx    # Generic destructive confirmation modal
+    Input/Input.tsx     # Base input. variant="default"|"auth", icon, rightSlot, label, error
+    Textarea/Textarea.tsx
+    Select/Select.tsx
+  forms/
+    NewChargeDrawer.tsx  # 4-step multi-step form
+    rhf/
+      RHFInput.tsx        # Controller-wrapped Input (fully typed generic)
+      RHFPasswordInput.tsx # Password input with built-in show/hide toggle
+      RHFTextarea.tsx     # Controller-wrapped Textarea. Supports inputRef for cursor control
+      RHFSelect.tsx       # Controller-wrapped Select
   dashboard/  # RecentActivityClient, ChargeDetailsDrawer, PeriodSelect
 ```
 
@@ -74,7 +88,18 @@ Pages are thin server components that fetch with `Promise.allSettled()` and pass
 
 ### Forms
 
-All forms use **React Hook Form + Zod** (`@hookform/resolvers/zod`). Input masks (money, phone) are implemented as pure `onChange` handlers in `lib/formatters.ts` — no mask library. Key formatters: `maskMoney`, `parseMoney`, `maskPhone`, `formatDate`, `interpolateTemplate` (for WhatsApp variable substitution like `{{nome}}`).
+All forms use **React Hook Form + Zod** (`@hookform/resolvers/zod`). Every controlled field uses a dedicated RHF wrapper — never use `register()` or raw `<input>/<textarea>/<select>` outside `components/ui/`.
+
+| Component | When to use |
+|---|---|
+| `RHFInput` | Text, email, tel, number. Supports `icon`, `mask`, `variant` |
+| `RHFPasswordInput` | Password with built-in show/hide toggle |
+| `RHFTextarea` | Long text. Supports `inputRef` for cursor control |
+| `RHFSelect` | RHF-controlled select with validation |
+| `DatePickerField` | Date selection with DayPicker |
+| `Checkbox` | Checkbox UI for tables and non-RHF toggles |
+
+For UI inputs without a form (search bars, filters), use `Input` or `Select` directly. Auth pages use `variant="auth"` on RHF fields for the light-mode style. Input masks (money, phone) pass through `mask` prop on `RHFInput` using formatters from `lib/formatters.ts` — no mask library. Key formatters: `maskMoney`, `parseMoney`, `maskPhone`, `formatDate`, `interpolateTemplate` (for WhatsApp variable substitution like `{{nome}}`). Toast: `sonner` only — `react-hot-toast` has been removed.
 
 ### Styling
 

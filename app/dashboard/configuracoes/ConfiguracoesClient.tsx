@@ -11,7 +11,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { ThemeToggle } from '@/components/layout/ThemeToggle/ThemeToggle';
 import {
   IconUser, IconMail, IconPhone, IconCamera, IconShieldCheck,
-  IconCreditCard, IconTrash, IconEye, IconEyeOff, IconCheck,
+  IconCreditCard, IconTrash, IconCheck,
   IconAlertOctagon, IconSun, IconMoon,
 } from '@/components/ui/Icons';
 import {
@@ -20,6 +20,10 @@ import {
   updatePasswordAction,
   deleteAccountAction,
 } from '@/app/actions/profile';
+import { RHFInput } from '@/components/forms/rhf/RHFInput';
+import { RHFPasswordInput } from '@/components/forms/rhf/RHFPasswordInput';
+import { Input } from '@/components/ui/Input/Input';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 
 // ─── Tipos ────────────────────────────────────────────────────────────
 interface Props {
@@ -59,8 +63,6 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
   const [tab, setTab] = useState<'perfil' | 'plano' | 'seguranca'>('perfil');
   const [avatarPreview, setAvatarPreview] = useState<string | null>(profile?.avatar_url ?? null);
   const [showDelete, setShowDelete] = useState(false);
-  const [showNewPw, setShowNewPw] = useState(false);
-  const [showCurrentPw, setShowCurrentPw] = useState(false);
   const [isPending, startTransition] = useTransition();
   const fileRef = useRef<HTMLInputElement>(null);
   const { theme } = useTheme();
@@ -202,47 +204,31 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
 
           {/* Form */}
           <form onSubmit={profileForm.handleSubmit(onSaveProfile)} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Nome</label>
-              <div className="relative">
-                <IconUser className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                <input
-                  {...profileForm.register('name')}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-zinc-200/80 dark:border-white/[0.07] bg-zinc-50 dark:bg-[#0f1c2b] text-zinc-800 dark:text-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 transition-all"
-                  placeholder="Seu nome completo"
-                />
-              </div>
-              {profileForm.formState.errors.name && (
-                <p className="text-xs text-red-500 mt-1">{profileForm.formState.errors.name.message}</p>
-              )}
-            </div>
+            <RHFInput<ProfileForm>
+              name="name"
+              control={profileForm.control}
+              label="Nome"
+              icon={<IconUser className="w-4 h-4" />}
+              placeholder="Seu nome completo"
+            />
+
+            <RHFInput<ProfileForm>
+              name="email"
+              control={profileForm.control}
+              label="E-mail"
+              type="email"
+              icon={<IconMail className="w-4 h-4" />}
+              placeholder="seu@email.com"
+            />
 
             <div>
-              <label className="block text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">E-mail</label>
-              <div className="relative">
-                <IconMail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                <input
-                  {...profileForm.register('email')}
-                  type="email"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-zinc-200/80 dark:border-white/[0.07] bg-zinc-50 dark:bg-[#0f1c2b] text-zinc-800 dark:text-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 transition-all"
-                  placeholder="seu@email.com"
-                />
-              </div>
-              {profileForm.formState.errors.email && (
-                <p className="text-xs text-red-500 mt-1">{profileForm.formState.errors.email.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Telefone</label>
-              <div className="relative">
-                <IconPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                <input
-                  value={profile?.phone ?? ''}
-                  readOnly
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-zinc-200/80 dark:border-white/[0.07] bg-zinc-100 dark:bg-white/5 text-zinc-400 dark:text-zinc-500 text-sm cursor-not-allowed"
-                />
-              </div>
+              <Input
+                label="Telefone"
+                value={profile?.phone ?? ''}
+                readOnly
+                icon={<IconPhone className="w-4 h-4" />}
+                className="bg-zinc-100 dark:bg-white/5 text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
+              />
               <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">Telefone vinculado à autenticação — não pode ser alterado.</p>
             </div>
 
@@ -266,7 +252,6 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
       {tab === 'plano' && (
         <div className="space-y-4">
 
-          {/* Card do plano */}
           <div className={`bg-gradient-to-br ${PLAN_COLOR[plan]} rounded-3xl p-6 md:p-8 text-white relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-3xl pointer-events-none" />
             <p className="text-xs font-bold uppercase tracking-widest text-white/60 mb-1">Seu plano atual</p>
@@ -278,7 +263,6 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
             )}
           </div>
 
-          {/* Uso */}
           <div className="bg-white dark:bg-[#152336] border border-zinc-100 dark:border-white/[0.06] rounded-3xl p-6 space-y-3 transition-colors duration-300">
             <div className="flex justify-between items-baseline">
               <p className="text-sm font-bold text-zinc-700 dark:text-zinc-200">Cobranças este mês</p>
@@ -297,7 +281,6 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
             )}
           </div>
 
-          {/* Benefícios por plano */}
           <div className="bg-white dark:bg-[#152336] border border-zinc-100 dark:border-white/[0.06] rounded-3xl p-6 space-y-3 transition-colors duration-300">
             <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Incluído no seu plano</p>
             {[
@@ -333,60 +316,31 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
       {tab === 'seguranca' && (
         <div className="space-y-4">
 
-          {/* Troca de senha */}
           <div className="bg-white dark:bg-[#152336] border border-zinc-100 dark:border-white/[0.06] rounded-3xl p-6 md:p-8 transition-colors duration-300">
             <p className="font-bold text-zinc-800 dark:text-zinc-200 mb-1">Alterar senha</p>
             <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-5">Use uma senha forte com pelo menos 8 caracteres.</p>
 
             <form onSubmit={pwForm.handleSubmit(onChangePassword)} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Senha atual</label>
-                <div className="relative">
-                  <input
-                    {...pwForm.register('current_password')}
-                    type={showCurrentPw ? 'text' : 'password'}
-                    className="w-full pl-4 pr-10 py-3 rounded-xl border border-zinc-200/80 dark:border-white/[0.07] bg-zinc-50 dark:bg-[#0f1c2b] text-zinc-800 dark:text-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 transition-all"
-                    placeholder="••••••••"
-                  />
-                  <button type="button" onClick={() => setShowCurrentPw(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600">
-                    {showCurrentPw ? <IconEyeOff className="w-4 h-4" /> : <IconEye className="w-4 h-4" />}
-                  </button>
-                </div>
-                {pwForm.formState.errors.current_password && (
-                  <p className="text-xs text-red-500 mt-1">{pwForm.formState.errors.current_password.message}</p>
-                )}
-              </div>
+              <RHFPasswordInput<PasswordForm>
+                name="current_password"
+                control={pwForm.control}
+                label="Senha atual"
+                placeholder="••••••••"
+              />
 
-              <div>
-                <label className="block text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Nova senha</label>
-                <div className="relative">
-                  <input
-                    {...pwForm.register('new_password')}
-                    type={showNewPw ? 'text' : 'password'}
-                    className="w-full pl-4 pr-10 py-3 rounded-xl border border-zinc-200/80 dark:border-white/[0.07] bg-zinc-50 dark:bg-[#0f1c2b] text-zinc-800 dark:text-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 transition-all"
-                    placeholder="••••••••"
-                  />
-                  <button type="button" onClick={() => setShowNewPw(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600">
-                    {showNewPw ? <IconEyeOff className="w-4 h-4" /> : <IconEye className="w-4 h-4" />}
-                  </button>
-                </div>
-                {pwForm.formState.errors.new_password && (
-                  <p className="text-xs text-red-500 mt-1">{pwForm.formState.errors.new_password.message}</p>
-                )}
-              </div>
+              <RHFPasswordInput<PasswordForm>
+                name="new_password"
+                control={pwForm.control}
+                label="Nova senha"
+                placeholder="••••••••"
+              />
 
-              <div>
-                <label className="block text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Confirmar nova senha</label>
-                <input
-                  {...pwForm.register('confirm_password')}
-                  type="password"
-                  className="w-full pl-4 pr-4 py-3 rounded-xl border border-zinc-200/80 dark:border-white/[0.07] bg-zinc-50 dark:bg-[#0f1c2b] text-zinc-800 dark:text-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/60 transition-all"
-                  placeholder="••••••••"
-                />
-                {pwForm.formState.errors.confirm_password && (
-                  <p className="text-xs text-red-500 mt-1">{pwForm.formState.errors.confirm_password.message}</p>
-                )}
-              </div>
+              <RHFPasswordInput<PasswordForm>
+                name="confirm_password"
+                control={pwForm.control}
+                label="Confirmar nova senha"
+                placeholder="••••••••"
+              />
 
               <button
                 type="submit"
@@ -401,7 +355,6 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
             </form>
           </div>
 
-          {/* Zona de perigo */}
           <div className="bg-white dark:bg-[#152336] border border-red-200 dark:border-red-500/20 rounded-3xl p-6 md:p-8 transition-colors duration-300">
             <div className="flex items-start gap-3 mb-4">
               <IconAlertOctagon className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
@@ -423,37 +376,25 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
         </div>
       )}
 
-      {/* ── Modal de confirmação de exclusão ────────────────────────── */}
-      {showDelete && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#152336] rounded-3xl p-8 max-w-sm w-full shadow-2xl border border-zinc-200/80 dark:border-white/[0.07] space-y-4 animate-in fade-in zoom-in-95 duration-200">
-            <div className="w-12 h-12 bg-red-100 dark:bg-red-500/20 rounded-2xl flex items-center justify-center">
-              <IconAlertOctagon className="w-6 h-6 text-red-500" />
-            </div>
-            <p className="font-extrabold text-xl text-zinc-800 dark:text-zinc-200">Excluir conta?</p>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
-              Esta ação é <strong>irreversível</strong>. Seus dados pessoais serão anonimizados, mas o histórico de cobranças permanece para fins contábeis.
-            </p>
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={() => setShowDelete(false)}
-                className="flex-1 py-3 rounded-xl border border-zinc-200/80 dark:border-white/[0.07] text-sm font-bold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={onDeleteAccount}
-                disabled={isPending}
-                className="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-600 disabled:opacity-60 text-white text-sm font-bold transition-colors flex items-center justify-center gap-2"
-              >
-                {isPending
-                  ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  : 'Sim, excluir'}
-              </button>
-            </div>
+      <ConfirmModal
+        open={showDelete}
+        title="Excluir conta?"
+        description={
+          <>
+            Esta ação é <strong>irreversível</strong>. Seus dados pessoais serão anonimizados, mas o histórico de cobranças permanece para fins contábeis.
+          </>
+        }
+        confirmLabel="Sim, excluir"
+        variant="danger"
+        loading={isPending}
+        icon={
+          <div className="w-12 h-12 bg-red-100 dark:bg-red-500/20 rounded-2xl flex items-center justify-center">
+            <IconAlertOctagon className="w-6 h-6 text-red-500" />
           </div>
-        </div>
-      )}
+        }
+        onConfirm={onDeleteAccount}
+        onCancel={() => setShowDelete(false)}
+      />
     </div>
   );
 }

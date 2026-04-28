@@ -1,14 +1,17 @@
+import { Control, FieldValues, Path, Controller } from "react-hook-form";
+import { ComponentProps } from "react";
 import { Input } from "@/components/ui/Input/Input";
-import { Controller } from "react-hook-form";
 
-export function RHFInput({
-  name,
-  control,
-  label,
-  icon,
-  mask,
-  ...props
-}: any) {
+type Props<T extends FieldValues> = Omit<
+  ComponentProps<typeof Input>,
+  "onChange" | "value" | "name"
+> & {
+  name: Path<T>;
+  control: Control<T>;
+  mask?: (v: string) => string;
+};
+
+export function RHFInput<T extends FieldValues>({ name, control, mask, ...props }: Props<T>) {
   return (
     <Controller
       name={name}
@@ -17,15 +20,10 @@ export function RHFInput({
         <Input
           {...props}
           {...field}
-          label={label}
-          icon={icon}
           error={fieldState.error?.message}
           value={field.value ?? ""}
           onChange={(e) => {
-            const value = mask
-              ? mask(e.target.value)
-              : e.target.value;
-
+            const value = mask ? mask(e.target.value) : e.target.value;
             field.onChange(value);
           }}
         />

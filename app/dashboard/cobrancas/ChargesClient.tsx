@@ -31,6 +31,8 @@ import {
 import { formatMoney, maskPhone } from '@/lib/formatters';
 import { NewChargeDrawer } from '@/components/forms/NewChargeDrawer';
 import { ChargeDetailsDrawer } from '@/components/dashboard/ChargeDetailsDrawer';
+import { Input } from '@/components/ui/Input/Input';
+import { Checkbox } from '@/components/ui/Checkbox';
 import { toast } from 'sonner';
 import { bulkCancelAction, bulkRemindAction } from '@/app/actions/charges';
 
@@ -91,21 +93,17 @@ export function ChargesClient({
       id: 'select',
       header: ({ table }) => (
         <div className="flex items-center justify-center w-full">
-          <input
-            type="checkbox"
-            className="w-4 h-4 rounded border-zinc-300 text-green-600 focus:ring-green-600 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          <Checkbox
             checked={table.getIsAllRowsSelected()}
             onChange={table.getToggleAllRowsSelectedHandler()}
+            indeterminate={table.getIsSomeRowsSelected()}
             disabled={plan === 'FREE' || plan === 'STARTER'}
-            title={plan === 'FREE' || plan === 'STARTER' ? 'Ação em massa disponível no plano PRO' : 'Selecionar todos'}
           />
         </div>
       ),
       cell: ({ row }) => (
         <div className="flex items-center justify-center w-full">
-          <input
-            type="checkbox"
-            className="w-4 h-4 rounded border-zinc-300 text-green-600 focus:ring-green-600 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          <Checkbox
             checked={row.getIsSelected()}
             onChange={row.getToggleSelectedHandler()}
             disabled={plan === 'FREE' || plan === 'STARTER'}
@@ -297,22 +295,20 @@ export function ChargesClient({
 
       {/* FILTER BAR */}
       <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
-        <div className="relative">
-          <IconSearch className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
-          <input
-            type="text"
+        <div className="w-full sm:w-80">
+          <Input
+            icon={<IconSearch className="w-4 h-4" />}
             placeholder="Buscar cliente..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full sm:w-80 pl-10 pr-4 py-2.5 bg-[#f8fafc] dark:bg-[#0f1c2b] border border-zinc-200/80 dark:border-white/[0.07] text-zinc-700 dark:text-zinc-300 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-transparent transition-shadow shadow-sm"
           />
         </div>
         <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
-          <input 
-            type="date" 
+          <Input
+            type="date"
             value={dateFilter}
             onChange={e => setDateFilter(e.target.value)}
-            className="px-4 py-2 bg-[#f8fafc] dark:bg-[#0f1c2b] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/[0.07] rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-green-500/40 shadow-sm mr-2"
+            className="mr-2"
           />
           <button onClick={() => setStatusFilter('ALL')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'ALL' ? 'bg-zinc-900 text-white shadow-zinc-900/20' : 'bg-[#f8fafc] dark:bg-[#0f1c2b] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/[0.07] hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Todas</button>
           <button onClick={() => setStatusFilter('PENDING')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'PENDING' ? 'bg-amber-100 text-amber-800' : 'bg-[#f8fafc] dark:bg-[#0f1c2b] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/[0.07] hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Pendentes</button>

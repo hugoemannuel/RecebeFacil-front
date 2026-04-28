@@ -99,14 +99,38 @@ export async function createChargeAction(payload): Promise<{ success: boolean; e
 
 ## Formulários (React Hook Form + Zod)
 
+**Regra:** nunca `register()` em páginas. Nunca `<input>/<textarea>/<select>` raw fora de `components/ui/`. Todo campo usa wrapper RHF ou componente UI.
+
+**Wrappers RHF disponíveis:**
+| Componente | Uso |
+|---|---|
+| `RHFInput` | Texto, email, tel, número. Props: `name`, `control`, `label`, `icon`, `mask`, `variant` |
+| `RHFPasswordInput` | Senha com show/hide embutido. Props: `name`, `control`, `label`, `placeholder`, `variant` |
+| `RHFTextarea` | Área longa. Props: `name`, `control`, `label`, `rows`, `inputRef` |
+| `RHFSelect` | Select controlado. Props: `name`, `control`, `label`, `options` |
+| `Checkbox` | Checkbox UI (tabelas, non-RHF). Props: `checked`, `onChange`, `indeterminate`, `size` |
+
+**Auth pages:** usar `variant="auth"` nos campos RHF (`py-3.5`, `shadow-sm`, light-mode only).
+
+**UI sem formulário (search, filtros):** usar `Input` ou `Select` diretamente, sem RHF.
+
+```tsx
+// Campo de formulário
+const { control, handleSubmit } = useForm<FormData>({ resolver: zodResolver(schema) });
+<RHFInput<FormData> name="email" control={control} label="E-mail" type="email" icon={<IconMail />} variant="auth" />
+<RHFPasswordInput<FormData> name="password" control={control} label="Senha" variant="auth" />
+
+// Campo de UI sem RHF
+<Input icon={<IconSearch />} value={q} onChange={e => setQ(e.target.value)} />
+```
+
+**Schema Zod:**
 ```ts
-// Schema com validações reais do projeto:
 const schema = z.object({
   debtor_name:     z.string().min(2, 'Nome obrigatório'),
   debtor_phone:    z.string().min(10, 'Telefone obrigatório'),
   amount_display:  z.string().refine(val => parseMoney(val) >= 100, { message: 'Mínimo R$ 1,00' }),
   due_date:        z.date().refine(val => { const t = new Date(); t.setHours(0,0,0,0); return val >= t; }, { message: 'Data futura ou hoje' }),
-  description:     z.string().min(3).max(200),
   recurrence:      z.enum(['ONCE', 'WEEKLY', 'MONTHLY', 'YEARLY']),
   custom_message:  z.string().min(5),
   send_pix_button: z.boolean(),
@@ -116,14 +140,11 @@ const schema = z.object({
   if (data.send_pix_button && !data.pix_key)
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Chave PIX obrigatória', path: ['pix_key'] });
 });
-
-const form = useForm<FormData>({ resolver: zodResolver(schema), defaultValues: { ... } });
 ```
 
-**Máscaras — sem libs externas**, via `lib/formatters.ts`:
-```ts
-onChange={(e) => setValue('debtor_phone', maskPhone(e.target.value), { shouldValidate: true })}
-onChange={(e) => setValue('amount_display', maskMoney(e.target.value), { shouldValidate: true })}
+**Máscaras** — via prop `mask` do `RHFInput`, nunca libs externas:
+```tsx
+<RHFInput name="phone" control={control} mask={maskPhone} />
 ```
 
 **Multi-step — validar só campos do step atual:**
@@ -142,7 +163,6 @@ async function onSubmit(data) {
     else toast.error(result.error ?? 'Erro. Tente novamente.');
   } finally { setSending(false); }
 }
-// Botão: disabled={sending} + spinner inline quando sending
 ```
 
 ---
@@ -289,3 +309,6 @@ function insertVariable(v: string) {
 - Nunca redirecionar para erro quando módulo bloqueado — UpgradeModal
 - Nunca logar dados sensíveis (CPF, senha, chave PIX) no console
 - Nunca submeter form sem loading state no botão
+- Nunca `<input>/<textarea>/<select>` raw fora de `components/ui/` — usar wrappers RHF ou componentes UI
+- Nunca `register()` em páginas — sempre `control` + wrapper RHF
+- Nunca importar `react-hot-toast` — usar `sonner`

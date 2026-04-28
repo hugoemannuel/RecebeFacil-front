@@ -7,6 +7,7 @@ type Option = {
 
 type SelectProps = {
   label?: string;
+  error?: string;
   value?: string;
   onChange?: (value: string) => void;
   options: Option[];
@@ -14,7 +15,7 @@ type SelectProps = {
 };
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, value, onChange, options, className = "" }, ref) => {
+  ({ label, error, value, onChange, options, className = "" }, ref) => {
     return (
       <div className="w-full">
         {label && (
@@ -44,6 +45,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             </option>
           ))}
         </select>
+
+        {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
       </div>
     );
   }

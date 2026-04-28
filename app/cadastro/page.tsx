@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { registerAction } from '@/app/actions/auth';
-import { toast, Toaster } from 'react-hot-toast';
+import { toast } from 'sonner';
 import {
   IconMessageCircle,
   IconTrendingUp,
@@ -15,13 +15,14 @@ import {
   IconUser,
   IconMail,
   IconPhone,
-  IconLock,
-  IconEye,
-  IconEyeOff,
   IconArrowLeft,
   IconArrowRight
 } from '@/components/ui/Icons';
 import { AuthLayout } from '@/components/layout/AuthLayout/AuthLayout';
+import { RHFInput } from '@/components/forms/rhf/RHFInput';
+import { RHFPasswordInput } from '@/components/forms/rhf/RHFPasswordInput';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { maskPhone } from '@/lib/formatters';
 
 const registerSchema = z.object({
   name: z.string().min(3, 'O nome deve ter no mínimo 3 caracteres'),
@@ -35,30 +36,11 @@ type RegisterForm = z.infer<typeof registerSchema>;
 export default function Cadastro() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [terms, setTerms] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<RegisterForm>({
+  const { control, handleSubmit } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
   });
-
-  const { onChange: onPhoneChange, ...phoneRest } = register('phone');
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let v = e.target.value.replace(/\D/g, "");
-    if (v.length > 2 && v.length <= 7) {
-      v = v.replace(/^(\d{2})(\d+)/, "($1) $2");
-    } else if (v.length > 7) {
-      v = v.replace(/^(\d{2})(\d{5})(\d{1,4}).*/, "($1) $2-$3");
-    } else if (v.length > 0) {
-      v = v.replace(/^(\d{1,2})/, "($1");
-    }
-    e.target.value = v;
-    onPhoneChange(e);
-  };
 
   async function onSubmit(data: RegisterForm) {
     setIsLoading(true);
@@ -74,6 +56,7 @@ export default function Cadastro() {
       setIsLoading(false);
     }
   }
+
   return (
     <AuthLayout
       rightPanel={
@@ -92,7 +75,6 @@ export default function Cadastro() {
             </p>
 
             <div className="space-y-4">
-
               <div className="bg-[#152336]/60 backdrop-blur-sm border border-[#1e3046] p-6 rounded-2xl flex gap-5 items-start hover:border-green-500/30 transition-colors">
                 <div className="w-12 h-12 rounded-xl bg-[#1e3046] flex items-center justify-center shrink-0">
                   <IconMessageCircle className="w-6 h-6 text-green-500" />
@@ -103,7 +85,6 @@ export default function Cadastro() {
                 </div>
               </div>
 
-
               <div className="bg-[#152336]/60 backdrop-blur-sm border border-[#1e3046] p-6 rounded-2xl flex gap-5 items-start hover:border-green-500/30 transition-colors">
                 <div className="w-12 h-12 rounded-xl bg-[#1e3046] flex items-center justify-center shrink-0">
                   <IconTrendingUp className="w-6 h-6 text-green-500" />
@@ -113,7 +94,6 @@ export default function Cadastro() {
                   <p className="text-sm text-slate-400 leading-relaxed">Régua de cobrança inteligente que recupera até 40% das faturas atrasadas.</p>
                 </div>
               </div>
-
 
               <div className="bg-[#152336] border border-green-500/40 p-6 rounded-2xl flex gap-5 items-start shadow-[0_0_30px_rgba(34,197,94,0.05)] relative overflow-hidden">
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>
@@ -127,7 +107,6 @@ export default function Cadastro() {
               </div>
             </div>
 
-
             <div className="mt-16 flex items-center gap-4">
               <div className="flex -space-x-3">
                 <img src="https://i.pravatar.cc/100?img=11" alt="User 1" className="w-10 h-10 rounded-full border-2 border-[#0b1521] object-cover" />
@@ -140,9 +119,6 @@ export default function Cadastro() {
         </>
       }
     >
-      <Toaster position="top-right" />
-
-
       <div className="lg:hidden flex items-center justify-between p-6">
         <Link href="/" className="text-zinc-400 hover:text-zinc-900 transition-colors">
           <IconArrowLeft className="w-6 h-6" />
@@ -150,7 +126,6 @@ export default function Cadastro() {
         <div className="font-bold text-lg tracking-tight">RecebeFácil</div>
         <div className="w-6"></div>
       </div>
-
 
       <header className="hidden lg:flex items-center justify-between p-8 xl:p-12">
         <Link href="/" className="flex items-center gap-2 group">
@@ -163,7 +138,6 @@ export default function Cadastro() {
           Entrar
         </Link>
       </header>
-
 
       <div className="flex-1 flex flex-col justify-center px-6 lg:px-12 xl:px-24 py-8 max-w-[600px] w-full mx-auto">
 
@@ -183,95 +157,59 @@ export default function Cadastro() {
 
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
 
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Nome Completo</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <IconUser className="w-5 h-5 text-zinc-400" />
-              </div>
-              <input
-                type="text"
-                {...register('name')}
-                placeholder="Como quer ser chamado?"
-                className="w-full pl-11 pr-4 py-3.5 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all font-medium shadow-sm hover:border-zinc-300"
-              />
-            </div>
-            {errors.name && <p className="text-red-500 text-xs font-bold mt-1">{errors.name.message}</p>}
-          </div>
+          <RHFInput<RegisterForm>
+            name="name"
+            control={control}
+            label="Nome Completo"
+            type="text"
+            placeholder="Como quer ser chamado?"
+            icon={<IconUser className="w-5 h-5" />}
+            variant="auth"
+          />
 
+          <RHFInput<RegisterForm>
+            name="email"
+            control={control}
+            label="E-mail"
+            type="email"
+            placeholder="seu@email.com"
+            icon={<IconMail className="w-5 h-5" />}
+            variant="auth"
+          />
 
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide">
-              <span className="hidden lg:inline">E-mail Corporativo</span>
-              <span className="lg:hidden">E-mail</span>
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <IconMail className="w-5 h-5 text-zinc-400" />
-              </div>
-              <input
-                type="email"
-                {...register('email')}
-                placeholder="seu@email.com"
-                className="w-full pl-11 pr-4 py-3.5 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all font-medium shadow-sm hover:border-zinc-300"
-              />
-            </div>
-            {errors.email && <p className="text-red-500 text-xs font-bold mt-1">{errors.email.message}</p>}
-          </div>
+          <RHFInput<RegisterForm>
+            name="phone"
+            control={control}
+            label="WhatsApp"
+            type="tel"
+            placeholder="(00) 00000-0000"
+            icon={<IconPhone className="w-5 h-5" />}
+            variant="auth"
+            mask={maskPhone}
+          />
 
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide">WhatsApp</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <IconPhone className="w-5 h-5 text-zinc-400" />
-              </div>
-              <input
-                type="tel"
-                {...phoneRest}
-                onChange={handlePhoneChange}
-                placeholder="(00) 00000-0000"
-                className="w-full pl-11 pr-4 py-3.5 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all font-medium shadow-sm hover:border-zinc-300"
-              />
-            </div>
-            {errors.phone && <p className="text-red-500 text-xs font-bold mt-1">{errors.phone.message}</p>}
-          </div>
-
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Senha</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <IconLock className="w-5 h-5 text-zinc-400" />
-              </div>
-              <input
-                type={showPassword ? "text" : "password"}
-                {...register('password')}
-                placeholder="Mínimo 8 caracteres"
-                className="w-full pl-11 pr-12 py-3.5 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all font-medium shadow-sm hover:border-zinc-300"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-4 flex items-center text-zinc-400 hover:text-zinc-600 transition-colors"
-              >
-                {showPassword ? <IconEyeOff className="w-5 h-5" /> : <IconEye className="w-5 h-5" />}
-              </button>
-            </div>
-            {errors.password && <p className="text-red-500 text-xs font-bold mt-1">{errors.password.message}</p>}
-          </div>
-
+          <RHFPasswordInput<RegisterForm>
+            name="password"
+            control={control}
+            label="Senha"
+            placeholder="Mínimo 8 caracteres"
+            variant="auth"
+          />
 
           <div className="flex items-start gap-3 pt-3">
-            <div className="flex items-center h-5 mt-0.5">
-              <input
+            <div className="mt-0.5">
+              <Checkbox
                 id="terms"
-                type="checkbox"
-                className="w-5 h-5 border border-zinc-300 rounded bg-white checked:bg-green-500 checked:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:ring-offset-0 text-green-500 transition-colors cursor-pointer appearance-none checked:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwb2x5bGluZSBwb2ludHM9IjIwIDYgOSAxNyA0IDEyIj48L3BvbHlsaW5lPjwvc3ZnPg==')] checked:bg-[length:70%_70%] checked:bg-center checked:bg-no-repeat"
+                checked={terms}
+                onChange={(e) => setTerms(e.target.checked)}
+                size="md"
               />
             </div>
             <label htmlFor="terms" className="text-sm text-zinc-500 leading-relaxed cursor-pointer">
-              Ao criar uma conta, você concorda com nossos <Link href="#" className="font-bold text-green-600 hover:text-green-700 hover:underline">Termos de Uso</Link> e <Link href="#" className="font-bold text-green-600 hover:text-green-700 hover:underline">Política de Privacidade</Link>.
+              Ao criar uma conta, você concorda com nossos{' '}
+              <Link href="#" className="font-bold text-green-600 hover:text-green-700 hover:underline">Termos de Uso</Link>{' '}
+              e{' '}
+              <Link href="#" className="font-bold text-green-600 hover:text-green-700 hover:underline">Política de Privacidade</Link>.
             </label>
           </div>
 
@@ -296,7 +234,6 @@ export default function Cadastro() {
           </p>
         </div>
 
-
         <div className="mt-auto pt-8 hidden lg:block text-center lg:text-left">
           <p className="text-[10px] text-zinc-400 font-medium tracking-wide">© 2024 RecebeFácil. Aceleração Financeira.</p>
         </div>
@@ -304,5 +241,3 @@ export default function Cadastro() {
     </AuthLayout>
   );
 }
-
-
