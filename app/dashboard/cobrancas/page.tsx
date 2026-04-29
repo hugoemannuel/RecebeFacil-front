@@ -1,8 +1,9 @@
-import { DashboardLayout, SubscriptionStatus } from '@/components/layout/DashboardLayout/DashboardLayout';
+import { DashboardLayout } from '@/components/layout/DashboardLayout/DashboardLayout';
 import { ChargesClient } from './ChargesClient';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { api } from '@/services/api';
+import { SubscriptionStatus } from '@/components/layout/DashboardLayout/interface';
 
 
 export const metadata = {

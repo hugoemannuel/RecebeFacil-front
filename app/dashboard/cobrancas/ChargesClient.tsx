@@ -43,6 +43,7 @@ type Charge = {
   amount: number;
   dueDate: string;
   status: string;
+  recurrence: 'ONCE' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
   automationEnabled: boolean;
 };
 
@@ -128,6 +129,13 @@ export function ChargesClient({
     columnHelper.accessor('dueDate', {
       header: 'Vencimento',
       cell: info => <div className="text-sm text-zinc-500 dark:text-zinc-400">{format(new Date(info.getValue()), "dd 'de' MMM, yyyy", { locale: ptBR })}</div>
+    }),
+    columnHelper.accessor('recurrence', {
+      header: 'Recorrência',
+      cell: info => {
+        const labels = { ONCE: '1× Única', WEEKLY: 'Semanal', MONTHLY: 'Mensal', YEARLY: 'Anual' };
+        return <div className="text-sm text-zinc-500 dark:text-zinc-400">{labels[info.getValue()] ?? info.getValue()}</div>;
+      }
     }),
     columnHelper.accessor('status', {
       header: 'Status',
