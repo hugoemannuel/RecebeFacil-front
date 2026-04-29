@@ -174,17 +174,19 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
     form.trigger(fieldsPerStep[step] as any).then((ok) => { if (ok) setStep((s) => s + 1); });
   }
 
-  if (!open) return null;
-
   return (
-    <div
-      className="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 sm:p-6 transition-colors duration-300"
-      onClick={handleClose}
-    >
+    <>
+      {/* Overlay */}
       <div
-        className="w-full max-w-5xl bg-[#f8fafc] dark:bg-[#152336] flex flex-col shadow-2xl overflow-hidden rounded-[2rem] border border-zinc-200 dark:border-white/[0.07] animate-in zoom-in-95 duration-200 max-h-[95vh] transition-colors duration-300"
-        onClick={e => e.stopPropagation()}
-      >
+        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={handleClose}
+      />
+
+      {/* Drawer */}
+      <div className={`fixed top-0 right-0 h-full z-50 flex transition-transform duration-300 ease-out ${open ? 'translate-x-0' : 'translate-x-full'}`}
+        style={{ width: '100%', maxWidth: step === 2 ? '900px' : '480px' }}>
+
+        <div className="flex-1 bg-[#f8fafc] dark:bg-[#152336] flex flex-col shadow-2xl overflow-hidden transition-colors duration-300">
 
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-200/80 dark:border-white/[0.07] shrink-0">
@@ -292,8 +294,9 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
               </button>
             )}
           </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
