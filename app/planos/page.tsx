@@ -12,7 +12,9 @@ import {
   IconTrendingUp,
   IconSparkles
 } from '@/components/ui/Icons';
-import { createCheckoutAction, getSubscriptionStatusAction } from '@/app/actions/subscription';
+import { createCheckoutAction, getSubscriptionStatusAction, cancelSubscriptionAction } from '@/app/actions/subscription';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { toast } from 'sonner';
 
 // ─── Tipos ──────────────────────────────────────────────────────
 interface PlanFeature {
@@ -108,16 +110,35 @@ export default function PlanosPage() {
   const [loading, setLoading] = useState<string | null>(null);
   const [currentPlan, setCurrentPlan] = useState<string>('FREE');
   const [error, setError] = useState<string | null>(null);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = useState(false);
+  const [periodEnd, setPeriodEnd] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadStatus() {
       const status = await getSubscriptionStatusAction();
       if (status) {
         setCurrentPlan(status.plan);
+        setCancelAtPeriodEnd(status.cancel_at_period_end ?? false);
+        setPeriodEnd(status.current_period_end ?? null);
       }
     }
     loadStatus();
   }, []);
+
+  async function handleCancel() {
+    setCancelLoading(true);
+    const result = await cancelSubscriptionAction();
+    if (result.success) {
+      setCancelAtPeriodEnd(true);
+      toast.success('Plano cancelado. Acesso mantido até o fim do período.');
+    } else {
+      toast.error(result.error ?? 'Erro ao cancelar.');
+    }
+    setCancelLoading(false);
+    setCancelModalOpen(false);
+  }
 
   const handleSubscribe = async (planId: string) => {
     if (planId === currentPlan) return;
@@ -252,26 +273,48 @@ export default function PlanosPage() {
                   ))}
                 </div>
 
-                <button
-                  onClick={() => handleSubscribe(plan.id)}
-                  disabled={isCurrent || !!loading}
-                  className={`w-full py-4 px-6 rounded-2xl font-extrabold text-sm transition-all flex items-center justify-center gap-2 ${
-                    isCurrent
-                      ? 'bg-zinc-100 text-zinc-400 cursor-default'
-                      : plan.highlight
-                        ? 'bg-[#0b1521] text-white hover:bg-[#152336] hover:scale-[1.02] shadow-lg shadow-zinc-900/20'
-                        : 'bg-zinc-100 text-zinc-900 hover:bg-zinc-200 hover:scale-[1.02]'
-                  }`}
-                >
-                  {loading === plan.id ? (
-                    <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    <>
-                      {plan.id !== 'FREE' && !isCurrent && <IconZap className={`w-4 h-4 ${plan.highlight ? 'text-green-400' : 'text-zinc-400'}`} />}
-                      {isCurrent ? 'Plano Atual' : plan.buttonText}
-                    </>
-                  )}
-                </button>
+                {isCurrent && cancelAtPeriodEnd && plan.id !== 'FREE' ? (
+                  <button
+                    disabled
+                    className="w-full py-4 px-6 rounded-2xl font-extrabold text-sm bg-amber-50 text-amber-600 cursor-default flex items-center justify-center"
+                  >
+                    Cancelamento agendado
+                  </button>
+                ) : isCurrent && plan.id !== 'FREE' ? (
+                  <button
+                    onClick={() => setCancelModalOpen(true)}
+                    disabled={!!loading}
+                    className="w-full py-4 px-6 rounded-2xl font-extrabold text-sm bg-zinc-100 text-zinc-500 hover:bg-red-50 hover:text-red-600 transition-all flex items-center justify-center"
+                  >
+                    Cancelar plano
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleSubscribe(plan.id)}
+                    disabled={isCurrent || !!loading}
+                    className={`w-full py-4 px-6 rounded-2xl font-extrabold text-sm transition-all flex items-center justify-center gap-2 ${
+                      isCurrent
+                        ? 'bg-zinc-100 text-zinc-400 cursor-default'
+                        : plan.highlight
+                          ? 'bg-[#0b1521] text-white hover:bg-[#152336] hover:scale-[1.02] shadow-lg shadow-zinc-900/20'
+                          : 'bg-zinc-100 text-zinc-900 hover:bg-zinc-200 hover:scale-[1.02]'
+                    }`}
+                  >
+                    {loading === plan.id ? (
+                      <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <>
+                        {plan.id !== 'FREE' && !isCurrent && <IconZap className={`w-4 h-4 ${plan.highlight ? 'text-green-400' : 'text-zinc-400'}`} />}
+                        {isCurrent ? 'Plano Atual' : plan.buttonText}
+                      </>
+                    )}
+                  </button>
+                )}
+                {isCurrent && cancelAtPeriodEnd && periodEnd && (
+                  <p className="text-xs text-amber-600 font-medium text-center mt-2">
+                    Acesso até {new Date(periodEnd).toLocaleDateString('pt-BR')}
+                  </p>
+                )}
               </div>
             );
           })}
@@ -301,6 +344,17 @@ export default function PlanosPage() {
         </div>
 
       </main>
+
+      <ConfirmModal
+        open={cancelModalOpen}
+        title="Cancelar plano?"
+        description={`Seu acesso continuará ativo até ${periodEnd ? new Date(periodEnd).toLocaleDateString('pt-BR') : 'o fim do período pago'}. Após isso, volta para FREE.`}
+        confirmLabel="Sim, cancelar"
+        variant="danger"
+        loading={cancelLoading}
+        onConfirm={handleCancel}
+        onCancel={() => setCancelModalOpen(false)}
+      />
     </div>
   );
 }

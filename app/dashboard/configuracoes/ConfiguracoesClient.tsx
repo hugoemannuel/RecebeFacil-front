@@ -20,6 +20,7 @@ import {
   updatePasswordAction,
   deleteAccountAction,
 } from '@/app/actions/profile';
+import { cancelSubscriptionAction } from '@/app/actions/subscription';
 import { RHFInput } from '@/components/forms/rhf/RHFInput';
 import { RHFPasswordInput } from '@/components/forms/rhf/RHFPasswordInput';
 import { Input } from '@/components/ui/Input/Input';
@@ -28,7 +29,7 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal';
 // ─── Tipos ────────────────────────────────────────────────────────────
 interface Props {
   profile: { id: string; name: string; email: string; phone: string; avatar_url?: string } | null;
-  subscription: { plan: string; status: string; sentThisMonth?: number; current_period_end?: string } | null;
+  subscription: { plan: string; status: string; sentThisMonth?: number; current_period_end?: string; cancel_at_period_end?: boolean } | null;
 }
 
 const PLAN_LIMIT: Record<string, number> = { FREE: 10, STARTER: 50, PRO: 200, UNLIMITED: Infinity };
@@ -63,6 +64,9 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
   const [tab, setTab] = useState<'perfil' | 'plano' | 'seguranca'>('perfil');
   const [avatarPreview, setAvatarPreview] = useState<string | null>(profile?.avatar_url ?? null);
   const [showDelete, setShowDelete] = useState(false);
+  const [showCancelPlan, setShowCancelPlan] = useState(false);
+  const [cancelPlanLoading, setCancelPlanLoading] = useState(false);
+  const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = useState(subscription?.cancel_at_period_end ?? false);
   const [isPending, startTransition] = useTransition();
   const fileRef = useRef<HTMLInputElement>(null);
   const { theme } = useTheme();
@@ -84,6 +88,19 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
       if (res.success) toast.success('Perfil atualizado com sucesso!');
       else toast.error(res.error ?? 'Ops, algo deu errado. Tente novamente.');
     });
+  }
+
+  async function handleCancelPlan() {
+    setCancelPlanLoading(true);
+    const result = await cancelSubscriptionAction();
+    if (result.success) {
+      setCancelAtPeriodEnd(true);
+      toast.success('Plano cancelado. Acesso mantido até o fim do período.');
+    } else {
+      toast.error(result.error ?? 'Erro ao cancelar.');
+    }
+    setCancelPlanLoading(false);
+    setShowCancelPlan(false);
   }
 
   function onAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -301,13 +318,39 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
             </div>
           </div>
 
-          {plan !== 'UNLIMITED' && (
+          {cancelAtPeriodEnd && subscription?.current_period_end && (
+            <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-2xl p-4">
+              <IconAlertOctagon className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-800 dark:text-amber-300">
+                Cancelamento agendado. Acesso mantido até <strong>{new Date(subscription.current_period_end).toLocaleDateString('pt-BR')}</strong>.
+              </p>
+            </div>
+          )}
+
+          {plan === 'FREE' ? (
             <Link
               href="/planos"
               className="block w-full text-center bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 rounded-2xl transition-all shadow-lg shadow-green-500/20 hover:scale-[1.01]"
             >
               Fazer upgrade de plano →
             </Link>
+          ) : (
+            <>
+              <Link
+                href="/planos"
+                className="block w-full text-center bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 text-zinc-800 dark:text-zinc-200 font-bold py-3.5 rounded-2xl transition-all hover:scale-[1.01]"
+              >
+                Gerenciar plano →
+              </Link>
+              {!cancelAtPeriodEnd && (
+                <button
+                  onClick={() => setShowCancelPlan(true)}
+                  className="w-full flex items-center justify-center gap-2 text-sm font-bold text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-500/10 px-4 py-2.5 rounded-xl transition-colors border border-red-200 dark:border-red-500/30"
+                >
+                  Cancelar plano
+                </button>
+              )}
+            </>
           )}
         </div>
       )}
@@ -394,6 +437,17 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
         }
         onConfirm={onDeleteAccount}
         onCancel={() => setShowDelete(false)}
+      />
+
+      <ConfirmModal
+        open={showCancelPlan}
+        title="Cancelar plano?"
+        description={`Seu acesso continuará ativo até ${subscription?.current_period_end ? new Date(subscription.current_period_end).toLocaleDateString('pt-BR') : 'o fim do período pago'}. Após isso, volta para FREE.`}
+        confirmLabel="Sim, cancelar"
+        variant="danger"
+        loading={cancelPlanLoading}
+        onConfirm={handleCancelPlan}
+        onCancel={() => setShowCancelPlan(false)}
       />
     </div>
   );

@@ -45,6 +45,9 @@ export default async function ChargesPage() {
     status: subscriptionData?.status ?? 'NONE',
     allowed_modules: subscriptionData?.allowed_modules ?? ['HOME', 'CHARGES'],
     current_period_end: subscriptionData?.current_period_end ?? null,
+    cancel_at_period_end: subscriptionData?.cancel_at_period_end ?? false,
+    payment_failed: subscriptionData?.payment_failed ?? false,
+    payment_failed_at: subscriptionData?.payment_failed_at ?? null,
     userName,
   };
 
