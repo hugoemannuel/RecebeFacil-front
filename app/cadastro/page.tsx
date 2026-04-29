@@ -46,7 +46,7 @@ export default function Cadastro() {
     setIsLoading(true);
     const toastId = toast.loading('Criando sua conta...');
 
-    const result = await registerAction(data);
+    const result = await registerAction({ ...data, phone: data.phone.replace(/\D/g, '') });
 
     if (result.success) {
       toast.success('Conta criada com sucesso!', { id: toastId });

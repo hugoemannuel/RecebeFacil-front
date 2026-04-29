@@ -1,4 +1,4 @@
-import { DashboardLayout, SubscriptionStatus } from '@/components/layout/DashboardLayout/DashboardLayout';
+import { DashboardLayout, } from '@/components/layout/DashboardLayout/DashboardLayout';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -11,12 +11,12 @@ import {
 } from '@/components/ui/Icons';
 import { PeriodSelect } from '@/components/dashboard/PeriodSelect';
 import { RecentActivityClient } from '@/components/dashboard/RecentActivityClient';
+import { SubscriptionStatus } from '@/components/layout/DashboardLayout/interface';
 
 export default async function Dashboard(props: any) {
   const searchParams = await props.searchParams;
   const period = searchParams?.period || '7days';
   const status = searchParams?.status;
-  const targetDate = searchParams?.targetDate;
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;
 
@@ -29,7 +29,6 @@ export default async function Dashboard(props: any) {
   const queryParams = new URLSearchParams();
   if (period) queryParams.set('period', period);
   if (status) queryParams.set('status', status);
-  if (targetDate) queryParams.set('targetDate', targetDate);
 
   // Busca métricas e assinatura em paralelo para melhor performance
   const [metricsRes, subscriptionRes] = await Promise.allSettled([
@@ -43,7 +42,7 @@ export default async function Dashboard(props: any) {
   if (metricsRes.status === 'rejected') console.error('Failed to fetch metrics:', metricsRes.reason);
   if (subscriptionRes.status === 'rejected') console.error('Failed to fetch subscription:', subscriptionRes.reason);
 
-  const summary = metrics?.summary || { totalPending: 0, totalOverdue: 0, sentThisMonth: 0, conversionRate: '0.0' };
+  const summary = metrics?.summary || { totalPending: 0, totalOverdue: 0, sentThisMonth: 0, totalSent: 0, conversionRate: '0.0' };
   const actionNecessary = metrics?.actionNecessary || 0;
   const topClients = metrics?.topClients || [];
   const chartData = metrics?.chart || [
@@ -78,22 +77,6 @@ export default async function Dashboard(props: any) {
 
       <div className="p-8 max-w-[1600px] mx-auto space-y-6">
 
-        {targetDate && (
-          <div className="fixed bottom-6 right-6 z-50 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-500/25 text-amber-800 dark:text-amber-300 px-6 py-4 rounded-2xl flex flex-col gap-4 shadow-xl shadow-amber-900/10 dark:shadow-amber-900/40 max-w-sm animate-in slide-in-from-bottom-5 fade-in duration-300">
-            <div className="flex items-start gap-3">
-              <IconAlertTriangle className="w-5 h-5 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
-              <div>
-                <p className="font-bold text-base">Modo Viagem no Tempo</p>
-                <p className="text-sm opacity-80 mt-0.5 leading-relaxed">
-                  Vendo métricas {period === 'month' ? 'da semana iniciada em' : 'como se hoje fosse o dia'} <strong>{new Date(targetDate + 'T00:00:00').toLocaleDateString('pt-BR')}</strong>.
-                </p>
-              </div>
-            </div>
-            <Link href="/dashboard" className="w-full text-center bg-amber-100 hover:bg-amber-200 text-amber-900 dark:bg-amber-500/15 dark:hover:bg-amber-500/25 dark:text-amber-300 font-bold px-5 py-2.5 rounded-xl text-sm transition-colors shadow-sm">
-              Voltar ao Presente
-            </Link>
-          </div>
-        )}
 
         <div className="bg-[#0b1521] rounded-[2rem] p-8 lg:p-10 text-white relative overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-black/20">
           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-green-500/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
@@ -119,8 +102,8 @@ export default async function Dashboard(props: any) {
               <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
                 <IconWallet className="w-5 h-5" />
               </div>
-              <span className={`text-xs font-bold px-2 py-1 rounded-lg ${summary.pendingVariation?.startsWith('+') ? 'bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-400'}`}>
-                {summary.pendingVariation || '0%'} hoje
+              <span className="bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-400 text-xs font-bold px-2 py-1 rounded-lg">
+                Todo o período
               </span>
             </div>
             <div>
@@ -152,7 +135,7 @@ export default async function Dashboard(props: any) {
             </div>
             <div>
               <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Cobranças Enviadas</p>
-              <p className="text-2xl font-bold text-zinc-700 dark:text-zinc-100 tracking-tight">{summary.sentThisMonth} <span className="text-sm font-medium text-zinc-400 dark:text-zinc-500">este mês</span></p>
+              <p className="text-2xl font-bold text-zinc-700 dark:text-zinc-100 tracking-tight">{summary.totalSent} <span className="text-sm font-medium text-zinc-400 dark:text-zinc-500">no total</span></p>
             </div>
           </div>
 
@@ -188,22 +171,18 @@ export default async function Dashboard(props: any) {
 
 
               <div className="h-48 flex items-end justify-between gap-2 mt-10">
-                {chartData.map((d: any, i: number) => {
-                  const isSelected = targetDate ? d.date === targetDate : d.isToday;
-                  return (
-                    <Link
-                      href={d.isToday ? `/dashboard?period=${period}` : `/dashboard?targetDate=${d.date}&period=${period}`}
-                      key={i}
-                      className={`w-full transition-colors rounded-t-lg relative group flex items-end justify-center pb-2 cursor-pointer ${isSelected ? 'bg-green-500 hover:bg-green-400' : 'bg-green-100 dark:bg-green-500/15 hover:bg-green-200 dark:hover:bg-green-500/25'}`}
-                      style={{ height: `${d.heightPercentage}%` }}
-                      title={`${d.count || 0} cobrança(s)\n${formatMoney(d.amount)}`}
-                    >
-                      <span className={`absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold ${isSelected ? 'text-green-600 dark:text-green-400' : 'text-slate-400 dark:text-slate-500'}`}>
-                        {d.label}
-                      </span>
-                    </Link>
-                  );
-                })}
+                {chartData.map((d: any, i: number) => (
+                  <div
+                    key={i}
+                    className={`w-full rounded-t-lg relative flex items-end justify-center pb-2 ${d.isToday ? 'bg-green-500' : 'bg-green-100 dark:bg-green-500/15'}`}
+                    style={{ height: `${d.heightPercentage}%` }}
+                    title={`${d.count || 0} cobrança(s)\n${formatMoney(d.amount)}`}
+                  >
+                    <span className={`absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold ${d.isToday ? 'text-green-600 dark:text-green-400' : 'text-slate-400 dark:text-slate-500'}`}>
+                      {d.label}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
 
