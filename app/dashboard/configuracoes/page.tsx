@@ -1,8 +1,9 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { api } from '@/services/api';
-import { DashboardLayout, SubscriptionStatus } from '@/components/layout/DashboardLayout/DashboardLayout';
+import { DashboardLayout } from '@/components/layout/DashboardLayout/DashboardLayout';
 import { ConfiguracoesClient } from './ConfiguracoesClient';
+import { SubscriptionStatus } from '@/components/layout/DashboardLayout/interface';
 
 export default async function ConfiguracoesPage() {
   const token = (await cookies()).get('recebefacil_token')?.value;

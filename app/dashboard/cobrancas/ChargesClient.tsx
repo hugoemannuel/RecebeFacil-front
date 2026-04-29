@@ -29,7 +29,7 @@ import {
   IconTrash
 } from '@/components/ui/Icons';
 import { formatMoney, maskPhone } from '@/lib/formatters';
-import { NewChargeDrawer } from '@/components/forms/NewChargeDrawer';
+import { NewChargeModal } from '@/components/forms/NewChargeModal';
 import { ChargeDetailsDrawer } from '@/components/dashboard/ChargeDetailsDrawer';
 import { Input } from '@/components/ui/Input/Input';
 import { Checkbox } from '@/components/ui/Checkbox';
@@ -442,7 +442,7 @@ export function ChargesClient({
         </div>
       )}
 
-      <NewChargeDrawer
+      <NewChargeModal
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         planType={plan}
