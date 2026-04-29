@@ -13,6 +13,8 @@ app/
     cobrancas/
       page.tsx      ← Server Component: busca dados, passa para ChargesClient
       ChargesClient.tsx ← 'use client': toda interatividade aqui
+    configuracoes/
+      page.tsx      ← Configurações do usuário (perfil, senha, PIX, integrações)
   layout.tsx
   page.tsx          ← Landing Page (Server Component, sem 'use client')
 
@@ -35,6 +37,8 @@ components/
       RHFTextarea.tsx     ← Controller-wrapped Textarea. Props: name, control, label, rows, inputRef
       RHFSelect.tsx       ← Controller-wrapped Select. Props: name, control, label, options
   dashboard/        ← Específicos do dashboard (ChargeDetailsDrawer.tsx, PeriodSelect.tsx)
+  patterns/
+    DatePickerField.tsx  ← Seleção de data com react-day-picker
 
 services/
   api.ts            ← Instância axios padronizada (baseURL, interceptor de token)
@@ -59,6 +63,10 @@ export function ClientComponent({ initialData }) { ... }
 
 - `page.tsx` máximo ~50 linhas — apenas orquestra layout e importa Client Components
 - Toda lógica de filtro, seleção, estado → Client Component dedicado
+
+## Middleware de Proteção de Rotas
+
+O arquivo `proxy.ts` na raiz define a lógica do middleware, mas exporta `proxy` em vez de `middleware`. **Para ativar a proteção de `/dashboard/*`, renomear para `middleware.ts` e a export para `middleware`.** Enquanto isso não for feito, as rotas do dashboard ficam desprotegidas no nível do middleware.
 
 ## Server Actions — Padrão Obrigatório
 

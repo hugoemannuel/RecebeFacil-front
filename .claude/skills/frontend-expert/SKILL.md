@@ -6,7 +6,7 @@ when_to_use: Qualquer tarefa de front-end — criar página, componente, form, S
 
 ## Arquitetura
 
-**Stack:** Next.js 15 App Router · TypeScript · Tailwind CSS · React Hook Form · Zod · Axios · Sonner (toasts) · TanStack Table · Radix UI · date-fns
+**Stack:** Next.js 16 App Router · TypeScript · Tailwind CSS · React Hook Form · Zod · Axios · Sonner (toasts) · TanStack Table · Radix UI · date-fns
 
 **Estrutura de pastas:**
 ```
@@ -19,9 +19,10 @@ app/
   layout.tsx / page.tsx (Landing — Server Component)
 
 components/
-  ui/       ← Atômicos sem negócio: Icons.tsx, UpgradeModal.tsx, WhatsAppPreview.tsx
+  ui/       ← Atômicos: Icons.tsx, UpgradeModal.tsx, WhatsAppPreview.tsx, ConfirmModal.tsx
   layout/   ← Cascas: DashboardLayout.tsx, AuthLayout.tsx, ThemeContext.tsx, ThemeToggle.tsx
   forms/    ← Formulários com RHF+Zod: NewChargeDrawer.tsx
+  patterns/ ← Padrões reutilizáveis: DatePickerField.tsx
   dashboard/← Específicos: ChargeDetailsDrawer.tsx, PeriodSelect.tsx, RecentActivityClient.tsx
 
 services/api.ts   ← Instância axios com interceptor de token
@@ -108,6 +109,7 @@ export async function createChargeAction(payload): Promise<{ success: boolean; e
 | `RHFPasswordInput` | Senha com show/hide embutido. Props: `name`, `control`, `label`, `placeholder`, `variant` |
 | `RHFTextarea` | Área longa. Props: `name`, `control`, `label`, `rows`, `inputRef` |
 | `RHFSelect` | Select controlado. Props: `name`, `control`, `label`, `options` |
+| `DatePickerField` | Seleção de data com DayPicker. Em `components/patterns/DatePickerField` |
 | `Checkbox` | Checkbox UI (tabelas, non-RHF). Props: `checked`, `onChange`, `indeterminate`, `size` |
 
 **Auth pages:** usar `variant="auth"` nos campos RHF (`py-3.5`, `shadow-sm`, light-mode only).
