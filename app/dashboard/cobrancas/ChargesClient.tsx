@@ -22,15 +22,12 @@ import {
   IconExternalLink,
   IconBot,
   IconLock,
-  IconCheckCircle,
-  IconClock,
-  IconAlertCircle,
   IconSend,
   IconTrash
 } from '@/components/ui/Icons';
 import { formatMoney, maskPhone } from '@/lib/formatters';
 import { NewChargeDrawer } from '@/components/forms/NewChargeDrawer';
-import { ChargeDetailsDrawer } from '@/components/dashboard/ChargeDetailsDrawer';
+import { ChargeDetailsModal, StatusBadge } from '@/components/dashboard/ChargeDetailsModal';
 import { Input } from '@/components/ui/Input/Input';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { toast } from 'sonner';
@@ -43,6 +40,7 @@ type Charge = {
   amount: number;
   dueDate: string;
   status: string;
+  recurrence: 'ONCE' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
   automationEnabled: boolean;
 };
 
@@ -129,14 +127,16 @@ export function ChargesClient({
       header: 'Vencimento',
       cell: info => <div className="text-sm text-zinc-500 dark:text-zinc-400">{format(new Date(info.getValue()), "dd 'de' MMM, yyyy", { locale: ptBR })}</div>
     }),
+    columnHelper.accessor('recurrence', {
+      header: 'Recorrência',
+      cell: info => {
+        const map: Record<string, string> = { ONCE: 'Única', WEEKLY: 'Semanal', MONTHLY: 'Mensal', YEARLY: 'Anual' };
+        return <span className="text-sm text-zinc-500 dark:text-zinc-400">{map[info.getValue()] ?? info.getValue()}</span>;
+      }
+    }),
     columnHelper.accessor('status', {
       header: 'Status',
-      cell: info => {
-        const status = info.getValue();
-        if (status === 'PAID') return <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800"><IconCheckCircle className="w-3 h-3" /> Pago</span>;
-        if (status === 'OVERDUE') return <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800"><IconAlertCircle className="w-3 h-3" /> Atrasado</span>;
-        return <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800"><IconClock className="w-3 h-3" /> Pendente</span>;
-      }
+      cell: info => <StatusBadge status={info.getValue()} />,
     }),
     columnHelper.accessor('automationEnabled', {
       header: 'Automação',
@@ -193,7 +193,10 @@ export function ChargesClient({
               </DropdownMenu.Trigger>
               <DropdownMenu.Portal>
                 <DropdownMenu.Content align="end" className="min-w-[180px] bg-[#f8fafc] dark:bg-[#1a2d42] rounded-xl shadow-xl border border-zinc-200/80 dark:border-white/[0.08] p-1.5 text-sm z-50 animate-in fade-in zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-95">
-                  <DropdownMenu.Item className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg text-zinc-600 dark:text-zinc-300 font-medium">
+                  <DropdownMenu.Item
+                    className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg text-zinc-600 dark:text-zinc-300 font-medium"
+                    onClick={() => setDetailsChargeId(row.original.id)}
+                  >
                     <IconExternalLink className="w-4 h-4 text-zinc-400 dark:text-zinc-500" /> Ver Detalhes
                   </DropdownMenu.Item>
                   <DropdownMenu.Item className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg text-zinc-600 dark:text-zinc-300 font-medium" onClick={() => {
@@ -452,9 +455,10 @@ export function ChargesClient({
         }}
       />
 
-      <ChargeDetailsDrawer
+      <ChargeDetailsModal
         chargeId={detailsChargeId}
         onClose={() => setDetailsChargeId(null)}
+        onCancel={(id) => setData(prev => prev.map(c => c.id === id ? { ...c, status: 'CANCELED' } : c))}
       />
     </div>
   );
