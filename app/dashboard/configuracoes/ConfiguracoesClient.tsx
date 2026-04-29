@@ -31,7 +31,7 @@ interface Props {
   subscription: { plan: string; status: string; sentThisMonth?: number; current_period_end?: string } | null;
 }
 
-const PLAN_LIMIT: Record<string, number> = { FREE: 10, STARTER: 100, PRO: 500, UNLIMITED: Infinity };
+const PLAN_LIMIT: Record<string, number> = { FREE: 10, STARTER: 50, PRO: 200, UNLIMITED: Infinity };
 const PLAN_COLOR: Record<string, string> = {
   FREE: 'from-zinc-700 to-zinc-900',
   STARTER: 'from-blue-600 to-blue-900',

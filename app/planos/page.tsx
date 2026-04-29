@@ -74,7 +74,7 @@ const PLANS: Plan[] = [
     monthlyPrice: 69,
     yearlyPrice: 662,
     features: [
-      { text: 'Cobranças ilimitadas', included: true },
+      { text: 'Até 200 cobranças/mês', included: true },
       { text: 'Tudo do plano Starter', included: true },
       { text: 'Automação completa (Régua)', included: true, premium: true },
       { text: 'Cobrança em Massa', included: true },
@@ -82,6 +82,22 @@ const PLANS: Plan[] = [
       { text: 'Suporte VIP 24h', included: true },
     ],
     buttonText: 'Escolher Pro',
+  },
+  {
+    id: 'UNLIMITED',
+    name: 'Unlimited',
+    description: 'Para empresas que precisam de poder total sem nenhum limite.',
+    monthlyPrice: 149,
+    yearlyPrice: 1430,
+    features: [
+      { text: 'Cobranças ilimitadas', included: true, premium: true },
+      { text: 'Tudo do plano Pro', included: true },
+      { text: 'Multi-usuário (em breve)', included: true },
+      { text: 'API de integração (em breve)', included: true },
+      { text: 'Suporte dedicado 24h', included: true, premium: true },
+      { text: 'SLA de atendimento garantido', included: true },
+    ],
+    buttonText: 'Escolher Unlimited',
   },
 ];
 
@@ -185,7 +201,7 @@ export default function PlanosPage() {
         )}
 
         {/* ── Cards de Planos ───────────────────────────────── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">
           {PLANS.map((plan) => {
             const isCurrent = plan.id === currentPlan;
             const price = period === 'MONTHLY' ? plan.monthlyPrice : Math.floor(plan.yearlyPrice / 12);

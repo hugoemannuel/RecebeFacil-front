@@ -39,6 +39,21 @@ export async function createCheckoutAction(planType: string, period: 'MONTHLY' |
   }
 }
 
+export async function cancelSubscriptionAction() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('recebefacil_token')?.value;
+  if (!token) redirect('/login');
+  try {
+    const response = await api.post('/subscription/cancel', {}, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return { success: true, data: response.data };
+  } catch (error: any) {
+    const msg = error.response?.data?.message;
+    return { success: false, error: Array.isArray(msg) ? msg[0] : msg ?? 'Erro ao cancelar assinatura.' };
+  }
+}
+
 export async function getSubscriptionStatusAction() {
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;

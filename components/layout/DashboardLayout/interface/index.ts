@@ -3,6 +3,9 @@ export interface SubscriptionStatus {
   status: 'ACTIVE' | 'CANCELED' | 'PAST_DUE' | 'NONE';
   allowed_modules: string[];
   current_period_end: string | null;
+  cancel_at_period_end?: boolean;
+  payment_failed?: boolean;
+  payment_failed_at?: string | null;
   userName?: string;
 }
 

@@ -17,6 +17,7 @@ import {
   IconLock,
   IconMenu,
   IconX,
+  IconAlertOctagon,
 } from '@/components/ui/Icons';
 import { logoutAction } from '@/app/actions/auth';
 import { Input } from '@/components/ui/Input/Input';
@@ -33,8 +34,10 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
   const [lockedModule, setLockedModule] = useState<string | null>(null);
   const [limitReached, setLimitReached] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [paymentAlertDismissed, setPaymentAlertDismissed] = useState(false);
+
+  const showPaymentAlert = subscription.payment_failed && !paymentAlertDismissed;
 
   const planBadge = PLAN_BADGE[subscription.plan] ?? PLAN_BADGE.FREE;
   const userName = subscription.userName ?? 'Usuário';
@@ -255,6 +258,31 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
             </button>
           </div>
         </header>
+
+        {/* Banner de falha de pagamento */}
+        {showPaymentAlert && (
+          <div className="bg-amber-50 dark:bg-amber-500/10 border-b border-amber-200 dark:border-amber-500/20 px-4 sm:px-8 py-3 flex items-center gap-3">
+            <IconAlertOctagon className="w-5 h-5 text-amber-500 shrink-0" />
+            <p className="flex-1 text-sm font-medium text-amber-800 dark:text-amber-300">
+              Não foi possível processar seu pagamento. Seu acesso será mantido por mais 3 dias.
+            </p>
+            <div className="flex items-center gap-2 shrink-0">
+              <a
+                href="/planos"
+                className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-500/20 hover:bg-amber-200 dark:hover:bg-amber-500/30 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                Tentar novamente
+              </a>
+              <button
+                onClick={() => setPaymentAlertDismissed(true)}
+                className="p-1.5 text-amber-500 hover:text-amber-700 dark:hover:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-500/20 rounded-lg transition-colors"
+                aria-label="Fechar aviso"
+              >
+                <IconX className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Scrollable Area */}
         <main className="flex-1 overflow-y-auto bg-[#f8fafc] dark:bg-[#0b1521] transition-colors duration-300">
