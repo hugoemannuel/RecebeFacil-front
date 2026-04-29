@@ -70,8 +70,8 @@ export async function deleteAccountAction() {
   try {
     await api.delete('/users/me', { headers: { Authorization: `Bearer ${token}` } });
     (await cookies()).delete('recebefacil_token');
-    redirect('/login');
   } catch {
     return { success: false, error: 'Erro ao excluir conta. Tente novamente.' };
   }
+  redirect('/login');
 }
