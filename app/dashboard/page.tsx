@@ -79,9 +79,9 @@ export default async function Dashboard(props: any) {
       <div className="p-8 max-w-[1600px] mx-auto space-y-6">
 
         {targetDate && (
-          <div className="fixed bottom-6 right-6 z-50 bg-amber-50 border border-amber-200 text-amber-800 px-6 py-4 rounded-2xl flex flex-col gap-4 shadow-xl shadow-amber-900/10 max-w-sm animate-in slide-in-from-bottom-5 fade-in duration-300">
+          <div className="fixed bottom-6 right-6 z-50 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-500/25 text-amber-800 dark:text-amber-300 px-6 py-4 rounded-2xl flex flex-col gap-4 shadow-xl shadow-amber-900/10 dark:shadow-amber-900/40 max-w-sm animate-in slide-in-from-bottom-5 fade-in duration-300">
             <div className="flex items-start gap-3">
-              <IconAlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+              <IconAlertTriangle className="w-5 h-5 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold text-base">Modo Viagem no Tempo</p>
                 <p className="text-sm opacity-80 mt-0.5 leading-relaxed">
@@ -89,7 +89,7 @@ export default async function Dashboard(props: any) {
                 </p>
               </div>
             </div>
-            <Link href="/dashboard" className="w-full text-center bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-5 py-2.5 rounded-xl text-sm transition-colors shadow-sm">
+            <Link href="/dashboard" className="w-full text-center bg-amber-100 hover:bg-amber-200 text-amber-900 dark:bg-amber-500/15 dark:hover:bg-amber-500/25 dark:text-amber-300 font-bold px-5 py-2.5 rounded-xl text-sm transition-colors shadow-sm">
               Voltar ao Presente
             </Link>
           </div>
@@ -136,7 +136,7 @@ export default async function Dashboard(props: any) {
               <div className="w-10 h-10 bg-red-50 text-red-500 rounded-xl flex items-center justify-center">
                 <IconAlertTriangle className="w-5 h-5" />
               </div>
-              <span className="bg-red-50 text-red-600 text-xs font-bold px-2 py-1 rounded-lg">Alerta</span>
+              <span className="bg-red-50 text-red-600 dark:bg-red-500/15 dark:text-red-400 text-xs font-bold px-2 py-1 rounded-lg">Alerta</span>
             </div>
             <div className="pl-2">
               <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Atrasados</p>
@@ -263,13 +263,13 @@ export default async function Dashboard(props: any) {
               <Link href={`/dashboard?period=${period}`} className={`py-2 px-3 rounded-xl text-xs font-bold transition-colors ${!status ? 'bg-zinc-800 dark:bg-green-500/20 text-white dark:text-green-400' : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10'}`}>
                 Todos
               </Link>
-              <Link href={`/dashboard?period=${period}&status=PENDING`} className={`py-2 px-3 rounded-xl text-xs font-bold transition-colors ${status === 'PENDING' ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-400' : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10'}`}>
+              <Link href={`/dashboard?period=${period}&status=PENDING`} className={`py-2 px-3 rounded-xl text-xs font-bold transition-colors ${status === 'PENDING' ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400' : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10'}`}>
                 Pendente
               </Link>
-              <Link href={`/dashboard?period=${period}&status=OVERDUE`} className={`py-2 px-3 rounded-xl text-xs font-bold transition-colors ${status === 'OVERDUE' ? 'bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-400' : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10'}`}>
+              <Link href={`/dashboard?period=${period}&status=OVERDUE`} className={`py-2 px-3 rounded-xl text-xs font-bold transition-colors ${status === 'OVERDUE' ? 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-400' : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10'}`}>
                 Atrasado
               </Link>
-              <Link href={`/dashboard?period=${period}&status=PAID`} className={`py-2 px-3 rounded-xl text-xs font-bold transition-colors ${status === 'PAID' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-400' : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10'}`}>
+              <Link href={`/dashboard?period=${period}&status=PAID`} className={`py-2 px-3 rounded-xl text-xs font-bold transition-colors ${status === 'PAID' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400' : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10'}`}>
                 Pago
               </Link>
             </div>

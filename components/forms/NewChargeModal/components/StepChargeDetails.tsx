@@ -45,7 +45,7 @@ export function StepChargeDetails({ planType }: { planType: PlanType }) {
                 >
                   <IconRepeat className="w-3.5 h-3.5" />
                   {labels[r]}
-                  {!isAllowed && <span className="absolute top-0 right-0 bg-amber-100 text-amber-700 text-[8px] uppercase px-1.5 py-0.5 rounded-bl-lg font-extrabold">Pro</span>}
+                  {!isAllowed && <span className="absolute top-0 right-0 bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400 text-[8px] uppercase px-1.5 py-0.5 rounded-bl-lg font-extrabold">Pro</span>}
                 </button>
               );
             })}

@@ -78,22 +78,22 @@ export function ChargeDetailsDrawer({ chargeId, onClose }: Props) {
                     <h3 className="text-4xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight">{formatMoney(charge.amount)}</h3>
                   </div>
                   {charge.status === 'PAID' && (
-                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold bg-emerald-100 text-emerald-800">
+                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400">
                       <IconCheckCircle className="w-4 h-4" /> Pago
                     </span>
                   )}
                   {charge.status === 'OVERDUE' && (
-                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold bg-red-100 text-red-800">
+                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-400">
                       <IconAlertCircle className="w-4 h-4" /> Atrasado
                     </span>
                   )}
                   {charge.status === 'PENDING' && (
-                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold bg-amber-100 text-amber-800">
+                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400">
                       <IconClock className="w-4 h-4" /> Pendente
                     </span>
                   )}
                   {charge.status === 'CANCELED' && (
-                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold bg-zinc-200 text-zinc-600">
+                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold bg-zinc-200 text-zinc-600 dark:bg-zinc-700/50 dark:text-zinc-400">
                       <IconX className="w-4 h-4" /> Cancelado
                     </span>
                   )}

@@ -72,17 +72,17 @@ export function RecentActivityClient({ recentActivity }: Props) {
                   </td>
                   <td className="py-5 px-8">
                     {isPaid && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400">
                         <IconCheckCircle className="w-3 h-3" /> Pago
                       </span>
                     )}
                     {isOverdue && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-400">
                         <IconAlertCircle className="w-3 h-3" /> Atrasado
                       </span>
                     )}
                     {isPending && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400">
                         <IconClock className="w-3 h-3" /> Pendente
                       </span>
                     )}

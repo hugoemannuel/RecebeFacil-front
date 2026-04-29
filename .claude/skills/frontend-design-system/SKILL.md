@@ -61,9 +61,24 @@ when_to_use: Quando estilizar componentes, definir cores, implementar dark mode,
 ## Badges de Status de Cobrança
 
 ```tsx
-PAID:    "bg-emerald-100 text-emerald-800"  // Pago
-OVERDUE: "bg-red-100 text-red-800"          // Atrasado
-PENDING: "bg-amber-100 text-amber-800"      // Pendente
+PAID:     "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400"  // Pago
+OVERDUE:  "bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-400"                  // Atrasado
+PENDING:  "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400"          // Pendente
+CANCELED: "bg-zinc-200 text-zinc-600 dark:bg-zinc-700/50 dark:text-zinc-400"              // Cancelado
+```
+
+## Badges de Plano Inline (feature gating)
+
+```tsx
+Pro: "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400"
+```
+
+## Alertas Flutuantes (dark mode)
+
+```tsx
+// Toast/alerta amber (ex: Modo Viagem no Tempo)
+container: "bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-500/25 text-amber-800 dark:text-amber-300"
+button:    "bg-amber-100 hover:bg-amber-200 text-amber-900 dark:bg-amber-500/15 dark:hover:bg-amber-500/25 dark:text-amber-300"
 ```
 
 ## Badges de Plano (sidebar)

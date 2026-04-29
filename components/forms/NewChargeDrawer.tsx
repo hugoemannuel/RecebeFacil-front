@@ -388,7 +388,7 @@ function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCa
                   className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all overflow-hidden ${!isAllowed ? 'opacity-50 cursor-not-allowed bg-zinc-50 border-zinc-200 text-zinc-400' : values.recurrence === r ? 'bg-green-50 border-green-400 text-green-700' : 'border-zinc-200 text-zinc-500 hover:border-zinc-300'}`}>
                   <IconRepeat className="w-3.5 h-3.5" />
                   {labels[r]}
-                  {!isAllowed && <span className="absolute top-0 right-0 bg-amber-100 text-amber-700 text-[8px] uppercase px-1.5 py-0.5 rounded-bl-lg font-extrabold">Pro</span>}
+                  {!isAllowed && <span className="absolute top-0 right-0 bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400 text-[8px] uppercase px-1.5 py-0.5 rounded-bl-lg font-extrabold">Pro</span>}
                 </button>
               );
             })}
@@ -546,7 +546,7 @@ function StepConfirm({ hasPixKey }: { hasPixKey: boolean }) {
         {values.send_pix_button && <p className="flex items-center gap-1.5"><span className="text-green-600">✓</span> Botão e código de pagamento PIX</p>}
       </div>
 
-      <div className="bg-amber-50 rounded-xl p-3 text-xs text-amber-700 border border-amber-100">
+      <div className="bg-amber-50 dark:bg-amber-500/10 rounded-xl p-3 text-xs text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-500/20">
         <p className="font-bold mb-0.5">⚡ Envio imediato</p>
         <p>A mensagem será disparada assim que você confirmar.</p>
       </div>

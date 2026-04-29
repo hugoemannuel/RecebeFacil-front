@@ -141,9 +141,9 @@ export function ChargesClient({
       header: 'Status',
       cell: info => {
         const status = info.getValue();
-        if (status === 'PAID') return <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800"><IconCheckCircle className="w-3 h-3" /> Pago</span>;
-        if (status === 'OVERDUE') return <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800"><IconAlertCircle className="w-3 h-3" /> Atrasado</span>;
-        return <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800"><IconClock className="w-3 h-3" /> Pendente</span>;
+        if (status === 'PAID') return <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400"><IconCheckCircle className="w-3 h-3" /> Pago</span>;
+        if (status === 'OVERDUE') return <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-400"><IconAlertCircle className="w-3 h-3" /> Atrasado</span>;
+        return <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400"><IconClock className="w-3 h-3" /> Pendente</span>;
       }
     }),
     columnHelper.accessor('automationEnabled', {
@@ -281,7 +281,7 @@ export function ChargesClient({
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xs font-bold tracking-widest text-zinc-400 uppercase">PLANO {plan}</span>
-              {usage.count >= usage.limit && <span className="bg-red-100 text-red-700 text-[10px] uppercase px-2 py-0.5 rounded-full font-bold">Limite Atingido</span>}
+              {usage.count >= usage.limit && <span className="bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400 text-[10px] uppercase px-2 py-0.5 rounded-full font-bold">Limite Atingido</span>}
             </div>
             <h3 className="text-zinc-700 dark:text-zinc-200 font-bold mb-3">Você usou {usage.count} das {usage.limit} cobranças deste mês.</h3>
 
@@ -319,9 +319,9 @@ export function ChargesClient({
             className="mr-2"
           />
           <button onClick={() => setStatusFilter('ALL')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'ALL' ? 'bg-zinc-900 text-white shadow-zinc-900/20' : 'bg-[#f8fafc] dark:bg-[#0f1c2b] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/[0.07] hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Todas</button>
-          <button onClick={() => setStatusFilter('PENDING')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'PENDING' ? 'bg-amber-100 text-amber-800' : 'bg-[#f8fafc] dark:bg-[#0f1c2b] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/[0.07] hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Pendentes</button>
-          <button onClick={() => setStatusFilter('OVERDUE')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'OVERDUE' ? 'bg-red-100 text-red-800' : 'bg-[#f8fafc] dark:bg-[#0f1c2b] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/[0.07] hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Atrasadas</button>
-          <button onClick={() => setStatusFilter('PAID')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'PAID' ? 'bg-emerald-100 text-emerald-800' : 'bg-[#f8fafc] dark:bg-[#0f1c2b] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/[0.07] hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Pagas</button>
+          <button onClick={() => setStatusFilter('PENDING')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'PENDING' ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400' : 'bg-[#f8fafc] dark:bg-[#0f1c2b] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/[0.07] hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Pendentes</button>
+          <button onClick={() => setStatusFilter('OVERDUE')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'OVERDUE' ? 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-400' : 'bg-[#f8fafc] dark:bg-[#0f1c2b] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/[0.07] hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Atrasadas</button>
+          <button onClick={() => setStatusFilter('PAID')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'PAID' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400' : 'bg-[#f8fafc] dark:bg-[#0f1c2b] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/[0.07] hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Pagas</button>
         </div>
       </div>
 
