@@ -66,25 +66,25 @@ export default function Login() {
           </div>
 
           <div className="w-full max-w-lg flex flex-col items-center z-10 mt-8 scale-95 origin-center">
-            <h2 className="text-4xl xl:text-5xl font-semibold tracking-tight mb-8 text-center leading-[1.1]">
-              Acelere seus <br />
-              <span className="text-green-400 italic font-medium">recebíveis</span> hoje.
+            <h2 className="text-4xl xl:text-5xl font-extrabold tracking-tight mb-8 text-center leading-[1.1]">
+              Transforme cobrança em <br />
+              <span className="text-green-500 italic font-medium">recebimento.</span>
             </h2>
 
             <div className="flex gap-4 mb-4 w-full justify-center">
               <div className="bg-surface-dark/80 backdrop-blur-md border border-[#1e3046] rounded-2xl p-4 flex flex-col items-center justify-center w-36 hover:border-green-500/20 transition-colors">
-                <span className="text-2xl font-bold text-green-400 mb-1">+10k</span>
-                <span className="text-xs text-slate-400">Cobranças Ativas</span>
+                <span className="text-2xl font-bold text-green-500 mb-1">40%</span>
+                <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest">Recuperação</span>
               </div>
               <div className="bg-surface-dark/80 backdrop-blur-md border border-[#1e3046] rounded-2xl p-4 flex flex-col items-center justify-center w-36 hover:border-green-500/20 transition-colors">
-                <span className="text-2xl font-bold text-green-400 mb-1">98%</span>
-                <span className="text-xs text-slate-400">Conversão de Pix</span>
+                <span className="text-2xl font-bold text-green-500 mb-1">24h</span>
+                <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest">Automação</span>
               </div>
             </div>
             <div className="flex gap-4 mb-8 w-full justify-center">
               <div className="bg-surface-dark/80 backdrop-blur-md border border-[#1e3046] rounded-2xl p-4 flex flex-col items-center justify-center w-36 hover:border-green-500/20 transition-colors">
-                <span className="text-2xl font-bold text-green-400 mb-1">0.1s</span>
-                <span className="text-xs text-slate-400 text-center">Tempo de<br />Resposta</span>
+                <span className="text-2xl font-bold text-green-500 mb-1">PIX</span>
+                <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest">Instantâneo</span>
               </div>
             </div>
 
@@ -93,11 +93,11 @@ export default function Login() {
 
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <p className="text-slate-400 text-sm mb-1">Saldo Disponível</p>
-                  <p className="text-3xl font-bold text-white tracking-tight">R$ 42.850,00</p>
+                  <p className="text-slate-400 text-sm mb-1">Total Recuperado (Mês)</p>
+                  <p className="text-3xl font-bold text-white tracking-tight">R$ 12.450,00</p>
                 </div>
                 <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center border border-green-500/20">
-                  <IconTrendingUp className="w-5 h-5 text-green-400" />
+                  <IconTrendingUp className="w-5 h-5 text-green-500" />
                 </div>
               </div>
 
@@ -108,24 +108,24 @@ export default function Login() {
                       <IconCheck className="w-4 h-4 text-green-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-slate-200">Venda Realizada</p>
-                      <p className="text-[10px] text-slate-500">João Silva • Pix</p>
+                      <p className="text-sm font-bold text-slate-200">Fatura Paga</p>
+                      <p className="text-[10px] text-slate-500">Ana Oliveira • Via WhatsApp</p>
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-green-400">+R$ 297,00</span>
+                  <span className="text-sm font-bold text-green-400">+R$ 199,00</span>
                 </div>
 
                 <div className="bg-surface-dark rounded-2xl p-3 flex items-center justify-between border border-[#1e3046]/50">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center shrink-0">
-                      <IconCheck className="w-4 h-4 text-green-500" />
+                      <IconMessageCircle className="w-4 h-4 text-green-500" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-slate-200">Mensagem Enviada</p>
-                      <p className="text-[10px] text-slate-500">Automação WhatsApp</p>
+                      <p className="text-sm font-bold text-slate-200">Lembrete Enviado</p>
+                      <p className="text-[10px] text-slate-500">Vence em 3 dias</p>
                     </div>
                   </div>
-                  <span className="text-xs font-bold tracking-widest text-green-500 uppercase">SUCESSO</span>
+                  <span className="text-[10px] font-black tracking-widest text-green-500 uppercase">AUTOMÁTICO</span>
                 </div>
               </div>
             </div>
@@ -163,12 +163,12 @@ export default function Login() {
       {/* Form Container */}
       <div className="flex-1 flex flex-col justify-center px-6 lg:px-12 xl:px-24 py-4 lg:py-8 max-w-[600px] w-full mx-auto">
 
-        <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-zinc-900 mb-3 lg:mb-4 text-center lg:text-left">
-          Acesse sua conta
+        <h1 className="text-3xl lg:text-4xl font-black tracking-tight text-zinc-900 mb-3 lg:mb-4 text-center lg:text-left">
+          Bem-vindo de volta
         </h1>
-        <p className="text-zinc-500 text-base mb-10 text-center lg:text-left leading-relaxed">
-          <span className="hidden lg:inline">Gerencie suas cobranças com a fintech de performance que mais cresce.</span>
-          <span className="lg:hidden">Gerencie suas cobranças automáticas no WhatsApp</span>
+        <p className="text-zinc-500 text-base mb-10 text-center lg:text-left leading-relaxed font-medium">
+          <span className="hidden lg:inline">Acesse sua conta para gerenciar suas automações e acompanhar sua performance em tempo real.</span>
+          <span className="lg:hidden">Gerencie sua automação de cobranças no WhatsApp</span>
         </p>
 
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
@@ -213,7 +213,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl mt-6 transition-all hover:scale-[1.02] shadow-xl shadow-green-500/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:hover:scale-100"
+            className="w-full bg-green-500 hover:bg-green-600 text-white font-black py-4 rounded-xl mt-6 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-green-500/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:hover:scale-100 cursor-pointer"
           >
             {isLoading ? 'Entrando...' : (
               <>

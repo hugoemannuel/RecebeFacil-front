@@ -12,9 +12,9 @@ export function DemoButton() {
       <button
         type="button"
         onClick={() => setModal('demo')}
-        className="w-full sm:w-auto bg-white hover:bg-zinc-50 border border-zinc-200 text-zinc-900 px-8 py-4 rounded-xl md:rounded-full font-bold text-lg flex items-center justify-center gap-2 transition-colors shadow-sm"
+        className="w-full sm:w-auto bg-white hover:bg-zinc-50 border border-zinc-200 text-zinc-900 px-8 py-4 rounded-xl md:rounded-full font-black text-lg flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-sm cursor-pointer"
       >
-        <IconPlayCircle className="w-5 h-5 text-zinc-700" /> Teste agora
+        <IconPlayCircle className="w-5 h-5 text-zinc-700 group-hover:scale-110 transition-transform" /> Teste agora
       </button>
 
       <DemoModal

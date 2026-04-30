@@ -64,45 +64,46 @@ export default function Cadastro() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-green-500/10 rounded-full blur-3xl -z-10"></div>
 
           <div className="max-w-md z-10 relative w-full">
-            <div className="text-green-400 text-xs font-bold uppercase tracking-widest mb-4">
-              Fintech de Performance
+            <div className="text-green-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4">
+              Tecnologia de Cobrança
             </div>
             <h2 className="text-4xl xl:text-5xl font-extrabold tracking-tight mb-6 leading-[1.1]">
-              Comece a receber agora.
+              Crie sua máquina de <br />
+              <span className="text-green-500 italic">recebimentos.</span>
             </h2>
-            <p className="text-slate-400 text-lg mb-12 leading-relaxed">
-              Sua operação financeira em piloto automático, do checkout à conciliação.
+            <p className="text-slate-400 text-lg mb-12 leading-relaxed font-medium">
+              Recupere faturas atrasadas e automatize lembretes via WhatsApp sem esforço manual.
             </p>
 
             <div className="space-y-4">
               <div className="bg-surface-dark/60 backdrop-blur-sm border border-[#1e3046] p-6 rounded-2xl flex gap-5 items-start hover:border-green-500/30 transition-colors">
-                <div className="w-12 h-12 rounded-xl bg-[#1e3046] flex items-center justify-center shrink-0">
-                  <IconMessageCircle className="w-6 h-6 text-green-500" />
+                <div className="w-12 h-12 rounded-xl bg-zinc-900 flex items-center justify-center shrink-0 border border-white/5">
+                  <IconTrendingUp className="w-6 h-6 text-green-500" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-white text-lg mb-1">Automação via WhatsApp</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">Envio automático de cobranças e lembretes direto no app favorito do seu cliente.</p>
+                  <h3 className="font-bold text-white text-lg mb-1">Recupere até 40%</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">Nossa régua de cobrança inteligente aborda o cliente no momento certo para garantir o pagamento.</p>
                 </div>
               </div>
 
               <div className="bg-surface-dark/60 backdrop-blur-sm border border-[#1e3046] p-6 rounded-2xl flex gap-5 items-start hover:border-green-500/30 transition-colors">
-                <div className="w-12 h-12 rounded-xl bg-[#1e3046] flex items-center justify-center shrink-0">
-                  <IconTrendingUp className="w-6 h-6 text-green-500" />
+                <div className="w-12 h-12 rounded-xl bg-zinc-900 flex items-center justify-center shrink-0 border border-white/5">
+                  <IconMessageCircle className="w-6 h-6 text-green-500" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-white text-lg mb-1">Recuperação de Inadimplência</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">Régua de cobrança inteligente que recupera até 40% das faturas atrasadas.</p>
+                  <h3 className="font-bold text-white text-lg mb-1">WhatsApp Oficial</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">Notificações automáticas com o seu nome e sua marca, aumentando a confiança do pagador.</p>
                 </div>
               </div>
 
-              <div className="bg-surface-dark border border-green-500/40 p-6 rounded-2xl flex gap-5 items-start shadow-[0_0_30px_rgba(34,197,94,0.05)] relative overflow-hidden">
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>
+              <div className="bg-zinc-900/80 border border-green-500/40 p-6 rounded-2xl flex gap-5 items-start shadow-2xl relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-green-500"></div>
                 <div className="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center shrink-0 shadow-lg shadow-green-500/20">
-                  <IconZap className="w-6 h-6 text-white fill-white/20" />
+                  <IconZap className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-white text-lg mb-1">Configuração em 5 minutos</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">Sem burocracia bancária. Integre, configure e venda no mesmo dia.</p>
+                  <h3 className="font-bold text-white text-lg mb-1">Setup Instantâneo</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed font-medium">Cadastre seu PIX ou vincule sua conta Asaas e comece a cobrar em menos de 5 minutos.</p>
                 </div>
               </div>
             </div>
@@ -113,7 +114,7 @@ export default function Cadastro() {
                 <img src="https://i.pravatar.cc/100?img=5" alt="User 2" className="w-10 h-10 rounded-full border-2 border-[#0b1521] object-cover" />
                 <img src="https://i.pravatar.cc/100?img=8" alt="User 3" className="w-10 h-10 rounded-full border-2 border-[#0b1521] object-cover" />
               </div>
-              <p className="text-xs text-slate-500 font-medium">+ de 2.000 empresas acelerando com a RecebeFácil</p>
+              <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">+ de 2.000 empresas ativas</p>
             </div>
           </div>
         </>
@@ -147,12 +148,12 @@ export default function Cadastro() {
           </div>
         </div>
 
-        <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-zinc-900 mb-3 lg:mb-4 text-center lg:text-left">
-          Crie sua conta <span className="lg:hidden">grátis</span>
+        <h1 className="text-3xl lg:text-4xl font-black tracking-tight text-zinc-900 mb-3 lg:mb-4 text-center lg:text-left">
+          Comece a receber agora
         </h1>
-        <p className="text-zinc-500 text-base mb-10 text-center lg:text-left leading-relaxed">
-          <span className="hidden lg:inline">Configure seu checkout e comece a receber pagamentos hoje mesmo.</span>
-          <span className="lg:hidden">Comece a receber pagamentos em segundos com a tecnologia RecebeFácil.</span>
+        <p className="text-zinc-500 text-base mb-10 text-center lg:text-left leading-relaxed font-medium">
+          <span className="hidden lg:inline">Crie sua conta em 30 segundos e configure sua primeira régua de cobrança automática.</span>
+          <span className="lg:hidden">Recupere faturas e automatize seu caixa hoje mesmo.</span>
         </p>
 
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
@@ -216,7 +217,7 @@ export default function Cadastro() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl mt-8 transition-all hover:scale-[1.02] shadow-xl shadow-green-500/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:hover:scale-100"
+            className="w-full bg-green-500 hover:bg-green-600 text-white font-black py-4 rounded-xl mt-8 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-green-500/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:hover:scale-100 cursor-pointer"
           >
             {isLoading ? 'Criando...' : (
               <>

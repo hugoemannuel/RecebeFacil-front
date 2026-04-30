@@ -111,7 +111,7 @@ export function DemoModal({ open, onClose, onBlocked }: Props) {
           <button
             type="button"
             onClick={handleClose}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 rounded-lg transition-colors"
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 rounded-lg transition-all cursor-pointer hover:rotate-90 active:scale-90"
           >
             <IconX className="w-5 h-5" />
           </button>
@@ -220,7 +220,7 @@ export function DemoModal({ open, onClose, onBlocked }: Props) {
               <button
                 type="button"
                 onClick={handleClose}
-                className="border border-zinc-200 text-zinc-600 font-bold py-3 px-6 rounded-xl hover:bg-zinc-50 transition-colors text-sm"
+                className="border border-zinc-200 text-zinc-600 font-black py-3 px-6 rounded-xl hover:bg-zinc-50 transition-all text-sm cursor-pointer active:scale-95"
               >
                 Cancelar
               </button>
