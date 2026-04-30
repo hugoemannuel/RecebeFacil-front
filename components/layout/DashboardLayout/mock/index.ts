@@ -1,6 +1,14 @@
 import { IconLayoutGrid, IconDollarSign, IconUsers, IconFileText, IconSettings, IconWallet } from "@/components/ui/Icons";
 
-export const MENU_ITEMS = [
+interface MenuItem {
+    name: string;
+    path: string;
+    icon: any;
+    module: string;
+    isComingSoon?: boolean;
+}
+
+export const MENU_ITEMS: MenuItem[] = [
     { name: 'INÍCIO', path: '/dashboard', icon: IconLayoutGrid, module: 'HOME' },
     { name: 'COBRANÇAS', path: '/dashboard/cobrancas', icon: IconDollarSign, module: 'CHARGES' },
     { name: 'CLIENTES', path: '/dashboard/clientes', icon: IconUsers, module: 'CLIENTS' },

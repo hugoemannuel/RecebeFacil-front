@@ -409,7 +409,51 @@ export function ChargesClient({
 
       {/* DATA TABLE */}
       <div className="bg-surface dark:bg-surface rounded-2xl border border-zinc-200/80 dark:border-white/7 shadow-sm overflow-hidden relative">
-        <div className="overflow-x-auto">
+        {/* MOBILE VIEW (CARDS) */}
+        <div className="md:hidden divide-y divide-zinc-100 dark:divide-white/5">
+          {table.getRowModel().rows.map(row => (
+            <div
+              key={row.id}
+              className="p-4 active:bg-zinc-50 dark:active:bg-white/5 transition-colors"
+              onClick={() => setDetailsChargeId(row.original.id)}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <p className="font-bold text-zinc-900 dark:text-zinc-100 truncate max-w-[200px]">
+                    {row.original.debtorName}
+                  </p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Vencimento: {format(new Date(row.original.dueDate), 'dd/MM/yy')}
+                  </p>
+                </div>
+                <div onClick={(e) => e.stopPropagation()}>
+                   {(() => {
+                     const cell = row.getVisibleCells().find(c => c.column.id === 'status');
+                     return cell ? flexRender(cell.column.columnDef.cell, cell.getContext()) : null;
+                   })()}
+                </div>
+              </div>
+              <div className="flex justify-between items-end">
+                <p className="text-lg font-black text-zinc-900 dark:text-zinc-100">
+                  {formatMoney(row.original.amount)}
+                </p>
+                <div onClick={(e) => e.stopPropagation()}>
+                   {(() => {
+                     const cell = row.getVisibleCells().find(c => c.column.id === 'actions');
+                     return cell ? flexRender(cell.column.columnDef.cell, cell.getContext()) : null;
+                   })()}
+                </div>
+              </div>
+            </div>
+          ))}
+          {table.getRowModel().rows.length === 0 && (
+            <div className="px-5 py-12 text-center">
+              <p className="text-sm text-zinc-400">Nenhuma cobrança encontrada</p>
+            </div>
+          )}
+        </div>
+
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               {table.getHeaderGroups().map(headerGroup => (

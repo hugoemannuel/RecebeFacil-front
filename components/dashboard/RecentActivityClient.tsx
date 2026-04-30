@@ -15,7 +15,66 @@ export function RecentActivityClient({ recentActivity }: Props) {
 
   return (
     <>
-      <table className="w-full text-left border-collapse">
+      {/* MOBILE VIEW (CARDS) */}
+      <div className="md:hidden divide-y divide-zinc-100 dark:divide-white/5">
+        {recentActivity.map((activity: any) => (
+          <div
+            key={activity.id}
+            className="p-6 active:bg-zinc-50 dark:active:bg-white/5 transition-colors"
+            onClick={() => setDetailsChargeId(activity.id)}
+          >
+            <div className="flex justify-between items-start mb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-white/10 flex items-center justify-center text-zinc-500 dark:text-zinc-400 font-bold text-xs">
+                  {activity.debtorName.substring(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  <p className="font-bold text-zinc-700 dark:text-zinc-200">{activity.debtorName}</p>
+                  <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
+                    {new Date(activity.dueDate).toLocaleDateString('pt-BR')}
+                  </p>
+                </div>
+              </div>
+              <div>
+                {activity.status === 'PAID' && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400">
+                    Pago
+                  </span>
+                )}
+                {activity.status === 'OVERDUE' && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-400">
+                    Atrasado
+                  </span>
+                )}
+                {activity.status === 'PENDING' && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400">
+                    Pendente
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-zinc-700 dark:text-zinc-200 text-lg">
+                {formatMoney(activity.amount)}
+              </span>
+              <button 
+                className="p-2 text-zinc-400"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDetailsChargeId(activity.id);
+                }}
+              >
+                <IconMoreVertical className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        ))}
+        {recentActivity.length === 0 && (
+          <div className="py-12 text-center text-sm text-zinc-400">Nenhuma atividade recente.</div>
+        )}
+      </div>
+
+      <table className="hidden md:table w-full text-left border-collapse">
         <thead>
           <tr className="bg-zinc-100/50 dark:bg-white/2">
             <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/6">Cliente</th>

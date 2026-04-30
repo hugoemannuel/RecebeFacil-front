@@ -27,7 +27,7 @@ export function ModalFooter({ step, totalSteps, sending, onBack, onNext, onSubmi
         <button
           type="button"
           onClick={onNext}
-          className="flex-1 bg-[#0b1521] hover:bg-surface-dark text-white font-bold py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2"
+          className="flex-1 bg-zinc-900 dark:bg-zinc-800 hover:bg-zinc-800 dark:hover:bg-zinc-700 text-white font-bold py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2"
         >
           Próximo <IconChevronRight className="w-4 h-4" />
         </button>
