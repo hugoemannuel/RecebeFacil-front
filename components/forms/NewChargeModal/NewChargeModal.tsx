@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
+import { maskPhone } from '@/lib/formatters';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
@@ -25,6 +26,7 @@ export function NewChargeModal({
   hasPixKey = false,
   planType = 'FREE',
   onSuccess,
+  prefilledDebtor,
 }: NewChargeModalProps) {
   const [step, setStep] = useState(0);
   const [sending, setSending] = useState(false);
@@ -61,6 +63,20 @@ export function NewChargeModal({
     return () => document.removeEventListener('keydown', handler);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (open && prefilledDebtor) {
+      reset({
+        debtor_name: prefilledDebtor.name,
+        debtor_phone: maskPhone(prefilledDebtor.phone.replace(/^55/, '')),
+        amount_display: '', description: '', recurrence: 'ONCE',
+        custom_message: DEFAULT_TEMPLATE, send_pix_button: true,
+        pix_key: '', pix_key_type: 'CPF',
+      });
+      setStep(1);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, prefilledDebtor]);
 
   function handleClose() { reset(); setStep(0); onClose(); }
 

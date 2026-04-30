@@ -5,4 +5,5 @@ export interface NewChargeModalProps {
   hasPixKey?: boolean;
   planType?: 'FREE' | 'STARTER' | 'PRO' | 'UNLIMITED';
   onSuccess?: () => void;
+  prefilledDebtor?: { name: string; phone: string };
 }
