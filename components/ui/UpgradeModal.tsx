@@ -11,7 +11,7 @@ interface UpgradeModalProps {
 
 const MODULE_LABELS: Record<string, { label: string; requiredPlan: string }> = {
   CLIENTS: { label: 'Gerenciar Clientes', requiredPlan: 'STARTER' },
-  REPORTS: { label: 'Relatórios Detalhados', requiredPlan: 'STARTER' },
+  REPORTS: { label: 'Relatórios Detalhados', requiredPlan: 'UNLIMITED' },
   EXCEL_IMPORT: { label: 'Importação via Excel', requiredPlan: 'STARTER' },
   LIMIT_REACHED: { label: 'Limite de cobranças atingido', requiredPlan: 'STARTER' },
   RECURRENCE: { label: 'Regras de Recorrência', requiredPlan: 'PRO' },

@@ -14,7 +14,7 @@ export default async function ExtratoPage() {
   }
 
   const authHeaders = { Authorization: `Bearer ${token}` };
-  
+
   const [subscriptionRes, profileRes] = await Promise.all([
     api.get('/subscription/status', { headers: authHeaders }).catch(() => null),
     api.get('/users/me', { headers: authHeaders }).catch(() => null),
