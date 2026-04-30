@@ -4,7 +4,7 @@ export const MENU_ITEMS = [
     { name: 'INÍCIO', path: '/dashboard', icon: IconLayoutGrid, module: 'HOME' },
     { name: 'COBRANÇAS', path: '/dashboard/cobrancas', icon: IconDollarSign, module: 'CHARGES' },
     { name: 'CLIENTES', path: '/dashboard/clientes', icon: IconUsers, module: 'CLIENTS' },
-    { name: 'RELATÓRIOS', path: '/dashboard/relatorios', icon: IconFileText, module: 'REPORTS', isComingSoon: true },
+    { name: 'RELATÓRIOS', path: '/dashboard/relatorios', icon: IconFileText, module: 'REPORTS' },
     { name: 'FINANCEIRO', path: '/dashboard/financeiro', icon: IconWallet, module: 'FINANCE' },
     { name: 'CONFIGURAÇÕES', path: '/dashboard/configuracoes', icon: IconSettings, module: 'HOME' },
 ];
