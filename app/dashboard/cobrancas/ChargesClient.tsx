@@ -265,19 +265,11 @@ export function ChargesClient({
           <p className="text-zinc-400 dark:text-zinc-500 mt-1">Gerencie seus recebimentos e automações.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => {
-              if (plan === 'FREE') {
-                setShowRecurrenceUpgrade(true);
-              } else {
-                toast.info('Importação via Excel em breve! Estamos preparando esta funcionalidade para você.');
-              }
-            }}
-            className={`flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold border border-zinc-200 dark:border-white/10 transition-all ${plan === 'FREE' ? 'text-zinc-400 bg-zinc-50 dark:bg-white/5' : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/5'}`}
-          >
-            {plan === 'FREE' ? <IconLock className="w-5 h-5" /> : <IconFileText className="w-5 h-5" />}
+          <div className="flex items-center gap-2 px-5 py-3 rounded-xl font-bold border border-zinc-200 dark:border-white/10 text-zinc-400 dark:text-zinc-500 bg-zinc-50 dark:bg-white/5 cursor-not-allowed opacity-70">
+            <IconFileText className="w-5 h-5" />
             Importar Excel
-          </button>
+            <span className="bg-zinc-200 dark:bg-white/10 text-zinc-500 dark:text-zinc-400 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase">Breve</span>
+          </div>
           <Link
             href={plan === 'FREE' || plan === 'STARTER' ? '#' : "/dashboard/cobrancas/recorrentes"}
             onClick={(e) => {
