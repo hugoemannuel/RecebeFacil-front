@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 import { format } from 'date-fns';
 import type { ChargeFormData } from '../interfaces';
 
-export function StepConfirm({ hasPixKey }: { hasPixKey: boolean }) {
+export function StepConfirm({ hasPixKey, plan = 'FREE' }: { hasPixKey: boolean, plan?: string }) {
   const { watch } = useFormContext<ChargeFormData>();
   const values = watch();
 
@@ -36,10 +36,12 @@ export function StepConfirm({ hasPixKey }: { hasPixKey: boolean }) {
         <p className="flex items-center gap-1.5"><span className="text-green-600">✓</span> Mensagem de texto personalizada</p>
         {values.send_pix_button && <p className="flex items-center gap-1.5"><span className="text-green-600">✓</span> Botão e código de pagamento PIX</p>}
       </div>
-      <div className="bg-amber-50 rounded-xl p-3 text-xs text-amber-700 border border-amber-100">
-        <p className="font-bold mb-0.5">⚡ Envio imediato</p>
-        <p>A mensagem será disparada assim que você confirmar.</p>
-      </div>
+      {['FREE', 'STARTER'].includes(plan) && (
+        <div className="bg-zinc-100 rounded-xl p-3 text-xs text-zinc-600 border border-zinc-200">
+          <p className="font-bold mb-0.5">ℹ️ Fluxo Manual</p>
+          <p>Como você está no plano {plan}, lembre-se de conferir seu extrato bancário e marcar como pago manualmente no dashboard.</p>
+        </div>
+      )}
     </div>
   );
 }

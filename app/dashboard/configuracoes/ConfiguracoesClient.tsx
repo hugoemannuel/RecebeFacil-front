@@ -370,16 +370,47 @@ export function ConfiguracoesClient({ profile, subscription, creditorProfile }: 
             <button
               type="submit"
               disabled={creditorLoading || !creditorForm.formState.isDirty}
-              className="w-full bg-green-500 hover:bg-green-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-green-500/20 hover:scale-[1.01] flex items-center justify-center gap-2"
+              className="w-full bg-zinc-900 dark:bg-green-500 hover:bg-zinc-800 dark:hover:bg-green-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-zinc-900/20 dark:shadow-green-500/20 hover:scale-[1.01] flex items-center justify-center gap-2"
             >
               {creditorLoading ? (
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <IconCheck className="w-4 h-4" />
               )}
-              Salvar configurações
+              Salvar chave PIX
             </button>
           </form>
+
+          {/* Seção Asaas Split */}
+          <div className="pt-6 border-t border-zinc-100 dark:border-white/5">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="font-bold text-zinc-800 dark:text-zinc-200">Split via Plataforma (Asaas)</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">Receba direto na sua conta Asaas com conciliação automática.</p>
+              </div>
+              {!['PRO', 'UNLIMITED'].includes(plan) && (
+                <span className="bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400 text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider">PRO+</span>
+              )}
+            </div>
+
+            {['PRO', 'UNLIMITED'].includes(plan) ? (
+              <div className="bg-zinc-50 dark:bg-white/2 border border-zinc-200 dark:border-white/10 rounded-2xl p-5 flex flex-col items-center text-center">
+                <IconWallet className="w-8 h-8 text-zinc-400 mb-3" />
+                <p className="text-sm text-zinc-600 dark:text-zinc-300 mb-4">Sua conta Asaas ainda não está conectada.</p>
+                <button className="bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-500/30 px-6 py-2 rounded-xl font-bold hover:bg-green-100 transition-colors">
+                  Conectar conta Asaas
+                </button>
+              </div>
+            ) : (
+              <div className="bg-zinc-100/50 dark:bg-white/2 border border-dashed border-zinc-200 dark:border-white/10 rounded-2xl p-6 flex flex-col items-center text-center opacity-60">
+                <IconShieldCheck className="w-8 h-8 text-zinc-300 mb-3" />
+                <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-4">O recebimento automático via Split está disponível apenas nos planos Pro e Unlimited.</p>
+                <Link href="/planos" className="text-sm font-bold text-green-600 hover:underline">
+                  Ver planos →
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

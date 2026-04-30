@@ -164,7 +164,7 @@ export function NewChargeModal({
                     plan={planType!} 
                   />
                 )}
-                {step === 3 && <StepConfirm hasPixKey={hasPixKey} />}
+                {step === 3 && <StepConfirm hasPixKey={hasPixKey} plan={planType!} />}
               </div>
 
               {step === 2 && (

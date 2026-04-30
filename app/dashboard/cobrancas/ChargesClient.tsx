@@ -76,7 +76,7 @@ export function ChargesClient({
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [dateFilter, setDateFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showRecurrenceUpgrade, setShowRecurrenceUpgrade] = useState(false);
+  const [upgradeModule, setUpgradeModule] = useState<string | null>(null);
   const [automacaoModalOpen, setAutomacaoModalOpen] = useState(false);
   const [selectedRecurringId, setSelectedRecurringId] = useState<string | null>(null);
   const [automacaoChargePreview, setAutomacaoChargePreview] = useState<{ debtorName: string; amount: number; dueDate: string } | null>(null);
@@ -177,7 +177,7 @@ export function ChargesClient({
             onClick={(e) => {
               e.stopPropagation();
               if (isLocked) {
-                setShowRecurrenceUpgrade(true);
+                setUpgradeModule('RECURRENCE');
               } else if (!hasAutomation) {
                 toast.info('Esta cobrança não possui recorrência configurada.');
               } else {
@@ -325,7 +325,7 @@ export function ChargesClient({
             onClick={(e) => {
               if (plan === 'FREE' || plan === 'STARTER') {
                 e.preventDefault();
-                setShowRecurrenceUpgrade(true);
+                setUpgradeModule('RECURRENCE');
               }
             }}
             className={`flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold border border-zinc-200 dark:border-white/10 transition-all ${(plan === 'FREE' || plan === 'STARTER') ? 'bg-zinc-50 dark:bg-white/5 text-zinc-400' : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/5'}`}
@@ -540,10 +540,10 @@ export function ChargesClient({
         onClose={() => setDetailsChargeId(null)}
       />
 
-      {showRecurrenceUpgrade && (
+      {upgradeModule && (
         <UpgradeModal
-          moduleName="RECURRENCE"
-          onClose={() => setShowRecurrenceUpgrade(false)}
+          moduleName={upgradeModule}
+          onClose={() => setUpgradeModule(null)}
         />
       )}
 
