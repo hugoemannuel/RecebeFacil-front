@@ -31,13 +31,15 @@ export default async function Dashboard(props: { searchParams: Promise<{ period?
   if (status) queryParams.set('status', status);
 
   // Busca métricas e assinatura em paralelo para melhor performance
-  const [metricsRes, subscriptionRes] = await Promise.allSettled([
+  const [metricsRes, subscriptionRes, profileRes] = await Promise.allSettled([
     api.get(`/dashboard/metrics?${queryParams.toString()}`, { headers: authHeaders }),
     api.get('/subscription/status', { headers: authHeaders }),
+    api.get('/users/me', { headers: authHeaders }),
   ]);
 
   const metrics = metricsRes.status === 'fulfilled' ? metricsRes.value.data : null;
   const subscriptionData = subscriptionRes.status === 'fulfilled' ? subscriptionRes.value.data : null;
+  const profileData = profileRes.status === 'fulfilled' ? profileRes.value.data : null;
 
   if (metricsRes.status === 'rejected') console.error('Failed to fetch metrics:', metricsRes.reason);
   if (subscriptionRes.status === 'rejected') console.error('Failed to fetch subscription:', subscriptionRes.reason);
@@ -66,6 +68,7 @@ export default async function Dashboard(props: { searchParams: Promise<{ period?
     payment_failed: subscriptionData?.payment_failed ?? false,
     payment_failed_at: subscriptionData?.payment_failed_at ?? null,
     userName,
+    avatarUrl: profileData?.avatar_url ?? undefined,
   };
 
   const formatMoney = (value: number) => {

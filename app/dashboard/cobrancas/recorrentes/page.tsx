@@ -34,6 +34,7 @@ export default async function RecorrentesPage() {
     payment_failed: subscriptionRes?.payment_failed ?? false,
     payment_failed_at: subscriptionRes?.payment_failed_at ?? null,
     userName: profileRes?.data?.name ?? 'Usuário',
+    avatarUrl: profileRes?.data?.avatar_url ?? undefined,
   };
 
   return (

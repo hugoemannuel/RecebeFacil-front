@@ -7,6 +7,7 @@ export interface SubscriptionStatus {
   payment_failed?: boolean;
   payment_failed_at?: string | null;
   userName?: string;
+  avatarUrl?: string;
 }
 
 export interface DashboardLayoutProps {

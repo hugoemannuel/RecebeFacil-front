@@ -30,6 +30,7 @@ export default async function ConfiguracoesPage() {
     payment_failed: subscriptionData?.payment_failed ?? false,
     payment_failed_at: subscriptionData?.payment_failed_at ?? null,
     userName: profile?.name ?? 'Usuário',
+    avatarUrl: profile?.avatar_url ?? undefined,
   };
 
   return (

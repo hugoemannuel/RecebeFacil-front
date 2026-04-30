@@ -17,13 +17,15 @@ export default async function ClientsPage() {
 
   const authHeaders = { Authorization: `Bearer ${token}` };
 
-  const [clientsRes, subscriptionRes] = await Promise.allSettled([
+  const [clientsRes, subscriptionRes, userRes] = await Promise.allSettled([
     api.get('/clients', { headers: authHeaders }),
     api.get('/subscription/status', { headers: authHeaders }),
+    api.get('/users/me', { headers: authHeaders }),
   ]);
 
   const clientsData = clientsRes.status === 'fulfilled' ? clientsRes.value.data : [];
   const subscriptionData = subscriptionRes.status === 'fulfilled' ? subscriptionRes.value.data : null;
+  const userData = userRes.status === 'fulfilled' ? userRes.value.data : null;
 
   const userName = subscriptionData?.userName || 'Usuário';
 
@@ -36,6 +38,7 @@ export default async function ClientsPage() {
     payment_failed: subscriptionData?.payment_failed ?? false,
     payment_failed_at: subscriptionData?.payment_failed_at ?? null,
     userName,
+    avatarUrl: userData?.avatar_url ?? undefined,
   };
 
   return (

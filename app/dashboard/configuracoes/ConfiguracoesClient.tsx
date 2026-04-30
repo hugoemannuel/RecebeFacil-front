@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useTheme } from '@/context/ThemeContext';
 import { ThemeToggle } from '@/components/layout/ThemeToggle/ThemeToggle';
 import {
@@ -84,7 +83,7 @@ export function ConfiguracoesClient({ profile, subscription, creditorProfile }: 
   const [showCancelPlan, setShowCancelPlan] = useState(false);
   const [cancelPlanLoading, setCancelPlanLoading] = useState(false);
   const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = useState(subscription?.cancel_at_period_end ?? false);
-  const [avatarLoading, setAvatarLoading] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [creditorLoading, setCreditorLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -105,6 +104,19 @@ export function ConfiguracoesClient({ profile, subscription, creditorProfile }: 
   function onSaveProfile(data: ProfileForm) {
     setProfileLoading(true);
     startTransition(async () => {
+      if (avatarFile) {
+        const fd = new FormData();
+        fd.append('file', avatarFile);
+        const avatarRes = await uploadAvatarAction(fd);
+        if (!avatarRes.success) {
+          toast.error(avatarRes.error ?? 'Erro ao enviar foto.');
+          setAvatarPreview(initialAvatar);
+          setAvatarFile(null);
+          setProfileLoading(false);
+          return;
+        }
+        setAvatarFile(null);
+      }
       const res = await updateProfileAction(data);
       if (res.success) toast.success('Perfil atualizado com sucesso!');
       else toast.error(res.error ?? 'Ops, algo deu errado. Tente novamente.');
@@ -128,32 +140,10 @@ export function ConfiguracoesClient({ profile, subscription, creditorProfile }: 
   function onAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    
-    // Preview imediato
     const reader = new FileReader();
     reader.onload = () => setAvatarPreview(reader.result as string);
     reader.readAsDataURL(file);
-
-    setAvatarLoading(true);
-    startTransition(async () => {
-      try {
-        const fd = new FormData();
-        fd.append('file', file);
-        const res = await uploadAvatarAction(fd);
-        if (res.success) {
-          toast.success('Foto atualizada!');
-        } else {
-          toast.error(res.error ?? 'Erro ao enviar foto.');
-          // Reverter preview em caso de erro
-          setAvatarPreview(initialAvatar);
-        }
-      } catch (err) {
-        toast.error('Erro de conexão ao enviar foto.');
-        setAvatarPreview(initialAvatar);
-      } finally {
-        setAvatarLoading(false);
-      }
-    });
+    setAvatarFile(file);
   }
 
   // ── Senha Form ────────────────────────────────────────────────────
@@ -254,7 +244,7 @@ export function ConfiguracoesClient({ profile, subscription, creditorProfile }: 
           <div className="flex items-center gap-5">
             <div className="relative group w-20 h-20 shrink-0">
               {avatarPreview ? (
-                <Image src={avatarPreview} alt="Avatar" fill className="rounded-full object-cover" />
+                <img src={avatarPreview} alt="Avatar" className="w-full h-full rounded-full object-cover" />
               ) : (
                 <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-2xl font-extrabold text-green-700 dark:text-green-400">
                   {(profile?.name ?? 'U').charAt(0).toUpperCase()}
@@ -271,10 +261,9 @@ export function ConfiguracoesClient({ profile, subscription, creditorProfile }: 
               <p className="font-bold text-zinc-800 dark:text-zinc-200">{profile?.name ?? 'Usuário'}</p>
               <button
                 onClick={() => fileRef.current?.click()}
-                disabled={avatarLoading}
-                className="text-sm text-green-600 dark:text-green-400 hover:underline mt-0.5 disabled:opacity-50"
+                className="text-sm text-green-600 dark:text-green-400 hover:underline mt-0.5"
               >
-                {avatarLoading ? 'Enviando...' : 'Alterar foto'}
+                {avatarFile ? 'Foto selecionada — salve para confirmar' : 'Alterar foto'}
               </button>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onAvatarChange} />
             </div>
@@ -312,8 +301,8 @@ export function ConfiguracoesClient({ profile, subscription, creditorProfile }: 
 
             <button
               type="submit"
-              disabled={profileLoading}
-              className="w-full bg-green-500 hover:bg-green-600 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-green-500/20 hover:scale-[1.01] flex items-center justify-center gap-2"
+              disabled={profileLoading || (!profileForm.formState.isDirty && !avatarFile)}
+              className="w-full bg-green-500 hover:bg-green-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-green-500/20 hover:scale-[1.01] flex items-center justify-center gap-2"
             >
               {profileLoading ? (
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -380,8 +369,8 @@ export function ConfiguracoesClient({ profile, subscription, creditorProfile }: 
 
             <button
               type="submit"
-              disabled={creditorLoading}
-              className="w-full bg-green-500 hover:bg-green-600 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-green-500/20 hover:scale-[1.01] flex items-center justify-center gap-2"
+              disabled={creditorLoading || !creditorForm.formState.isDirty}
+              className="w-full bg-green-500 hover:bg-green-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-green-500/20 hover:scale-[1.01] flex items-center justify-center gap-2"
             >
               {creditorLoading ? (
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -516,8 +505,8 @@ export function ConfiguracoesClient({ profile, subscription, creditorProfile }: 
 
               <button
                 type="submit"
-                disabled={isPending}
-                className="w-full bg-green-500 hover:bg-green-600 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-green-500/20 hover:scale-[1.01] flex items-center justify-center gap-2"
+                disabled={isPending || !pwForm.formState.isDirty}
+                className="w-full bg-green-500 hover:bg-green-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-green-500/20 hover:scale-[1.01] flex items-center justify-center gap-2"
               >
                 {isPending
                   ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

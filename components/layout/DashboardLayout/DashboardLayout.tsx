@@ -36,6 +36,10 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
 
   const planBadge = PLAN_BADGE[subscription.plan] ?? PLAN_BADGE.FREE;
   const userName = subscription.userName ?? 'Usuário';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const avatarSrc = subscription.avatarUrl
+    ? (subscription.avatarUrl.startsWith('http') ? subscription.avatarUrl : `${apiUrl}${subscription.avatarUrl}`)
+    : null;
 
   return (
     <div className="min-h-screen bg-surface dark:bg-[#0b1521] text-zinc-900 dark:text-zinc-50 font-sans flex overflow-hidden selection:bg-green-200 transition-colors duration-300">
@@ -127,8 +131,11 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
 
         {/* User Profile & Logout */}
         <div className="p-4 border-t border-zinc-100 dark:border-white/5 m-4 mt-0 rounded-2xl bg-surface dark:bg-[#0b1521] flex items-center gap-3 transition-colors duration-300">
-          <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center font-bold text-green-700 dark:text-green-400 text-sm shrink-0">
-            {userName.charAt(0).toUpperCase()}
+          <div className="w-10 h-10 rounded-full shrink-0 overflow-hidden bg-green-100 dark:bg-green-900/30 flex items-center justify-center font-bold text-green-700 dark:text-green-400 text-sm">
+            {avatarSrc
+              ? <img src={avatarSrc} alt={userName} className="w-full h-full object-cover" />
+              : userName.charAt(0).toUpperCase()
+            }
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-zinc-900 dark:text-zinc-50 truncate">{userName}</p>
@@ -227,8 +234,11 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
 
         {/* User Profile & Logout */}
         <div className="p-4 border-t border-zinc-100 dark:border-white/5 mt-auto bg-surface dark:bg-[#0b1521] flex items-center gap-3 transition-colors duration-300">
-          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center font-bold text-green-700 text-sm shrink-0">
-            {userName.charAt(0).toUpperCase()}
+          <div className="w-10 h-10 rounded-full shrink-0 overflow-hidden bg-green-100 dark:bg-green-900/30 flex items-center justify-center font-bold text-green-700 dark:text-green-400 text-sm">
+            {avatarSrc
+              ? <img src={avatarSrc} alt={userName} className="w-full h-full object-cover" />
+              : userName.charAt(0).toUpperCase()
+            }
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-zinc-900 truncate">{userName}</p>
