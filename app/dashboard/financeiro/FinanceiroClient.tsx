@@ -137,7 +137,7 @@ export function FinanceiroClient({ isPremium, plan }: Props) {
           </div>
         </div>
 
-        <div className="bg-[#0b1521] dark:bg-surface-dark p-8 rounded-3xl border border-white/5 shadow-xl relative overflow-hidden group">
+        <div className="bg-background dark:bg-surface-dark p-8 rounded-3xl border border-white/5 shadow-xl relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-3xl -z-10" />
           <div className="flex justify-between items-start mb-6">
             <div className="w-12 h-12 bg-white/5 text-white rounded-2xl flex items-center justify-center">

@@ -42,7 +42,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
     : null;
 
   return (
-    <div className="min-h-screen bg-surface dark:bg-[#0b1521] text-zinc-900 dark:text-zinc-50 font-sans flex overflow-hidden selection:bg-green-200 transition-colors duration-300">
+    <div className="min-h-screen bg-surface dark:bg-background text-zinc-900 dark:text-zinc-50 font-sans flex overflow-hidden selection:bg-green-200 transition-colors duration-300">
 
       {/* ── Sidebar ────────────────────────────────────────── */}
       <aside className="w-[280px] bg-white dark:bg-surface border-r border-zinc-200 dark:border-white/5 flex flex-col h-screen shrink-0 hidden md:flex transition-colors duration-300">
@@ -117,7 +117,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
 
         {/* Upgrade banner para plano FREE */}
         {subscription.plan === 'FREE' && (
-          <div className="mx-4 mb-4 bg-linear-to-br from-[#0b1521] to-[#0b3d2e] rounded-2xl p-4">
+          <div className="mx-4 mb-4 bg-linear-to-br from-[#18181b] to-[#064e3b] rounded-2xl p-4 border border-white/5 shadow-xl">
             <p className="text-white font-bold text-xs mb-1">Desbloqueie mais poder</p>
             <p className="text-slate-400 text-[11px] mb-3 leading-relaxed">Clientes, relatórios e importação de Excel no plano Starter.</p>
             <Link
@@ -130,7 +130,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
         )}
 
         {/* User Profile & Logout */}
-        <div className="p-4 border-t border-zinc-100 dark:border-white/5 m-4 mt-0 rounded-2xl bg-surface dark:bg-[#0b1521] flex items-center gap-3 transition-colors duration-300">
+        <div className="p-4 border-t border-zinc-100 dark:border-white/5 m-4 mt-0 rounded-2xl bg-surface dark:bg-surface-soft flex items-center gap-3 transition-colors duration-300">
           <div className="w-10 h-10 rounded-full shrink-0 overflow-hidden bg-green-100 dark:bg-green-900/30 flex items-center justify-center font-bold text-green-700 dark:text-green-400 text-sm">
             {avatarSrc
               ? <img src={avatarSrc} alt={userName} className="w-full h-full object-cover" />
@@ -233,7 +233,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
         </nav>
 
         {/* User Profile & Logout */}
-        <div className="p-4 border-t border-zinc-100 dark:border-white/5 mt-auto bg-surface dark:bg-[#0b1521] flex items-center gap-3 transition-colors duration-300">
+        <div className="p-4 border-t border-zinc-100 dark:border-white/5 mt-auto bg-surface dark:bg-surface-soft flex items-center gap-3 transition-colors duration-300">
           <div className="w-10 h-10 rounded-full shrink-0 overflow-hidden bg-green-100 dark:bg-green-900/30 flex items-center justify-center font-bold text-green-700 dark:text-green-400 text-sm">
             {avatarSrc
               ? <img src={avatarSrc} alt={userName} className="w-full h-full object-cover" />
@@ -270,7 +270,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
               <Input
                 icon={<IconSearch className="w-4 h-4" />}
                 placeholder="Buscar cobranças ou clientes..."
-                className="rounded-full bg-surface-soft dark:bg-[#0b1521] border-none"
+                className="rounded-full bg-surface-soft dark:bg-background border-none"
               />
             </div>
           </div>
@@ -288,7 +288,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
                   setDrawerOpen(true);
                 }
               }}
-              className="bg-[#0b1521] dark:bg-green-500 hover:bg-surface-dark dark:hover:bg-green-600 text-white font-bold py-2.5 px-6 rounded-full text-sm transition-all shadow-md flex items-center gap-2">
+              className="bg-zinc-900 dark:bg-green-500 hover:bg-zinc-800 dark:hover:bg-green-600 text-white font-bold py-2.5 px-6 rounded-full text-sm transition-all shadow-md flex items-center gap-2">
               <IconPlus className="w-4 h-4" />
               <span className="hidden sm:inline">Nova Cobrança</span>
             </button>
@@ -321,7 +321,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
         )}
 
         {/* Scrollable Area */}
-        <main className="flex-1 overflow-y-auto bg-surface dark:bg-[#0b1521] transition-colors duration-300">
+        <main className="flex-1 overflow-y-auto bg-surface dark:bg-background transition-colors duration-300">
           {children}
         </main>
       </div>

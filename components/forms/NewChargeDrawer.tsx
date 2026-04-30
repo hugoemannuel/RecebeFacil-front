@@ -270,7 +270,7 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
 
                 {/* Preview WhatsApp — só no step 2 */}
                 {step === 2 && (
-                  <div className="w-full md:w-[380px] border-t md:border-t-0 md:border-l border-zinc-100 dark:border-white/7 flex flex-col bg-zinc-50 dark:bg-[#0b1521] shrink-0">
+                  <div className="w-full md:w-[380px] border-t md:border-t-0 md:border-l border-zinc-100 dark:border-white/7 flex flex-col bg-zinc-50 dark:bg-background shrink-0">
                     <div className="px-5 py-4 border-b border-zinc-100 dark:border-white/7">
                       <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
                         <IconSparkles className="w-3.5 h-3.5 text-green-500" /> Preview ao vivo
@@ -304,7 +304,7 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
 
             {step < 3 ? (
               <button type="button" onClick={nextStep}
-                className="flex-1 bg-[#0b1521] hover:bg-surface-dark text-white font-bold py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2">
+                className="flex-1 bg-zinc-900 dark:bg-green-500 hover:bg-zinc-800 dark:hover:bg-green-600 text-white font-bold py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2">
                 Próximo <IconChevronRight className="w-4 h-4" />
               </button>
             ) : (

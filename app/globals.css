@@ -16,15 +16,15 @@
 }
 
 .dark {
-  --background:   #0b1521;
-  --foreground:   #dde4ed;
+  --background:   #09090b;   /* Zinc 950 */
+  --foreground:   #fafafa;   /* Zinc 50 */
   /* superfícies dark - escalonadas para dar profundidade */
-  --surface:      #152336;   /* cards */
-  --surface-soft: #0f1c2b;   /* inputs dentro dos cards */
-  --border:       rgba(255,255,255,0.08);
-  --text-primary: #dde4ed;
-  --text-muted:   #7a90a8;
-  --placeholder:  #4e6480;
+  --surface:      #18181b;   /* Zinc 900 - cards */
+  --surface-soft: #27272a;   /* Zinc 800 - inputs/inner surfaces */
+  --border:       rgba(255,255,255,0.06);
+  --text-primary: #fafafa;
+  --text-muted:   #a1a1aa;   /* Zinc 400 */
+  --placeholder:  #52525b;   /* Zinc 600 */
 }
 
 @theme inline {

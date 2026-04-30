@@ -138,6 +138,20 @@ export default function PlanosPage() {
       }
     }
     loadStatus();
+
+    // Forçar Light Mode nesta página
+    const root = document.documentElement;
+    const hadDark = root.classList.contains('dark');
+    if (hadDark) {
+      root.classList.remove('dark');
+    }
+
+    return () => {
+      // Restaurar o tema ao sair se ele era dark
+      if (hadDark) {
+        root.classList.add('dark');
+      }
+    };
   }, []);
 
   async function handleCancel() {
@@ -309,7 +323,7 @@ export default function PlanosPage() {
                       isCurrent
                         ? 'bg-zinc-100 text-zinc-400 cursor-default'
                         : plan.highlight
-                          ? 'bg-[#0b1521] text-white hover:bg-surface-dark hover:scale-[1.02] shadow-lg shadow-zinc-900/20'
+                          ? 'bg-zinc-900 text-white hover:bg-surface-dark hover:scale-[1.02] shadow-lg shadow-zinc-900/20'
                           : 'bg-zinc-100 text-zinc-900 hover:bg-zinc-200 hover:scale-[1.02]'
                     }`}
                   >

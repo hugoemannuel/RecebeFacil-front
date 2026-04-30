@@ -84,7 +84,7 @@ export function RelatoriosClient({ isUnlimited, plan, token, userName }: Relator
   if (!isUnlimited) {
     return (
       <div className="p-8">
-        <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] p-12 border border-zinc-200/60 dark:border-white/5 shadow-xl shadow-zinc-200/40 dark:shadow-none text-center max-w-4xl mx-auto">
+        <div className="bg-white dark:bg-surface rounded-[2.5rem] p-12 border border-zinc-200/60 dark:border-white/5 shadow-xl shadow-zinc-200/40 dark:shadow-none text-center max-w-4xl mx-auto">
           <div className="w-20 h-20 bg-purple-100 dark:bg-purple-500/10 rounded-3xl flex items-center justify-center mx-auto mb-8">
             <IconLock className="w-10 h-10 text-purple-600 dark:text-purple-400" />
           </div>
@@ -122,7 +122,7 @@ export function RelatoriosClient({ isUnlimited, plan, token, userName }: Relator
           <p className="text-zinc-500 dark:text-zinc-400 font-medium mt-1">Insights detalhados sobre sua operação financeira.</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 px-4 py-2 rounded-2xl flex items-center gap-2 text-sm font-bold text-zinc-600 dark:text-zinc-400">
+          <div className="bg-white dark:bg-surface border border-zinc-200 dark:border-white/10 px-4 py-2 rounded-2xl flex items-center gap-2 text-sm font-bold text-zinc-600 dark:text-zinc-400">
             <IconCalendar className="w-4 h-4" />
             Últimos 30 dias
           </div>
@@ -154,7 +154,7 @@ export function RelatoriosClient({ isUnlimited, plan, token, userName }: Relator
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-zinc-200 dark:border-white/5 shadow-sm">
+        <div className="bg-white dark:bg-surface p-6 rounded-[2rem] border border-zinc-200 dark:border-white/5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className="w-12 h-12 bg-green-50 dark:bg-green-500/10 rounded-2xl flex items-center justify-center text-green-600 dark:text-green-400">
               <IconTrendingUp className="w-6 h-6" />
@@ -171,7 +171,7 @@ export function RelatoriosClient({ isUnlimited, plan, token, userName }: Relator
           <p className="text-zinc-400 dark:text-zinc-500 text-[10px] mt-2 font-medium">Conversão de lembretes em pagamentos</p>
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-zinc-200 dark:border-white/5 shadow-sm">
+        <div className="bg-white dark:bg-surface p-6 rounded-[2rem] border border-zinc-200 dark:border-white/5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400">
               <IconChartBar className="w-6 h-6" />
@@ -184,7 +184,7 @@ export function RelatoriosClient({ isUnlimited, plan, token, userName }: Relator
           <p className="text-zinc-400 dark:text-zinc-500 text-[10px] mt-2 font-medium">Total recuperado por réguas ativas</p>
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-zinc-200 dark:border-white/5 shadow-sm">
+        <div className="bg-white dark:bg-surface p-6 rounded-[2rem] border border-zinc-200 dark:border-white/5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className="w-12 h-12 bg-purple-50 dark:bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-600 dark:text-purple-400">
               <IconMessageCircle className="w-6 h-6" />
@@ -197,7 +197,7 @@ export function RelatoriosClient({ isUnlimited, plan, token, userName }: Relator
           <p className="text-zinc-400 dark:text-zinc-500 text-[10px] mt-2 font-medium">Alunos/clientes recuperados este mês</p>
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-zinc-200 dark:border-white/5 shadow-sm">
+        <div className="bg-white dark:bg-surface p-6 rounded-[2rem] border border-zinc-200 dark:border-white/5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className="w-12 h-12 bg-amber-50 dark:bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-600 dark:text-amber-400">
               <IconUsers className="w-6 h-6" />
@@ -218,7 +218,7 @@ export function RelatoriosClient({ isUnlimited, plan, token, userName }: Relator
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Gráfico de Forecast */}
-        <div className="lg:col-span-2 bg-white dark:bg-zinc-900 p-8 rounded-[2.5rem] border border-zinc-200 dark:border-white/5 shadow-sm">
+        <div className="lg:col-span-2 bg-white dark:bg-surface p-8 rounded-[2.5rem] border border-zinc-200 dark:border-white/5 shadow-sm">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h3 className="text-xl font-black text-zinc-900 dark:text-zinc-100">Projeção de Fluxo de Caixa</h3>
@@ -276,7 +276,7 @@ export function RelatoriosClient({ isUnlimited, plan, token, userName }: Relator
         </div>
 
         {/* Ranking de Piores Pagadores */}
-        <div className="bg-white dark:bg-zinc-900 p-8 rounded-[2.5rem] border border-zinc-200 dark:border-white/5 shadow-sm flex flex-col">
+        <div className="bg-white dark:bg-surface p-8 rounded-[2.5rem] border border-zinc-200 dark:border-white/5 shadow-sm flex flex-col">
           <div className="mb-6">
             <h3 className="text-xl font-black text-zinc-900 dark:text-zinc-100">Fila de Inadimplência</h3>
             <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium">Clientes com maior saldo vencido</p>

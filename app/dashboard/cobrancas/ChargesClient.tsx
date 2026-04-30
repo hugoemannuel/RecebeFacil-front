@@ -226,7 +226,7 @@ export function ChargesClient({
                 </button>
               </DropdownMenu.Trigger>
               <DropdownMenu.Portal>
-                <DropdownMenu.Content align="end" className="min-w-[190px] bg-surface dark:bg-[#1a2d42] rounded-xl shadow-xl border border-zinc-200/80 dark:border-white/8 p-1.5 text-sm z-50 animate-in fade-in zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-95">
+                <DropdownMenu.Content align="end" className="min-w-[190px] bg-surface dark:bg-surface border border-zinc-200/80 dark:border-white/10 shadow-2xl p-1.5 text-sm z-50 animate-in fade-in zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-95">
                   <DropdownMenu.Item
                     className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg text-zinc-600 dark:text-zinc-300 font-medium"
                     onClick={() => setDetailsChargeId(row.original.id)}
