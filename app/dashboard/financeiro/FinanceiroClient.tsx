@@ -137,16 +137,16 @@ export function FinanceiroClient({ isPremium, plan }: Props) {
           </div>
         </div>
 
-        <div className="bg-background dark:bg-surface-dark p-8 rounded-3xl border border-white/5 shadow-xl relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-3xl -z-10" />
+        <div className="bg-white dark:bg-surface p-8 rounded-3xl border border-zinc-100 dark:border-white/7 shadow-sm group hover:shadow-md transition-shadow relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 rounded-full blur-3xl -z-10" />
           <div className="flex justify-between items-start mb-6">
-            <div className="w-12 h-12 bg-white/5 text-white rounded-2xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-zinc-900 dark:bg-white/5 text-white dark:text-zinc-100 rounded-2xl flex items-center justify-center">
               <IconTrendingUp className="w-6 h-6" />
             </div>
           </div>
-          <p className="text-sm font-bold text-white/40 uppercase tracking-widest mb-1">Total Recebido (Mês)</p>
-          <p className="text-3xl font-extrabold text-white tracking-tight">R$ 0,00</p>
-          <div className="mt-4 flex items-center gap-2 text-green-400 text-xs font-bold">
+          <p className="text-sm font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Total Recebido (Mês)</p>
+          <p className="text-3xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight">R$ 0,00</p>
+          <div className="mt-4 flex items-center gap-2 text-green-600 dark:text-green-400 text-xs font-bold">
             <IconTrendingUp className="w-4 h-4" />
             0% em relação ao mês anterior
           </div>
