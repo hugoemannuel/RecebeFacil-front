@@ -16,6 +16,7 @@ const MODULE_LABELS: Record<string, { label: string; requiredPlan: string }> = {
   LIMIT_REACHED: { label: 'Limite de cobranças atingido', requiredPlan: 'STARTER' },
   RECURRENCE: { label: 'Regras de Recorrência', requiredPlan: 'PRO' },
   NEW_CHARGE: { label: 'Cobrança Direta pelo Dashboard', requiredPlan: 'PRO' },
+  FINANCE: { label: 'Módulo Financeiro', requiredPlan: 'PRO' },
 };
 
 
