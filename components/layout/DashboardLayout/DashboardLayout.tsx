@@ -59,8 +59,23 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
         <nav className="flex-1 px-4 space-y-1">
           {MENU_ITEMS.map((item) => {
             const isActive = pathname === item.path;
-            const isLocked = !subscription.allowed_modules.includes(item.module);
+            const isComingSoon = item.isComingSoon;
+            const isLocked = !isComingSoon && !subscription.allowed_modules.includes(item.module);
             const Icon = item.icon;
+
+            if (isComingSoon) {
+              return (
+                <div
+                  key={item.path}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-sm transition-all text-zinc-400 cursor-not-allowed opacity-60"
+                  title="Funcionalidade em desenvolvimento"
+                >
+                  <Icon className="w-5 h-5 text-zinc-300" />
+                  <span className="flex-1 text-left">{item.name}</span>
+                  <span className="bg-zinc-100 dark:bg-white/5 text-zinc-400 dark:text-zinc-500 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase">Breve</span>
+                </div>
+              );
+            }
 
             if (isLocked) {
               return (
@@ -87,7 +102,10 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
                   }`}
               >
                 <Icon className={`w-5 h-5 ${isActive ? 'text-green-600 dark:text-green-400' : 'text-zinc-400 dark:text-zinc-500'}`} />
-                {item.name}
+                <span className="flex-1">{item.name}</span>
+                {item.isComingSoon && (
+                  <span className="bg-zinc-100 dark:bg-white/5 text-zinc-400 dark:text-zinc-500 text-[9px] px-2 py-0.5 rounded-full font-bold">Breve</span>
+                )}
               </Link>
             );
           })}
@@ -159,8 +177,22 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
         <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
           {MENU_ITEMS.map((item) => {
             const isActive = pathname === item.path;
-            const isLocked = !subscription.allowed_modules.includes(item.module);
+            const isComingSoon = item.isComingSoon;
+            const isLocked = !isComingSoon && !subscription.allowed_modules.includes(item.module);
             const Icon = item.icon;
+
+            if (isComingSoon) {
+              return (
+                <div
+                  key={item.path}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-sm transition-all text-zinc-400 cursor-not-allowed opacity-60"
+                >
+                  <Icon className="w-5 h-5 text-zinc-300" />
+                  <span className="flex-1 text-left">{item.name}</span>
+                  <span className="bg-zinc-100 dark:bg-white/5 text-zinc-400 dark:text-zinc-500 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase">Breve</span>
+                </div>
+              );
+            }
 
             if (isLocked) {
               return (
@@ -235,9 +267,8 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
 
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <button className="relative text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors p-2">
+            <button className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors p-2">
               <IconBell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-[#152336]"></span>
             </button>
             <button
               onClick={() => {

@@ -78,19 +78,23 @@ export default async function Dashboard(props: { searchParams: Promise<{ period?
       <div className="p-8 max-w-[1600px] mx-auto space-y-6">
 
 
-        <div className="bg-[#0b1521] rounded-4xl p-8 lg:p-10 text-white relative overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-black/20">
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-green-500/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
-
-          <div className="inline-block bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-6">
-            Performance em tempo real
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-zinc-800 dark:text-zinc-100">
+              Bom dia, {userName}.
+            </h1>
+            <p className="text-zinc-500 dark:text-zinc-400 mt-1">
+              Aqui está o que está acontecendo com suas cobranças hoje.
+            </p>
           </div>
-
-          <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight mb-3">
-            Bom dia, {userName}.
-          </h1>
-          <p className="text-slate-400 text-lg max-w-2xl leading-relaxed">
-            Sua performance este mês está <span className="text-green-400 font-medium">+15% acima da média</span> do trimestre anterior. O dinheiro está em movimento.
-          </p>
+          <div className="flex items-center gap-3">
+            <Link 
+              href="/dashboard/cobrancas" 
+              className="px-5 py-2.5 bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-300 font-bold rounded-xl hover:bg-zinc-200 dark:hover:bg-white/10 transition-all text-sm"
+            >
+              Ver tudo
+            </Link>
+          </div>
         </div>
 
 

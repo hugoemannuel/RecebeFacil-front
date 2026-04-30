@@ -27,6 +27,7 @@ export function NewChargeModal({
   planType = 'FREE',
   onSuccess,
   prefilledDebtor,
+  creditorProfile,
 }: NewChargeModalProps) {
   const [step, setStep] = useState(0);
   const [sending, setSending] = useState(false);
@@ -50,7 +51,8 @@ export function NewChargeModal({
       description: '', recurrence: 'ONCE',
       custom_message: DEFAULT_TEMPLATE,
       send_pix_button: true,
-      pix_key: '', pix_key_type: 'CPF',
+      pix_key: creditorProfile?.pix_key || '', 
+      pix_key_type: creditorProfile?.pix_key_type || 'CPF',
     },
   });
 
@@ -154,7 +156,14 @@ export function NewChargeModal({
               <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
                 {step === 0 && <StepDebtor />}
                 {step === 1 && <StepChargeDetails planType={planType!} />}
-                {step === 2 && <StepMessage hasPixKey={hasPixKey} textareaRef={textareaRef} insertVariable={insertVariable} />}
+                {step === 2 && (
+                  <StepMessage 
+                    hasPixKey={hasPixKey} 
+                    textareaRef={textareaRef} 
+                    insertVariable={insertVariable} 
+                    plan={planType!} 
+                  />
+                )}
                 {step === 3 && <StepConfirm hasPixKey={hasPixKey} />}
               </div>
 

@@ -27,7 +27,8 @@ import {
   IconAlertCircle,
   IconSend,
   IconTrash,
-  IconRepeat
+  IconRepeat,
+  IconFileText
 } from '@/components/ui/Icons';
 import Link from 'next/link';
 import { formatMoney, maskPhone } from '@/lib/formatters';
@@ -37,6 +38,7 @@ import { Input } from '@/components/ui/Input/Input';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { toast } from 'sonner';
 import { bulkCancelAction, bulkRemindAction } from '@/app/actions/charges';
+import { UpgradeModal } from '@/components/ui/UpgradeModal';
 
 type Charge = {
   id: string;
@@ -54,11 +56,13 @@ const columnHelper = createColumnHelper<Charge>();
 export function ChargesClient({
   initialData,
   plan,
-  usage
+  usage,
+  creditorProfile
 }: {
   initialData: Charge[],
   plan: 'FREE' | 'STARTER' | 'PRO' | 'UNLIMITED',
-  usage: { count: number, limit: number }
+  usage: { count: number, limit: number },
+  creditorProfile?: any
 }) {
   const [data, setData] = useState(initialData);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -68,6 +72,7 @@ export function ChargesClient({
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [dateFilter, setDateFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showRecurrenceUpgrade, setShowRecurrenceUpgrade] = useState(false);
   
   const searchParams = useSearchParams();
 
@@ -152,28 +157,24 @@ export function ChargesClient({
       header: 'Automação',
       cell: info => {
         const isEnabled = info.getValue();
-        if (plan === 'FREE') {
-          return (
-            <button
-              onClick={() => toast.error('O plano FREE não possui automação. Faça upgrade para o plano STARTER.')}
-              className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-100 dark:bg-white/5 text-zinc-400 dark:text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors relative"
-              title="Automação bloqueada no plano Free"
-            >
-              <IconBot className="w-4 h-4" />
-              <IconLock className="w-3 h-3 absolute -bottom-1 -right-1 text-zinc-500 bg-zinc-100 rounded-full border border-white" />
-            </button>
-          );
-        }
+        const isLocked = plan === 'FREE' || plan === 'STARTER';
         return (
           <button
-            onClick={() => {
-              // Mock toggle
-              toast.success(`Automação ${!isEnabled ? 'ativada' : 'desativada'} para esta cobrança.`);
+            onClick={(e) => {
+              e.stopPropagation();
+              if (isLocked) {
+                setShowRecurrenceUpgrade(true);
+              } else {
+                toast.success(`Automação ${!isEnabled ? 'ativada' : 'desativada'} para esta cobrança.`);
+              }
             }}
-            className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${isEnabled ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-500/30' : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-white/10'}`}
+            className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${isEnabled ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-500/30' : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-white/10'} relative`}
             title={isEnabled ? 'Robô ativo' : 'Robô inativo'}
           >
             <IconBot className="w-4 h-4" />
+            {isLocked && (
+              <IconLock className="w-2.5 h-2.5 absolute -bottom-0.5 -right-0.5 text-zinc-500 bg-white dark:bg-zinc-800 rounded-full border border-zinc-200 dark:border-white/10" />
+            )}
           </button>
         );
       }
@@ -264,11 +265,31 @@ export function ChargesClient({
           <p className="text-zinc-400 dark:text-zinc-500 mt-1">Gerencie seus recebimentos e automações.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link
-            href="/dashboard/cobrancas/recorrentes"
-            className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/5 transition-all"
+          <button
+            onClick={() => {
+              if (plan === 'FREE') {
+                setShowRecurrenceUpgrade(true);
+              } else {
+                toast.info('Importação via Excel em breve! Estamos preparando esta funcionalidade para você.');
+              }
+            }}
+            className={`flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold border border-zinc-200 dark:border-white/10 transition-all ${plan === 'FREE' ? 'text-zinc-400 bg-zinc-50 dark:bg-white/5' : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/5'}`}
           >
-            <IconRepeat className="w-5 h-5" /> Regras de Recorrência
+            {plan === 'FREE' ? <IconLock className="w-5 h-5" /> : <IconFileText className="w-5 h-5" />}
+            Importar Excel
+          </button>
+          <Link
+            href={plan === 'FREE' || plan === 'STARTER' ? '#' : "/dashboard/cobrancas/recorrentes"}
+            onClick={(e) => {
+              if (plan === 'FREE' || plan === 'STARTER') {
+                e.preventDefault();
+                setShowRecurrenceUpgrade(true);
+              }
+            }}
+            className={`flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold border border-zinc-200 dark:border-white/10 transition-all ${(plan === 'FREE' || plan === 'STARTER') ? 'bg-zinc-50 dark:bg-white/5 text-zinc-400' : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/5'}`}
+          >
+            {(plan === 'FREE' || plan === 'STARTER') ? <IconLock className="w-5 h-5" /> : <IconRepeat className="w-5 h-5" />}
+            Regras de Recorrência
           </Link>
           <button
             onClick={() => {
@@ -464,6 +485,8 @@ export function ChargesClient({
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         planType={plan}
+        creditorProfile={creditorProfile}
+        userName={creditorProfile?.business_name || 'Minha Empresa'}
         onSuccess={() => {
           setDrawerOpen(false);
           router.refresh();
@@ -474,6 +497,13 @@ export function ChargesClient({
         chargeId={detailsChargeId}
         onClose={() => setDetailsChargeId(null)}
       />
+
+      {showRecurrenceUpgrade && (
+        <UpgradeModal
+          moduleName="RECURRENCE"
+          onClose={() => setShowRecurrenceUpgrade(false)}
+        />
+      )}
     </div>
   );
 }

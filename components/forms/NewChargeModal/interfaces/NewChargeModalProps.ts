@@ -6,4 +6,5 @@ export interface NewChargeModalProps {
   planType?: 'FREE' | 'STARTER' | 'PRO' | 'UNLIMITED';
   onSuccess?: () => void;
   prefilledDebtor?: { name: string; phone: string };
+  creditorProfile?: any;
 }

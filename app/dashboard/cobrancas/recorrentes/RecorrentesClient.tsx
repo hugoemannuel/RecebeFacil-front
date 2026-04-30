@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { 
   IconRepeat, IconCalendar, IconUser, IconTrash, 
-  IconCheckCircle, IconAlertCircle, IconArrowLeft 
+  IconCheckCircle, IconAlertCircle, IconArrowLeft, IconLock
 } from '@/components/ui/Icons';
 import { cancelRecurringChargeAction } from '@/app/actions/charges';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -23,9 +23,10 @@ interface RecurringRule {
 
 interface Props {
   initialData: RecurringRule[];
+  plan: string;
 }
 
-export function RecorrentesClient({ initialData }: Props) {
+export function RecorrentesClient({ initialData, plan }: Props) {
   const [rules, setRules] = useState<RecurringRule[]>(initialData);
   const [selectedRule, setSelectedRule] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();

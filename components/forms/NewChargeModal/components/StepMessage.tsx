@@ -6,23 +6,54 @@ import { RHFSelect } from '@/components/forms/rhf/RHFSelect';
 import { RHFInput } from '@/components/forms/rhf/RHFInput';
 import { Select } from '@/components/ui/Select/Select';
 import { Chip } from '@/components/ui/Chip';
-import { IconDollarSign, IconSparkles } from '@/components/ui/Icons';
+import { IconDollarSign, IconSparkles, IconLock } from '@/components/ui/Icons';
+import { toast } from 'sonner';
 import { TEMPLATE_OPTIONS, VARIABLES, type ChargeFormData } from '../interfaces';
 
 interface StepMessageProps {
   hasPixKey: boolean;
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   insertVariable: (v: string) => void;
+  plan: string;
 }
 
-export function StepMessage({ hasPixKey, textareaRef, insertVariable }: StepMessageProps) {
+export function StepMessage({ hasPixKey, textareaRef, insertVariable, plan }: StepMessageProps) {
   const { control, watch, setValue } = useFormContext<ChargeFormData>();
   const values = watch();
 
   return (
     <>
-      <p className="text-sm text-zinc-500">Personalize a mensagem que será enviada</p>
-      <div className="space-y-4">
+      <p className="text-sm text-zinc-500 mb-6">Personalize a mensagem que será enviada</p>
+      
+      <div className="space-y-6">
+        {/* Salvar como Template (Gated) */}
+        <button
+          type="button"
+          onClick={() => {
+            if (plan === 'FREE') {
+              toast.info('Para salvar templates personalizados, faça upgrade para o plano STARTER.');
+            } else {
+              setValue('save_as_template', !values.save_as_template);
+            }
+          }}
+          className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all text-left ${values.save_as_template ? 'bg-amber-50 dark:bg-amber-500/10 border-amber-300 dark:border-amber-500/30' : 'border-zinc-200 dark:border-white/7 bg-white dark:bg-surface-soft hover:border-zinc-300 dark:hover:border-white/12'}`}
+        >
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${values.save_as_template ? 'bg-amber-100' : 'bg-zinc-100'}`}>
+            <IconSparkles className={`w-4 h-4 ${values.save_as_template ? 'text-amber-600' : 'text-zinc-400'}`} />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <p className={`text-sm font-bold ${values.save_as_template ? 'text-amber-800' : 'text-zinc-600'}`}>Salvar como template</p>
+              {plan === 'FREE' && <IconLock className="w-3 h-3 text-zinc-400" />}
+            </div>
+            <p className="text-[11px] text-zinc-500">Salve esta mensagem para usar em outras cobranças</p>
+          </div>
+          <div className={`w-10 h-5 rounded-full transition-colors flex items-center px-0.5 ${values.save_as_template ? 'bg-amber-500' : 'bg-zinc-200'}`}>
+            <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${values.save_as_template ? 'translate-x-5' : 'translate-x-0'}`} />
+          </div>
+        </button>
+
+        <div className="space-y-4">
         <Select
           label="Template base"
           value={values.custom_message}
@@ -53,7 +84,7 @@ export function StepMessage({ hasPixKey, textareaRef, insertVariable }: StepMess
           <button
             type="button"
             onClick={() => setValue('send_pix_button', !values.send_pix_button)}
-            className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all text-left ${values.send_pix_button ? 'bg-green-50 dark:bg-green-500/10 border-green-300 dark:border-green-500/30' : 'border-zinc-200 dark:border-white/7 bg-white dark:bg-surface-soft hover:border-zinc-300 dark:hover:border-white/[0.12]'}`}
+            className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all text-left ${values.send_pix_button ? 'bg-green-50 dark:bg-green-500/10 border-green-300 dark:border-green-500/30' : 'border-zinc-200 dark:border-white/7 bg-white dark:bg-surface-soft hover:border-zinc-300 dark:hover:border-white/12'}`}
           >
             <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${values.send_pix_button ? 'bg-green-100' : 'bg-zinc-100'}`}>
               <IconDollarSign className={`w-4 h-4 ${values.send_pix_button ? 'text-green-600' : 'text-zinc-400'}`} />
@@ -93,6 +124,8 @@ export function StepMessage({ hasPixKey, textareaRef, insertVariable }: StepMess
               </div>
             </div>
           )}
+        </div>
+
         </div>
       </div>
     </>

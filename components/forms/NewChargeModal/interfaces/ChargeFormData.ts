@@ -35,6 +35,7 @@ export const baseSchema = z.object({
   send_pix_button: z.boolean(),
   pix_key: z.string().optional(),
   pix_key_type: z.enum(['CPF', 'CNPJ', 'PHONE', 'EMAIL', 'EVP']).optional(),
+  save_as_template: z.boolean().optional(),
 });
 
 export type ChargeFormData = z.infer<typeof baseSchema>;

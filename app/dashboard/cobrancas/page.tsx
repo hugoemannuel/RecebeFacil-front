@@ -23,15 +23,17 @@ export default async function ChargesPage() {
   }
 
   const authHeaders = { Authorization: `Bearer ${token}` };
-  const [metricsRes, subscriptionRes, chargesRes] = await Promise.allSettled([
+  const [metricsRes, subscriptionRes, chargesRes, profileRes] = await Promise.allSettled([
     api.get('/dashboard/metrics', { headers: authHeaders }),
     api.get('/subscription/status', { headers: authHeaders }),
     api.get('/charges', { headers: authHeaders }),
+    api.get('/profiles/me', { headers: authHeaders }),
   ]);
   const metrics = metricsRes.status === 'fulfilled' ? metricsRes.value.data : null;
 
   const subscriptionData = subscriptionRes.status === 'fulfilled' ? subscriptionRes.value.data : null;
   const chargesData = chargesRes.status === 'fulfilled' ? chargesRes.value.data : [];
+  const profileData = profileRes.status === 'fulfilled' ? profileRes.value.data : null;
 
   const limits: Record<string, number> = { FREE: 10, STARTER: 50, PRO: 200, UNLIMITED: 999999 };
   const userPlan = subscriptionData?.plan ?? 'FREE';
@@ -57,6 +59,7 @@ export default async function ChargesPage() {
         initialData={chargesData}
         plan={userPlan}
         usage={{ count: usageCount, limit: usageLimit }}
+        creditorProfile={profileData}
       />
     </DashboardLayout>
   );
