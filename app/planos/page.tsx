@@ -158,7 +158,7 @@ export default function PlanosPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-zinc-900 font-sans pb-20">
+    <div className="min-h-screen bg-surface text-zinc-900 font-sans pb-20">
       
       {/* ── Header ────────────────────────────────────────── */}
       <header className="bg-white border-b border-zinc-200/60 sticky top-0 z-30">
@@ -296,7 +296,7 @@ export default function PlanosPage() {
                       isCurrent
                         ? 'bg-zinc-100 text-zinc-400 cursor-default'
                         : plan.highlight
-                          ? 'bg-[#0b1521] text-white hover:bg-[#152336] hover:scale-[1.02] shadow-lg shadow-zinc-900/20'
+                          ? 'bg-[#0b1521] text-white hover:bg-surface-dark hover:scale-[1.02] shadow-lg shadow-zinc-900/20'
                           : 'bg-zinc-100 text-zinc-900 hover:bg-zinc-200 hover:scale-[1.02]'
                     }`}
                   >
@@ -358,3 +358,5 @@ export default function PlanosPage() {
     </div>
   );
 }
+
+

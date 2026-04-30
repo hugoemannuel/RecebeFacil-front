@@ -30,7 +30,7 @@ export default function Home() {
 
       <main>
       <section className="px-6 py-12 md:py-24 max-w-7xl mx-auto flex flex-col items-center text-center relative overflow-hidden">
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-blue-50 to-green-50 rounded-[100%] blur-3xl -z-10 opacity-50"></div>
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-linear-to-b from-blue-50 to-green-50 rounded-[100%] blur-3xl -z-10 opacity-50"></div>
 
         <div className="bg-blue-50 text-blue-600 text-[10px] md:text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-6 flex items-center gap-2 border border-blue-100">
           <span className="text-blue-500 text-sm">🏆</span> #1 PLATAFORMA DE COBRANÇAS
@@ -140,7 +140,7 @@ export default function Home() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-green-100 rounded-full blur-3xl -z-10"></div>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[180px] h-[400px] bg-green-50 rounded-full -z-10"></div>
 
-          <div className="w-[300px] md:w-[320px] bg-white rounded-[2.5rem] border-[8px] md:border-[10px] border-slate-900 shadow-2xl overflow-hidden relative">
+          <div className="w-[300px] md:w-[320px] bg-white rounded-[2.5rem] border-8 md:border-10 border-slate-900 shadow-2xl overflow-hidden relative">
             <div className="bg-[#008069] text-white p-4 flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
                 <IconMessageCircle className="text-white w-6 h-6" />
@@ -222,12 +222,12 @@ export default function Home() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-[#152336] p-8 rounded-2xl border border-[#1e3046]">
+            <div className="bg-surface-dark p-8 rounded-2xl border border-[#1e3046]">
               <div className="flex gap-1 text-yellow-400 mb-6">
                 <IconStar /><IconStar /><IconStar /><IconStar /><IconStar />
               </div>
               <p className="text-slate-200 text-base md:text-lg leading-relaxed mb-8 italic">
-                "Nossa inadimplência baixou de 15% para 2% no primeiro mês! O sistema trabalha sozinho e os clientes adoram a facilidade do Pix pelo WhatsApp."
+                &quot;Nossa inadimplência baixou de 15% para 2% no primeiro mês! O sistema trabalha sozinho e os clientes adoram a facilidade do Pix pelo WhatsApp.&quot;
               </p>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-slate-600 rounded-full flex items-center justify-center text-white font-bold text-xl overflow-hidden">
@@ -240,12 +240,12 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-[#152336] p-8 rounded-2xl border border-[#1e3046]">
+            <div className="bg-surface-dark p-8 rounded-2xl border border-[#1e3046]">
               <div className="flex gap-1 text-yellow-400 mb-6">
                 <IconStar /><IconStar /><IconStar /><IconStar /><IconStar />
               </div>
               <p className="text-slate-200 text-base md:text-lg leading-relaxed mb-8 italic">
-                "A cobrança era a pior parte do meu negócio. Agora, não preciso mais me preocupar com isso. O dinheiro simplesmente entra na conta."
+                &quot;A cobrança era a pior parte do meu negócio. Agora, não preciso mais me preocupar com isso. O dinheiro simplesmente entra na conta.&quot;
               </p>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-slate-600 rounded-full flex items-center justify-center text-white font-bold text-xl overflow-hidden">
@@ -258,12 +258,12 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-[#152336] p-8 rounded-2xl border border-[#1e3046]">
+            <div className="bg-surface-dark p-8 rounded-2xl border border-[#1e3046]">
               <div className="flex gap-1 text-yellow-400 mb-6">
                 <IconStar /><IconStar /><IconStar /><IconStar /><IconStar />
               </div>
               <p className="text-slate-200 text-base md:text-lg leading-relaxed mb-8 italic">
-                "Facilidade incrível. O suporte é rápido e a interface é muito intuitiva. Recomendo para todos os meus parceiros."
+                &quot;Facilidade incrível. O suporte é rápido e a interface é muito intuitiva. Recomendo para todos os meus parceiros.&quot;
               </p>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-slate-600 rounded-full flex items-center justify-center text-white font-bold text-xl overflow-hidden">
@@ -346,3 +346,4 @@ function IconShieldCheck({ className }: { className?: string }) {
 function IconCheckCircle2({ className }: { className?: string }) {
   return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" /></svg>;
 }
+

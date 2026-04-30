@@ -17,15 +17,15 @@ export function RecentActivityClient({ recentActivity }: Props) {
     <>
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="bg-zinc-100/50 dark:bg-white/[0.02]">
-            <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/[0.06]">Cliente</th>
-            <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/[0.06]">Valor</th>
-            <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/[0.06]">Vencimento</th>
-            <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/[0.06]">Status</th>
-            <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/[0.06] text-right">Ações</th>
+          <tr className="bg-zinc-100/50 dark:bg-white/2">
+            <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/6">Cliente</th>
+            <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/6">Valor</th>
+            <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/6">Vencimento</th>
+            <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/6">Status</th>
+            <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/6 text-right">Ações</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-zinc-100 dark:divide-white/[0.05] text-sm">
+        <tbody className="divide-y divide-zinc-100 dark:divide-white/5 text-sm">
           {recentActivity.length === 0 ? (
             <tr>
               <td colSpan={5} className="py-16 text-center">
@@ -50,7 +50,7 @@ export function RecentActivityClient({ recentActivity }: Props) {
               return (
                 <tr 
                   key={activity.id} 
-                  className="hover:bg-zinc-100/60 dark:hover:bg-white/[0.03] transition-colors cursor-pointer"
+                  className="hover:bg-zinc-100/60 dark:hover:bg-white/3 transition-colors cursor-pointer"
                   onClick={() => setDetailsChargeId(activity.id)}
                 >
                   <td className="py-5 px-8">
@@ -115,3 +115,4 @@ export function RecentActivityClient({ recentActivity }: Props) {
     </>
   );
 }
+

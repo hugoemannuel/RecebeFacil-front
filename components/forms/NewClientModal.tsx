@@ -66,10 +66,10 @@ export function NewClientModal({ open, onClose, onSuccess }: Props) {
       onClick={handleClose}
     >
       <div
-        className="w-full max-w-lg bg-zinc-50 dark:bg-[#0f1c2b] rounded-[2rem] shadow-2xl flex flex-col max-h-[95vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-transparent dark:border-white/[0.07]"
+        className="w-full max-w-lg bg-zinc-50 dark:bg-surface-soft rounded-4xl shadow-2xl flex flex-col max-h-[95vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-transparent dark:border-white/7"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-100 dark:border-white/[0.07] bg-white dark:bg-[#152336]">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-100 dark:border-white/7 bg-white dark:bg-surface">
           <div>
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Novo Cliente</h2>
             <p className="text-sm text-zinc-500 dark:text-zinc-400">Cadastre um cliente na sua base</p>
@@ -117,7 +117,7 @@ export function NewClientModal({ open, onClose, onSuccess }: Props) {
             />
           </div>
 
-          <div className="px-6 py-4 border-t border-zinc-100 dark:border-white/[0.07] bg-white dark:bg-[#152336] flex justify-end gap-3">
+          <div className="px-6 py-4 border-t border-zinc-100 dark:border-white/7 bg-white dark:bg-surface flex justify-end gap-3">
             <button
               type="button"
               onClick={handleClose}
@@ -138,3 +138,5 @@ export function NewClientModal({ open, onClose, onSuccess }: Props) {
     </div>
   );
 }
+
+

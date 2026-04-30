@@ -11,7 +11,7 @@ export function StepConfirm({ hasPixKey }: { hasPixKey: boolean }) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-zinc-500">Revise e confirme o envio</p>
-      <div className="bg-zinc-50 dark:bg-white/5 rounded-2xl p-5 space-y-3 border border-transparent dark:border-white/[0.06]">
+      <div className="bg-zinc-50 dark:bg-white/5 rounded-2xl p-5 space-y-3 border border-transparent dark:border-white/6">
         {[
           { label: 'Para', value: `${values.debtor_name} • ${values.debtor_phone}` },
           { label: 'Valor', value: values.amount_display },
@@ -25,7 +25,7 @@ export function StepConfirm({ hasPixKey }: { hasPixKey: boolean }) {
           </div>
         ))}
         {values.send_pix_button && !hasPixKey && values.pix_key && (
-          <div className="flex items-start justify-between gap-4 border-t border-zinc-200 dark:border-white/[0.07] pt-3 mt-1">
+          <div className="flex items-start justify-between gap-4 border-t border-zinc-200 dark:border-white/7 pt-3 mt-1">
             <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider shrink-0 pt-0.5">Pagamento para</span>
             <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 text-right">{values.pix_key_type}: {values.pix_key}</span>
           </div>
@@ -43,3 +43,4 @@ export function StepConfirm({ hasPixKey }: { hasPixKey: boolean }) {
     </div>
   );
 }
+

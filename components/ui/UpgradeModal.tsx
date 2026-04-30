@@ -32,7 +32,7 @@ export function UpgradeModal({ moduleName, onClose }: UpgradeModalProps) {
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-[#152336] rounded-3xl p-8 max-w-md w-full shadow-2xl relative border border-transparent dark:border-white/[0.07]"
+        className="bg-white dark:bg-surface rounded-3xl p-8 max-w-md w-full shadow-2xl relative border border-transparent dark:border-white/7"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
@@ -75,3 +75,5 @@ export function UpgradeModal({ moduleName, onClose }: UpgradeModalProps) {
     </div>
   );
 }
+
+

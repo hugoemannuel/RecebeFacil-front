@@ -200,7 +200,7 @@ export function ChargesClient({
                 </button>
               </DropdownMenu.Trigger>
               <DropdownMenu.Portal>
-                <DropdownMenu.Content align="end" className="min-w-[180px] bg-[#f8fafc] dark:bg-[#1a2d42] rounded-xl shadow-xl border border-zinc-200/80 dark:border-white/[0.08] p-1.5 text-sm z-50 animate-in fade-in zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-95">
+                <DropdownMenu.Content align="end" className="min-w-[180px] bg-surface dark:bg-[#1a2d42] rounded-xl shadow-xl border border-zinc-200/80 dark:border-white/8 p-1.5 text-sm z-50 animate-in fade-in zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-95">
                   <DropdownMenu.Item className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg text-zinc-600 dark:text-zinc-300 font-medium">
                     <IconExternalLink className="w-4 h-4 text-zinc-400 dark:text-zinc-500" /> Ver Detalhes
                   </DropdownMenu.Item>
@@ -210,7 +210,7 @@ export function ChargesClient({
                   }}>
                     <IconCopy className="w-4 h-4 text-zinc-400" /> Copiar Link
                   </DropdownMenu.Item>
-                  <DropdownMenu.Separator className="h-px bg-zinc-200/80 dark:bg-white/[0.06] my-1" />
+                  <DropdownMenu.Separator className="h-px bg-zinc-200/80 dark:bg-white/6 my-1" />
                   <DropdownMenu.Item 
                     className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg text-red-600 dark:text-red-400 font-medium"
                     onClick={async () => {
@@ -277,7 +277,7 @@ export function ChargesClient({
 
       {/* UPSELL / USAGE CARD (Apenas para FREE e STARTER) */}
       {(plan === 'FREE' || plan === 'STARTER') && (
-        <div className="bg-[#f8fafc] dark:bg-[#152336] border border-zinc-200/80 dark:border-white/[0.07] rounded-2xl p-5 mb-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="bg-surface dark:bg-surface border border-zinc-200/80 dark:border-white/7 rounded-2xl p-5 mb-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xs font-bold tracking-widest text-zinc-400 uppercase">PLANO {plan}</span>
@@ -318,20 +318,20 @@ export function ChargesClient({
             onChange={e => setDateFilter(e.target.value)}
             className="mr-2"
           />
-          <button onClick={() => setStatusFilter('ALL')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'ALL' ? 'bg-zinc-900 text-white shadow-zinc-900/20' : 'bg-[#f8fafc] dark:bg-[#0f1c2b] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/[0.07] hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Todas</button>
-          <button onClick={() => setStatusFilter('PENDING')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'PENDING' ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400' : 'bg-[#f8fafc] dark:bg-[#0f1c2b] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/[0.07] hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Pendentes</button>
-          <button onClick={() => setStatusFilter('OVERDUE')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'OVERDUE' ? 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-400' : 'bg-[#f8fafc] dark:bg-[#0f1c2b] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/[0.07] hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Atrasadas</button>
-          <button onClick={() => setStatusFilter('PAID')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'PAID' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400' : 'bg-[#f8fafc] dark:bg-[#0f1c2b] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/[0.07] hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Pagas</button>
+          <button onClick={() => setStatusFilter('ALL')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'ALL' ? 'bg-zinc-900 text-white shadow-zinc-900/20' : 'bg-surface dark:bg-surface-soft text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/7 hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Todas</button>
+          <button onClick={() => setStatusFilter('PENDING')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'PENDING' ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400' : 'bg-surface dark:bg-surface-soft text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/7 hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Pendentes</button>
+          <button onClick={() => setStatusFilter('OVERDUE')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'OVERDUE' ? 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-400' : 'bg-surface dark:bg-surface-soft text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/7 hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Atrasadas</button>
+          <button onClick={() => setStatusFilter('PAID')} className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap shadow-sm ${statusFilter === 'PAID' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400' : 'bg-surface dark:bg-surface-soft text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/7 hover:bg-zinc-100 dark:hover:bg-white/5'}`}>Pagas</button>
         </div>
       </div>
 
       {/* DATA TABLE */}
-      <div className="bg-[#f8fafc] dark:bg-[#152336] rounded-2xl border border-zinc-200/80 dark:border-white/[0.07] shadow-sm overflow-hidden relative">
+      <div className="bg-surface dark:bg-surface rounded-2xl border border-zinc-200/80 dark:border-white/7 shadow-sm overflow-hidden relative">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               {table.getHeaderGroups().map(headerGroup => (
-                <tr key={headerGroup.id} className="border-b border-zinc-200/80 dark:border-white/[0.06] bg-zinc-100/50 dark:bg-white/[0.02]">
+                <tr key={headerGroup.id} className="border-b border-zinc-200/80 dark:border-white/6 bg-zinc-100/50 dark:bg-white/2">
                   {headerGroup.headers.map(header => (
                     <th key={header.id} className="px-5 py-4 text-xs font-bold tracking-wider text-zinc-400 dark:text-zinc-500 uppercase whitespace-nowrap">
                       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
@@ -344,7 +344,7 @@ export function ChargesClient({
               {table.getRowModel().rows.map(row => (
                 <tr
                   key={row.id}
-                  className={`border-b border-zinc-100 dark:border-white/[0.04] transition-colors hover:bg-zinc-100/60 dark:hover:bg-white/[0.03] cursor-pointer ${row.getIsSelected() ? 'bg-green-50/40 dark:bg-green-500/5' : ''}`}
+                  className={`border-b border-zinc-100 dark:border-white/4 transition-colors hover:bg-zinc-100/60 dark:hover:bg-white/3 cursor-pointer ${row.getIsSelected() ? 'bg-green-50/40 dark:bg-green-500/5' : ''}`}
                   onClick={(e) => {
                     if ((e.target as HTMLElement).closest('input[type="checkbox"]')) return;
                     setDetailsChargeId(row.original.id);
@@ -388,7 +388,7 @@ export function ChargesClient({
 
         {/* Bulk Actions Lock State (STARTER/FREE) */}
         {(plan === 'FREE' || plan === 'STARTER') && (
-          <div className="bg-zinc-100/60 dark:bg-white/[0.02] border-t border-zinc-200/80 dark:border-white/[0.06] p-4 flex items-center justify-between">
+          <div className="bg-zinc-100/60 dark:bg-white/2 border-t border-zinc-200/80 dark:border-white/6 p-4 flex items-center justify-between">
             <p className="text-sm font-medium text-zinc-400 dark:text-zinc-500 flex items-center gap-2">
               <IconLock className="w-4 h-4 text-zinc-400" /> Seleção em massa bloqueada no plano {plan}.
             </p>
@@ -467,3 +467,5 @@ export function ChargesClient({
     </div>
   );
 }
+
+

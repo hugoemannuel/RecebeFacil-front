@@ -22,7 +22,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const variantClasses = isAuth
       ? "py-3.5 bg-white border-zinc-200 shadow-sm hover:border-zinc-300 text-zinc-800 font-medium focus:border-green-500/60"
-      : "py-3 bg-white dark:bg-[#0f1c2b] border-zinc-200/80 dark:border-white/[0.07] text-zinc-700 dark:text-zinc-200 focus:border-green-500/60 dark:focus:border-green-500/40";
+      : "py-3 bg-white dark:bg-surface-soft border-zinc-200/80 dark:border-white/7 text-zinc-700 dark:text-zinc-200 focus:border-green-500/60 dark:focus:border-green-500/40";
 
     return (
       <div className="w-full">
@@ -59,3 +59,5 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 );
 
 Input.displayName = "Input";
+
+

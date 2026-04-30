@@ -64,11 +64,11 @@ export function ClientDetailsModal({ clientId, onClose, onNewCharge, onChargeCli
       onClick={onClose}
     >
       <div
-        className="w-full max-w-3xl bg-zinc-50 dark:bg-[#0f1c2b] rounded-[2rem] shadow-2xl flex flex-col max-h-[95vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-transparent dark:border-white/[0.07]"
+        className="w-full max-w-3xl bg-zinc-50 dark:bg-surface-soft rounded-4xl shadow-2xl flex flex-col max-h-[95vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-transparent dark:border-white/7"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-100 dark:border-white/[0.07] bg-white dark:bg-[#152336]">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-100 dark:border-white/7 bg-white dark:bg-surface">
           <div>
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Detalhes do Cliente</h2>
             {client && (
@@ -104,7 +104,7 @@ export function ClientDetailsModal({ clientId, onClose, onNewCharge, onChargeCli
           ) : client ? (
             <>
               {/* Perfil */}
-              <div className="bg-white dark:bg-[#152336] border border-zinc-200 dark:border-white/[0.07] rounded-2xl p-6 shadow-sm">
+              <div className="bg-white dark:bg-surface border border-zinc-200 dark:border-white/7 rounded-2xl p-6 shadow-sm">
                 <div className="flex items-center gap-5">
                   <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 flex items-center justify-center font-bold text-2xl shrink-0">
                     {client.initials}
@@ -124,7 +124,7 @@ export function ClientDetailsModal({ clientId, onClose, onNewCharge, onChargeCli
                   </div>
                 </div>
                 {client.notes && (
-                  <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-white/[0.07]">
+                  <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-white/7">
                     <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Observações</p>
                     <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">{client.notes}</p>
                   </div>
@@ -133,11 +133,11 @@ export function ClientDetailsModal({ clientId, onClose, onNewCharge, onChargeCli
 
               {/* Resumo */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white dark:bg-[#152336] border border-zinc-200 dark:border-white/[0.07] rounded-2xl p-5 shadow-sm">
+                <div className="bg-white dark:bg-surface border border-zinc-200 dark:border-white/7 rounded-2xl p-5 shadow-sm">
                   <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Total de Cobranças</p>
                   <p className="text-2xl font-extrabold text-zinc-800 dark:text-zinc-100">{client.charges?.length ?? 0}</p>
                 </div>
-                <div className="bg-white dark:bg-[#152336] border border-zinc-200 dark:border-white/[0.07] rounded-2xl p-5 shadow-sm">
+                <div className="bg-white dark:bg-surface border border-zinc-200 dark:border-white/7 rounded-2xl p-5 shadow-sm">
                   <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Em Aberto</p>
                   <p className="text-2xl font-extrabold text-red-500">
                     {formatMoney(
@@ -150,8 +150,8 @@ export function ClientDetailsModal({ clientId, onClose, onNewCharge, onChargeCli
               </div>
 
               {/* Cobranças */}
-              <div className="bg-white dark:bg-[#152336] border border-zinc-200 dark:border-white/[0.07] rounded-2xl overflow-hidden shadow-sm">
-                <div className="px-6 py-4 border-b border-zinc-100 dark:border-white/[0.07]">
+              <div className="bg-white dark:bg-surface border border-zinc-200 dark:border-white/7 rounded-2xl overflow-hidden shadow-sm">
+                <div className="px-6 py-4 border-b border-zinc-100 dark:border-white/7">
                   <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-widest">Histórico de Cobranças</h4>
                 </div>
                 {client.charges?.length === 0 ? (
@@ -168,7 +168,7 @@ export function ClientDetailsModal({ clientId, onClose, onNewCharge, onChargeCli
                   <div className="overflow-x-auto">
                     <table className="w-full text-left">
                       <thead>
-                        <tr className="border-b border-zinc-100 dark:border-white/[0.06] bg-zinc-50 dark:bg-white/[0.02]">
+                        <tr className="border-b border-zinc-100 dark:border-white/6 bg-zinc-50 dark:bg-white/2">
                           <th className="px-5 py-3 text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Descrição</th>
                           <th className="px-5 py-3 text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Valor</th>
                           <th className="px-5 py-3 text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Vencimento</th>
@@ -179,7 +179,7 @@ export function ClientDetailsModal({ clientId, onClose, onNewCharge, onChargeCli
                         {client.charges.map((charge: any) => (
                           <tr
                             key={charge.id}
-                            className="border-b border-zinc-100 dark:border-white/[0.04] hover:bg-zinc-50 dark:hover:bg-white/[0.03] cursor-pointer transition-colors"
+                            className="border-b border-zinc-100 dark:border-white/4 hover:bg-zinc-50 dark:hover:bg-white/3 cursor-pointer transition-colors"
                             onClick={() => onChargeClick(charge.id)}
                           >
                             <td className="px-5 py-3.5 text-sm text-zinc-700 dark:text-zinc-200 font-medium truncate max-w-[200px]">{charge.description}</td>
@@ -206,3 +206,5 @@ export function ClientDetailsModal({ clientId, onClose, onNewCharge, onChargeCli
     </div>
   );
 }
+
+

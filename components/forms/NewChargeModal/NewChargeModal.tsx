@@ -104,7 +104,7 @@ export function NewChargeModal({
       ['amount_display', 'due_date', 'description'],
       ['custom_message', 'pix_key', 'pix_key_type'],
     ];
-    form.trigger(fieldsPerStep[step] as any).then((ok) => { if (ok) setStep((s) => s + 1); });
+    form.trigger(fieldsPerStep[step] as (keyof ChargeFormData)[]).then((ok) => { if (ok) setStep((s) => s + 1); });
   }
 
   async function onSubmit(data: ChargeFormData) {
@@ -142,7 +142,7 @@ export function NewChargeModal({
       onClick={handleClose}
     >
       <div
-        className={`w-full ${step === 2 ? 'max-w-5xl' : 'max-w-3xl'} bg-zinc-50 dark:bg-[#0f1c2b] rounded-[2rem] shadow-2xl flex flex-col max-h-[95vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-transparent dark:border-white/[0.07]`}
+        className={`w-full ${step === 2 ? 'max-w-5xl' : 'max-w-3xl'} bg-zinc-50 dark:bg-surface-soft rounded-4xl shadow-2xl flex flex-col max-h-[95vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-transparent dark:border-white/7`}
         onClick={(e) => e.stopPropagation()}
       >
         <ModalHeader step={step} totalSteps={STEPS.length} onClose={handleClose} />
@@ -159,8 +159,8 @@ export function NewChargeModal({
               </div>
 
               {step === 2 && (
-                <div className="w-full md:w-[380px] border-t md:border-t-0 md:border-l border-zinc-100 dark:border-white/[0.07] flex flex-col bg-zinc-50 dark:bg-[#0b1521] shrink-0">
-                  <div className="px-5 py-4 border-b border-zinc-100 dark:border-white/[0.07]">
+                <div className="w-full md:w-[380px] border-t md:border-t-0 md:border-l border-zinc-100 dark:border-white/7 flex flex-col bg-zinc-50 dark:bg-[#0b1521] shrink-0">
+                  <div className="px-5 py-4 border-b border-zinc-100 dark:border-white/7">
                     <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
                       <IconSparkles className="w-3.5 h-3.5 text-green-500" /> Preview ao vivo
                     </p>
@@ -194,3 +194,5 @@ export function NewChargeModal({
     </div>
   );
 }
+
+

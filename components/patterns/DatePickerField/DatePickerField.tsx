@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { Controller } from "react-hook-form";
+import { Controller, Control, FieldValues } from "react-hook-form";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DayPicker } from "react-day-picker";
 
 type Props = {
   name: string;
-  control: any;
+  control: Control<FieldValues>;
   label?: string;
   icon?: React.ReactNode;
-  disabled?: any;
+  disabled?: boolean | ((date: Date) => boolean) | Date | Date[] | { from: Date; to: Date };
 };
 
 export function DatePickerField({
@@ -39,8 +39,8 @@ export function DatePickerField({
             onClick={() => setOpen((prev) => !prev)}
             className="
               w-full flex items-center gap-3 pl-10 pr-4 py-3
-              border border-zinc-200/80 dark:border-white/[0.07]
-              bg-white dark:bg-[#0f1c2b]
+              border border-zinc-200/80 dark:border-white/7
+              bg-white dark:bg-surface-soft
               text-zinc-700 dark:text-zinc-200
               rounded-xl text-sm text-left
               focus:outline-none focus:ring-2 focus:ring-green-500/30
@@ -70,7 +70,7 @@ export function DatePickerField({
 
 
           {open && (
-            <div className="absolute z-50 mt-2 border border-zinc-200 dark:border-white/[0.07] rounded-2xl overflow-hidden shadow-lg bg-white dark:bg-[#152336]">
+            <div className="absolute z-50 mt-2 border border-zinc-200 dark:border-white/7 rounded-2xl overflow-hidden shadow-lg bg-white dark:bg-surface">
               <DayPicker
                 mode="single"
                 locale={ptBR}
@@ -100,3 +100,4 @@ export function DatePickerField({
     />
   );
 }
+

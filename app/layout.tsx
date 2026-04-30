@@ -53,6 +53,7 @@ export const metadata: Metadata = {
   },
 };
 
+import Script from "next/script";
 import { ThemeProvider } from "@/context/ThemeContext";
 
 export default function RootLayout({
@@ -67,7 +68,9 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <script
+        <Script
+          id="theme-initializer"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `try{if(localStorage.getItem('theme')==='dark'){document.documentElement.classList.add('dark')}}catch(_){}`,
           }}

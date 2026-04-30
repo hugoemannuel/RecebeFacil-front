@@ -53,7 +53,7 @@ export function StepMessage({ hasPixKey, textareaRef, insertVariable }: StepMess
           <button
             type="button"
             onClick={() => setValue('send_pix_button', !values.send_pix_button)}
-            className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all text-left ${values.send_pix_button ? 'bg-green-50 dark:bg-green-500/10 border-green-300 dark:border-green-500/30' : 'border-zinc-200 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] hover:border-zinc-300 dark:hover:border-white/[0.12]'}`}
+            className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all text-left ${values.send_pix_button ? 'bg-green-50 dark:bg-green-500/10 border-green-300 dark:border-green-500/30' : 'border-zinc-200 dark:border-white/7 bg-white dark:bg-surface-soft hover:border-zinc-300 dark:hover:border-white/[0.12]'}`}
           >
             <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${values.send_pix_button ? 'bg-green-100' : 'bg-zinc-100'}`}>
               <IconDollarSign className={`w-4 h-4 ${values.send_pix_button ? 'text-green-600' : 'text-zinc-400'}`} />
@@ -67,7 +67,7 @@ export function StepMessage({ hasPixKey, textareaRef, insertVariable }: StepMess
             </div>
           </button>
           {values.send_pix_button && !hasPixKey && (
-            <div className="bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/[0.07] p-4 rounded-xl space-y-3 animate-in fade-in slide-in-from-top-2">
+            <div className="bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/7 p-4 rounded-xl space-y-3 animate-in fade-in slide-in-from-top-2">
               <div className="flex items-start gap-2 mb-2">
                 <IconSparkles className="w-4 h-4 text-zinc-400 mt-0.5 shrink-0" />
                 <p className="text-xs text-zinc-600 dark:text-zinc-400">Como você não possui uma chave salva, insira abaixo para onde o dinheiro deve ir nesta cobrança:</p>
@@ -98,3 +98,5 @@ export function StepMessage({ hasPixKey, textareaRef, insertVariable }: StepMess
     </>
   );
 }
+
+

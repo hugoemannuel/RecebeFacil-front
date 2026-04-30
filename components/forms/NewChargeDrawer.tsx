@@ -186,10 +186,10 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
       <div className={`fixed top-0 right-0 h-full z-50 flex transition-transform duration-300 ease-out ${open ? 'translate-x-0' : 'translate-x-full'}`}
         style={{ width: '100%', maxWidth: step === 2 ? '900px' : '480px' }}>
 
-        <div className="flex-1 bg-[#f8fafc] dark:bg-[#152336] flex flex-col shadow-2xl overflow-hidden transition-colors duration-300">
+        <div className="flex-1 bg-surface dark:bg-surface flex flex-col shadow-2xl overflow-hidden transition-colors duration-300">
 
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-200/80 dark:border-white/[0.07] shrink-0">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-200/80 dark:border-white/7 shrink-0">
             <div>
               <h2 className="text-lg font-extrabold text-zinc-800 dark:text-zinc-100 tracking-tight">Nova Cobrança</h2>
               <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">Etapa {step + 1} de {STEPS.length}</p>
@@ -246,8 +246,8 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
 
                 {/* Preview WhatsApp — só no step 2 */}
                 {step === 2 && (
-                  <div className="w-full md:w-[380px] border-t md:border-t-0 md:border-l border-zinc-100 dark:border-white/[0.07] flex flex-col bg-zinc-50 dark:bg-[#0b1521] shrink-0">
-                    <div className="px-5 py-4 border-b border-zinc-100 dark:border-white/[0.07]">
+                  <div className="w-full md:w-[380px] border-t md:border-t-0 md:border-l border-zinc-100 dark:border-white/7 flex flex-col bg-zinc-50 dark:bg-[#0b1521] shrink-0">
+                    <div className="px-5 py-4 border-b border-zinc-100 dark:border-white/7">
                       <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
                         <IconSparkles className="w-3.5 h-3.5 text-green-500" /> Preview ao vivo
                       </p>
@@ -270,17 +270,17 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
           </FormProvider>
 
           {/* Footer */}
-          <div className="px-6 py-5 border-t border-zinc-100 dark:border-white/[0.07] flex gap-3 shrink-0">
+          <div className="px-6 py-5 border-t border-zinc-100 dark:border-white/7 flex gap-3 shrink-0">
             {step > 0 && (
               <button type="button" onClick={() => setStep((s) => s - 1)}
-                className="flex-1 border border-zinc-200 dark:border-white/[0.08] text-zinc-600 dark:text-zinc-300 font-bold py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors text-sm">
+                className="flex-1 border border-zinc-200 dark:border-white/8 text-zinc-600 dark:text-zinc-300 font-bold py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors text-sm">
                 Voltar
               </button>
             )}
 
             {step < 3 ? (
               <button type="button" onClick={nextStep}
-                className="flex-1 bg-[#0b1521] hover:bg-[#152336] text-white font-bold py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2">
+                className="flex-1 bg-[#0b1521] hover:bg-surface-dark text-white font-bold py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2">
                 Próximo <IconChevronRight className="w-4 h-4" />
               </button>
             ) : (
@@ -459,7 +459,7 @@ function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: bo
         {/* Toggles PIX Simples */}
         <div className="space-y-3 pt-2">
           <button type="button" onClick={() => setValue('send_pix_button', !values.send_pix_button)}
-            className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all text-left ${values.send_pix_button ? 'bg-green-50 dark:bg-green-500/10 border-green-300 dark:border-green-500/30' : 'border-zinc-200 dark:border-white/[0.07] bg-white dark:bg-[#0f1c2b] hover:border-zinc-300 dark:hover:border-white/[0.12]'}`}>
+            className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all text-left ${values.send_pix_button ? 'bg-green-50 dark:bg-green-500/10 border-green-300 dark:border-green-500/30' : 'border-zinc-200 dark:border-white/7 bg-white dark:bg-surface-soft hover:border-zinc-300 dark:hover:border-white/[0.12]'}`}>
             <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${values.send_pix_button ? 'bg-green-100' : 'bg-zinc-100'}`}>
               <IconDollarSign className={`w-4 h-4 ${values.send_pix_button ? 'text-green-600' : 'text-zinc-400'}`} />
             </div>
@@ -474,7 +474,7 @@ function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: bo
 
           {/* Campos de PIX Inline (se não tiver configurado globalmente) */}
           {values.send_pix_button && !hasPixKey && (
-            <div className="bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/[0.07] p-4 rounded-xl space-y-3 animate-in fade-in slide-in-from-top-2">
+            <div className="bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/7 p-4 rounded-xl space-y-3 animate-in fade-in slide-in-from-top-2">
               <div className="flex items-start gap-2 mb-2">
                 <IconSparkles className="w-4 h-4 text-zinc-400 mt-0.5 shrink-0" />
                 <p className="text-xs text-zinc-600 dark:text-zinc-400">Como você não possui uma chave salva, insira abaixo para onde o dinheiro deve ir nesta cobrança:</p>
@@ -519,7 +519,7 @@ function StepConfirm({ hasPixKey }: { hasPixKey: boolean }) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-zinc-500">Revise e confirme o envio</p>
-      <div className="bg-zinc-50 dark:bg-white/5 rounded-2xl p-5 space-y-3 border border-transparent dark:border-white/[0.06]">
+      <div className="bg-zinc-50 dark:bg-white/5 rounded-2xl p-5 space-y-3 border border-transparent dark:border-white/6">
         {[
           { label: 'Para', value: `${values.debtor_name} • ${values.debtor_phone}` },
           { label: 'Valor', value: values.amount_display },
@@ -533,7 +533,7 @@ function StepConfirm({ hasPixKey }: { hasPixKey: boolean }) {
           </div>
         ))}
         {values.send_pix_button && !hasPixKey && values.pix_key && (
-          <div className="flex items-start justify-between gap-4 border-t border-zinc-200 dark:border-white/[0.07] pt-3 mt-1">
+          <div className="flex items-start justify-between gap-4 border-t border-zinc-200 dark:border-white/7 pt-3 mt-1">
             <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider shrink-0 pt-0.5">Pagamento para</span>
             <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 text-right">{values.pix_key_type}: {values.pix_key}</span>
           </div>
@@ -553,3 +553,6 @@ function StepConfirm({ hasPixKey }: { hasPixKey: boolean }) {
     </div>
   );
 }
+
+
+

@@ -4,11 +4,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  IconLayoutGrid,
-  IconDollarSign,
-  IconUsers,
-  IconFileText,
-  IconSettings,
   IconSearch,
   IconBell,
   IconPlus,
@@ -43,10 +38,10 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
   const userName = subscription.userName ?? 'Usuário';
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0b1521] text-zinc-900 dark:text-zinc-50 font-sans flex overflow-hidden selection:bg-green-200 transition-colors duration-300">
+    <div className="min-h-screen bg-surface dark:bg-[#0b1521] text-zinc-900 dark:text-zinc-50 font-sans flex overflow-hidden selection:bg-green-200 transition-colors duration-300">
 
       {/* ── Sidebar ────────────────────────────────────────── */}
-      <aside className="w-[280px] bg-white dark:bg-[#152336] border-r border-zinc-200 dark:border-white/5 flex flex-col h-screen shrink-0 hidden md:flex transition-colors duration-300">
+      <aside className="w-[280px] bg-white dark:bg-surface border-r border-zinc-200 dark:border-white/5 flex flex-col h-screen shrink-0 hidden md:flex transition-colors duration-300">
 
         {/* Logo */}
         <div className="p-8 pb-10">
@@ -100,7 +95,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
 
         {/* Upgrade banner para plano FREE */}
         {subscription.plan === 'FREE' && (
-          <div className="mx-4 mb-4 bg-gradient-to-br from-[#0b1521] to-[#0b3d2e] rounded-2xl p-4">
+          <div className="mx-4 mb-4 bg-linear-to-br from-[#0b1521] to-[#0b3d2e] rounded-2xl p-4">
             <p className="text-white font-bold text-xs mb-1">Desbloqueie mais poder</p>
             <p className="text-slate-400 text-[11px] mb-3 leading-relaxed">Clientes, relatórios e importação de Excel no plano Starter.</p>
             <Link
@@ -113,7 +108,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
         )}
 
         {/* User Profile & Logout */}
-        <div className="p-4 border-t border-zinc-100 dark:border-white/5 m-4 mt-0 rounded-2xl bg-[#f8fafc] dark:bg-[#0b1521] flex items-center gap-3 transition-colors duration-300">
+        <div className="p-4 border-t border-zinc-100 dark:border-white/5 m-4 mt-0 rounded-2xl bg-surface dark:bg-[#0b1521] flex items-center gap-3 transition-colors duration-300">
           <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center font-bold text-green-700 dark:text-green-400 text-sm shrink-0">
             {userName.charAt(0).toUpperCase()}
           </div>
@@ -144,7 +139,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
       )}
 
       {/* ── Mobile Sidebar ─────────────────────────────────── */}
-      <aside className={`fixed inset-y-0 left-0 w-[280px] bg-white dark:bg-[#152336] border-r border-zinc-200 dark:border-white/5 flex flex-col h-screen shrink-0 z-50 md:hidden transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`fixed inset-y-0 left-0 w-[280px] bg-white dark:bg-surface border-r border-zinc-200 dark:border-white/5 flex flex-col h-screen shrink-0 z-50 md:hidden transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         {/* Logo & Close */}
         <div className="p-6 pb-6 flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
@@ -199,7 +194,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
         </nav>
 
         {/* User Profile & Logout */}
-        <div className="p-4 border-t border-zinc-100 dark:border-white/5 mt-auto bg-[#f8fafc] dark:bg-[#0b1521] flex items-center gap-3 transition-colors duration-300">
+        <div className="p-4 border-t border-zinc-100 dark:border-white/5 mt-auto bg-surface dark:bg-[#0b1521] flex items-center gap-3 transition-colors duration-300">
           <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center font-bold text-green-700 text-sm shrink-0">
             {userName.charAt(0).toUpperCase()}
           </div>
@@ -221,7 +216,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
 
         {/* Top Header */}
-        <header className="h-20 bg-white dark:bg-[#152336] border-b border-zinc-200/60 dark:border-white/5 flex items-center justify-between px-4 sm:px-8 shrink-0 z-10 sticky top-0 transition-colors duration-300">
+        <header className="h-20 bg-white dark:bg-surface border-b border-zinc-200/60 dark:border-white/5 flex items-center justify-between px-4 sm:px-8 shrink-0 z-10 sticky top-0 transition-colors duration-300">
           <div className="flex items-center gap-3 w-full max-w-md">
             <button
               onClick={() => setMobileMenuOpen(true)}
@@ -233,7 +228,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
               <Input
                 icon={<IconSearch className="w-4 h-4" />}
                 placeholder="Buscar cobranças ou clientes..."
-                className="rounded-full bg-[#f4f7fb] dark:bg-[#0b1521] border-none"
+                className="rounded-full bg-surface-soft dark:bg-[#0b1521] border-none"
               />
             </div>
           </div>
@@ -252,7 +247,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
                   setDrawerOpen(true);
                 }
               }}
-              className="bg-[#0b1521] dark:bg-green-500 hover:bg-[#152336] dark:hover:bg-green-600 text-white font-bold py-2.5 px-6 rounded-full text-sm transition-all shadow-md flex items-center gap-2">
+              className="bg-[#0b1521] dark:bg-green-500 hover:bg-surface-dark dark:hover:bg-green-600 text-white font-bold py-2.5 px-6 rounded-full text-sm transition-all shadow-md flex items-center gap-2">
               <IconPlus className="w-4 h-4" />
               <span className="hidden sm:inline">Nova Cobrança</span>
             </button>
@@ -285,7 +280,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
         )}
 
         {/* Scrollable Area */}
-        <main className="flex-1 overflow-y-auto bg-[#f8fafc] dark:bg-[#0b1521] transition-colors duration-300">
+        <main className="flex-1 overflow-y-auto bg-surface dark:bg-[#0b1521] transition-colors duration-300">
           {children}
         </main>
       </div>
@@ -315,3 +310,5 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
     </div>
   );
 }
+
+

@@ -75,7 +75,7 @@ export default function Cadastro() {
             </p>
 
             <div className="space-y-4">
-              <div className="bg-[#152336]/60 backdrop-blur-sm border border-[#1e3046] p-6 rounded-2xl flex gap-5 items-start hover:border-green-500/30 transition-colors">
+              <div className="bg-surface-dark/60 backdrop-blur-sm border border-[#1e3046] p-6 rounded-2xl flex gap-5 items-start hover:border-green-500/30 transition-colors">
                 <div className="w-12 h-12 rounded-xl bg-[#1e3046] flex items-center justify-center shrink-0">
                   <IconMessageCircle className="w-6 h-6 text-green-500" />
                 </div>
@@ -85,7 +85,7 @@ export default function Cadastro() {
                 </div>
               </div>
 
-              <div className="bg-[#152336]/60 backdrop-blur-sm border border-[#1e3046] p-6 rounded-2xl flex gap-5 items-start hover:border-green-500/30 transition-colors">
+              <div className="bg-surface-dark/60 backdrop-blur-sm border border-[#1e3046] p-6 rounded-2xl flex gap-5 items-start hover:border-green-500/30 transition-colors">
                 <div className="w-12 h-12 rounded-xl bg-[#1e3046] flex items-center justify-center shrink-0">
                   <IconTrendingUp className="w-6 h-6 text-green-500" />
                 </div>
@@ -95,7 +95,7 @@ export default function Cadastro() {
                 </div>
               </div>
 
-              <div className="bg-[#152336] border border-green-500/40 p-6 rounded-2xl flex gap-5 items-start shadow-[0_0_30px_rgba(34,197,94,0.05)] relative overflow-hidden">
+              <div className="bg-surface-dark border border-green-500/40 p-6 rounded-2xl flex gap-5 items-start shadow-[0_0_30px_rgba(34,197,94,0.05)] relative overflow-hidden">
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>
                 <div className="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center shrink-0 shadow-lg shadow-green-500/20">
                   <IconZap className="w-6 h-6 text-white fill-white/20" />
@@ -241,3 +241,4 @@ export default function Cadastro() {
     </AuthLayout>
   );
 }
+

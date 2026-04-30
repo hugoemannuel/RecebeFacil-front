@@ -132,7 +132,7 @@ export function ClientsClient({
               </button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
-              <DropdownMenu.Content align="end" className="min-w-[180px] bg-[#f8fafc] dark:bg-[#1a2d42] rounded-xl shadow-xl border border-zinc-200/80 dark:border-white/[0.08] p-1.5 text-sm z-50 animate-in fade-in zoom-in-95">
+              <DropdownMenu.Content align="end" className="min-w-[180px] bg-surface dark:bg-[#1a2d42] rounded-xl shadow-xl border border-zinc-200/80 dark:border-white/8 p-1.5 text-sm z-50 animate-in fade-in zoom-in-95">
                 <DropdownMenu.Item
                   className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg text-zinc-600 dark:text-zinc-300 font-medium"
                   onClick={() => setSelectedClientId(row.original.id)}
@@ -148,7 +148,7 @@ export function ClientsClient({
                 >
                   <IconPlus className="w-4 h-4 text-zinc-400" /> Nova Cobrança
                 </DropdownMenu.Item>
-                <DropdownMenu.Separator className="h-px bg-zinc-200/80 dark:bg-white/[0.06] my-1" />
+                <DropdownMenu.Separator className="h-px bg-zinc-200/80 dark:bg-white/6 my-1" />
                 <DropdownMenu.Item
                   className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg text-red-600 dark:text-red-400 font-medium"
                   onClick={async () => {
@@ -206,12 +206,12 @@ export function ClientsClient({
       </div>
 
       {/* Table */}
-      <div className="bg-[#f8fafc] dark:bg-[#152336] rounded-2xl border border-zinc-200/80 dark:border-white/[0.07] shadow-sm overflow-hidden">
+      <div className="bg-surface dark:bg-surface rounded-2xl border border-zinc-200/80 dark:border-white/7 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               {table.getHeaderGroups().map(hg => (
-                <tr key={hg.id} className="border-b border-zinc-200/80 dark:border-white/[0.06] bg-zinc-100/50 dark:bg-white/[0.02]">
+                <tr key={hg.id} className="border-b border-zinc-200/80 dark:border-white/6 bg-zinc-100/50 dark:bg-white/2">
                   {hg.headers.map(h => (
                     <th key={h.id} className="px-5 py-4 text-xs font-bold tracking-wider text-zinc-400 dark:text-zinc-500 uppercase whitespace-nowrap">
                       {h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}
@@ -224,7 +224,7 @@ export function ClientsClient({
               {table.getRowModel().rows.map(row => (
                 <tr
                   key={row.id}
-                  className="border-b border-zinc-100 dark:border-white/[0.04] hover:bg-zinc-100/60 dark:hover:bg-white/[0.03] transition-colors cursor-pointer"
+                  className="border-b border-zinc-100 dark:border-white/4 hover:bg-zinc-100/60 dark:hover:bg-white/3 transition-colors cursor-pointer"
                   onClick={e => {
                     if ((e.target as HTMLElement).closest('[role="menuitem"]') || (e.target as HTMLElement).closest('button')) return;
                     setSelectedClientId(row.original.id);
@@ -300,3 +300,5 @@ export function ClientsClient({
     </div>
   );
 }
+
+

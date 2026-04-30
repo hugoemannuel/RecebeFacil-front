@@ -10,7 +10,7 @@ interface ModalHeaderProps {
 
 export function ModalHeader({ step, totalSteps, onClose }: ModalHeaderProps) {
   return (
-    <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-100 dark:border-white/[0.07] bg-white dark:bg-[#152336] shrink-0 rounded-t-[2rem]">
+    <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-100 dark:border-white/7 bg-white dark:bg-surface shrink-0 rounded-t-[2rem]">
       <div>
         <h2 className="text-lg font-extrabold text-zinc-800 dark:text-zinc-100 tracking-tight">Nova Cobrança</h2>
         <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">Etapa {step + 1} de {totalSteps}</p>
@@ -24,3 +24,5 @@ export function ModalHeader({ step, totalSteps, onClose }: ModalHeaderProps) {
     </div>
   );
 }
+
+

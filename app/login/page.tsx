@@ -72,23 +72,23 @@ export default function Login() {
             </h2>
 
             <div className="flex gap-4 mb-4 w-full justify-center">
-              <div className="bg-[#152336]/80 backdrop-blur-md border border-[#1e3046] rounded-2xl p-4 flex flex-col items-center justify-center w-36 hover:border-green-500/20 transition-colors">
+              <div className="bg-surface-dark/80 backdrop-blur-md border border-[#1e3046] rounded-2xl p-4 flex flex-col items-center justify-center w-36 hover:border-green-500/20 transition-colors">
                 <span className="text-2xl font-bold text-green-400 mb-1">+10k</span>
                 <span className="text-xs text-slate-400">Cobranças Ativas</span>
               </div>
-              <div className="bg-[#152336]/80 backdrop-blur-md border border-[#1e3046] rounded-2xl p-4 flex flex-col items-center justify-center w-36 hover:border-green-500/20 transition-colors">
+              <div className="bg-surface-dark/80 backdrop-blur-md border border-[#1e3046] rounded-2xl p-4 flex flex-col items-center justify-center w-36 hover:border-green-500/20 transition-colors">
                 <span className="text-2xl font-bold text-green-400 mb-1">98%</span>
                 <span className="text-xs text-slate-400">Conversão de Pix</span>
               </div>
             </div>
             <div className="flex gap-4 mb-8 w-full justify-center">
-              <div className="bg-[#152336]/80 backdrop-blur-md border border-[#1e3046] rounded-2xl p-4 flex flex-col items-center justify-center w-36 hover:border-green-500/20 transition-colors">
+              <div className="bg-surface-dark/80 backdrop-blur-md border border-[#1e3046] rounded-2xl p-4 flex flex-col items-center justify-center w-36 hover:border-green-500/20 transition-colors">
                 <span className="text-2xl font-bold text-green-400 mb-1">0.1s</span>
                 <span className="text-xs text-slate-400 text-center">Tempo de<br />Resposta</span>
               </div>
             </div>
 
-            <div className="bg-gradient-to-b from-[#111e2f] to-[#0a121c] border border-[#1e3046] rounded-3xl p-6 w-full max-w-md shadow-2xl relative overflow-hidden">
+            <div className="bg-linear-to-b from-[#111e2f] to-[#0a121c] border border-[#1e3046] rounded-3xl p-6 w-full max-w-md shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-green-500/30 to-transparent"></div>
 
               <div className="flex justify-between items-start mb-6">
@@ -102,7 +102,7 @@ export default function Login() {
               </div>
 
               <div className="space-y-3">
-                <div className="bg-[#152336] rounded-2xl p-3 flex items-center justify-between border border-[#1e3046]/50">
+                <div className="bg-surface-dark rounded-2xl p-3 flex items-center justify-between border border-[#1e3046]/50">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
                       <IconCheck className="w-4 h-4 text-green-400" />
@@ -115,7 +115,7 @@ export default function Login() {
                   <span className="text-sm font-bold text-green-400">+R$ 297,00</span>
                 </div>
 
-                <div className="bg-[#152336] rounded-2xl p-3 flex items-center justify-between border border-[#1e3046]/50">
+                <div className="bg-surface-dark rounded-2xl p-3 flex items-center justify-between border border-[#1e3046]/50">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center shrink-0">
                       <IconCheck className="w-4 h-4 text-green-500" />
@@ -253,3 +253,4 @@ export default function Login() {
     </AuthLayout>
   );
 }
+

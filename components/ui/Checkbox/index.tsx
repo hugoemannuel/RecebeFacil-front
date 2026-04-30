@@ -37,7 +37,7 @@ export function Checkbox({ id, checked, onChange, disabled, indeterminate, size 
         className={`
           ${sizeClass} rounded border-2 flex items-center justify-center
           border-zinc-300 dark:border-zinc-600
-          bg-white dark:bg-[#0f1c2b]
+          bg-white dark:bg-surface-soft
           peer-checked:bg-green-500 peer-checked:border-green-500
           peer-indeterminate:bg-green-500 peer-indeterminate:border-green-500
           peer-disabled:opacity-50
@@ -62,3 +62,4 @@ export function Checkbox({ id, checked, onChange, disabled, indeterminate, size 
     </div>
   );
 }
+

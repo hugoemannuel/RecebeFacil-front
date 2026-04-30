@@ -1,18 +1,26 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTheme } from "../../../context/ThemeContext";
 import { IconSun, IconMoon } from "@/components/ui/Icons";
 
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <button
       onClick={toggleTheme}
-      className="p-2.5 rounded-xl bg-white dark:bg-surface-dark border border-zinc-100 dark:border-white/5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all shadow-sm"
+      className="p-2.5 rounded-xl bg-white dark:bg-surface border border-zinc-100 dark:border-white/5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all shadow-sm"
       aria-label="Alternar tema"
     >
-      {theme === 'light' ? (
+      {!mounted ? (
+        <div className="w-5 h-5" />
+      ) : theme === 'light' ? (
         <IconMoon className="w-5 h-5" />
       ) : (
         <IconSun className="w-5 h-5" />
@@ -20,3 +28,4 @@ export function ThemeToggle() {
     </button>
   );
 }
+

@@ -30,8 +30,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           onChange={(e) => onChange?.(e.target.value)}
           className={`
             w-full px-4 py-2.5
-            border border-zinc-200/80 dark:border-white/[0.07]
-            bg-white dark:bg-[#0f1c2b]
+            border border-zinc-200/80 dark:border-white/7
+            bg-white dark:bg-surface-soft
             text-zinc-700 dark:text-zinc-200
             rounded-xl text-sm
             focus:outline-none focus:ring-2 focus:ring-green-500/30
@@ -53,3 +53,5 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
 );
 
 Select.displayName = "Select";
+
+

@@ -32,7 +32,7 @@ export function ConfirmModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-[#0f1c2b] rounded-2xl shadow-xl p-6 w-full max-w-sm mx-4">
+      <div className="bg-white dark:bg-surface-soft rounded-2xl shadow-xl p-6 w-full max-w-sm mx-4">
         {icon && <div className="mb-3">{icon}</div>}
 
         <h3 className="text-base font-bold text-zinc-800 dark:text-zinc-100 mb-2">{title}</h3>
@@ -61,3 +61,4 @@ export function ConfirmModal({
     </div>
   );
 }
+

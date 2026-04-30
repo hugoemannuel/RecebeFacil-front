@@ -160,7 +160,7 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
       </div>
 
       {/* Dark mode hint card */}
-      <div className="flex items-center gap-3 bg-zinc-50 dark:bg-[#152336] border border-zinc-200 dark:border-white/5 rounded-2xl px-4 py-3 text-sm text-zinc-500 dark:text-zinc-400 transition-colors duration-300">
+      <div className="flex items-center gap-3 bg-zinc-50 dark:bg-surface border border-zinc-200 dark:border-white/5 rounded-2xl px-4 py-3 text-sm text-zinc-500 dark:text-zinc-400 transition-colors duration-300">
         {theme === 'light'
           ? <IconMoon className="w-4 h-4 shrink-0" />
           : <IconSun className="w-4 h-4 shrink-0 text-amber-400" />}
@@ -170,7 +170,7 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-zinc-100/70 dark:bg-[#0f1c2b] p-1 rounded-2xl border border-zinc-200/60 dark:border-white/[0.06] transition-colors duration-300">
+      <div className="flex gap-1 bg-zinc-100/70 dark:bg-surface-soft p-1 rounded-2xl border border-zinc-200/60 dark:border-white/6 transition-colors duration-300">
         {tabs.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
@@ -188,7 +188,7 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
 
       {/* ── ABA: PERFIL ─────────────────────────────────────────────── */}
       {tab === 'perfil' && (
-        <div className="bg-white dark:bg-[#152336] border border-zinc-100 dark:border-white/[0.06] rounded-3xl p-6 md:p-8 space-y-6 transition-colors duration-300">
+        <div className="bg-white dark:bg-surface border border-zinc-100 dark:border-white/6 rounded-3xl p-6 md:p-8 space-y-6 transition-colors duration-300">
 
           {/* Avatar */}
           <div className="flex items-center gap-5">
@@ -269,7 +269,7 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
       {tab === 'plano' && (
         <div className="space-y-4">
 
-          <div className={`bg-gradient-to-br ${PLAN_COLOR[plan]} rounded-3xl p-6 md:p-8 text-white relative overflow-hidden`}>
+          <div className={`bg-linear-to-br ${PLAN_COLOR[plan]} rounded-3xl p-6 md:p-8 text-white relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-3xl pointer-events-none" />
             <p className="text-xs font-bold uppercase tracking-widest text-white/60 mb-1">Seu plano atual</p>
             <p className="text-4xl font-extrabold tracking-tight">{PLAN_LABEL[plan]}</p>
@@ -280,7 +280,7 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
             )}
           </div>
 
-          <div className="bg-white dark:bg-[#152336] border border-zinc-100 dark:border-white/[0.06] rounded-3xl p-6 space-y-3 transition-colors duration-300">
+          <div className="bg-white dark:bg-surface border border-zinc-100 dark:border-white/6 rounded-3xl p-6 space-y-3 transition-colors duration-300">
             <div className="flex justify-between items-baseline">
               <p className="text-sm font-bold text-zinc-700 dark:text-zinc-200">Cobranças este mês</p>
               <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
@@ -298,7 +298,7 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
             )}
           </div>
 
-          <div className="bg-white dark:bg-[#152336] border border-zinc-100 dark:border-white/[0.06] rounded-3xl p-6 space-y-3 transition-colors duration-300">
+          <div className="bg-white dark:bg-surface border border-zinc-100 dark:border-white/6 rounded-3xl p-6 space-y-3 transition-colors duration-300">
             <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Incluído no seu plano</p>
             {[
               plan !== 'FREE' && 'Clientes ilimitados',
@@ -359,7 +359,7 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
       {tab === 'seguranca' && (
         <div className="space-y-4">
 
-          <div className="bg-white dark:bg-[#152336] border border-zinc-100 dark:border-white/[0.06] rounded-3xl p-6 md:p-8 transition-colors duration-300">
+          <div className="bg-white dark:bg-surface border border-zinc-100 dark:border-white/6 rounded-3xl p-6 md:p-8 transition-colors duration-300">
             <p className="font-bold text-zinc-800 dark:text-zinc-200 mb-1">Alterar senha</p>
             <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-5">Use uma senha forte com pelo menos 8 caracteres.</p>
 
@@ -398,7 +398,7 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
             </form>
           </div>
 
-          <div className="bg-white dark:bg-[#152336] border border-red-200 dark:border-red-500/20 rounded-3xl p-6 md:p-8 transition-colors duration-300">
+          <div className="bg-white dark:bg-surface border border-red-200 dark:border-red-500/20 rounded-3xl p-6 md:p-8 transition-colors duration-300">
             <div className="flex items-start gap-3 mb-4">
               <IconAlertOctagon className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
               <div>
@@ -452,3 +452,6 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
     </div>
   );
 }
+
+
+

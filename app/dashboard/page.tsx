@@ -13,7 +13,7 @@ import { PeriodSelect } from '@/components/dashboard/PeriodSelect';
 import { RecentActivityClient } from '@/components/dashboard/RecentActivityClient';
 import { SubscriptionStatus } from '@/components/layout/DashboardLayout/interface';
 
-export default async function Dashboard(props: any) {
+export default async function Dashboard(props: { searchParams: Promise<{ period?: string; status?: string }> }) {
   const searchParams = await props.searchParams;
   const period = searchParams?.period || '7days';
   const status = searchParams?.status;
@@ -78,7 +78,7 @@ export default async function Dashboard(props: any) {
       <div className="p-8 max-w-[1600px] mx-auto space-y-6">
 
 
-        <div className="bg-[#0b1521] rounded-[2rem] p-8 lg:p-10 text-white relative overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-black/20">
+        <div className="bg-[#0b1521] rounded-4xl p-8 lg:p-10 text-white relative overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-black/20">
           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-green-500/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
 
           <div className="inline-block bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-6">
@@ -97,7 +97,7 @@ export default async function Dashboard(props: any) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
 
-          <div className="bg-[#f8fafc] dark:bg-[#152336] p-6 rounded-3xl border border-zinc-100 dark:border-white/[0.07] shadow-sm flex flex-col justify-between h-40">
+          <div className="bg-surface dark:bg-surface p-6 rounded-3xl border border-zinc-100 dark:border-white/7 shadow-sm flex flex-col justify-between h-40">
             <div className="flex justify-between items-start">
               <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
                 <IconWallet className="w-5 h-5" />
@@ -113,7 +113,7 @@ export default async function Dashboard(props: any) {
           </div>
 
 
-          <div className="bg-[#f8fafc] dark:bg-[#152336] p-6 rounded-3xl border border-zinc-100 dark:border-white/[0.07] shadow-sm flex flex-col justify-between h-40 relative overflow-hidden">
+          <div className="bg-surface dark:bg-surface p-6 rounded-3xl border border-zinc-100 dark:border-white/7 shadow-sm flex flex-col justify-between h-40 relative overflow-hidden">
             <div className="absolute left-0 top-6 bottom-6 w-1 bg-red-500 rounded-r-full"></div>
             <div className="flex justify-between items-start pl-2">
               <div className="w-10 h-10 bg-red-50 text-red-500 rounded-xl flex items-center justify-center">
@@ -127,7 +127,7 @@ export default async function Dashboard(props: any) {
             </div>
           </div>
 
-          <div className="bg-[#f8fafc] dark:bg-[#152336] p-6 rounded-3xl border border-zinc-100 dark:border-white/[0.07] shadow-sm flex flex-col justify-between h-40">
+          <div className="bg-surface dark:bg-surface p-6 rounded-3xl border border-zinc-100 dark:border-white/7 shadow-sm flex flex-col justify-between h-40">
             <div className="flex justify-between items-start">
               <div className="w-10 h-10 bg-slate-100 text-slate-500 rounded-xl flex items-center justify-center">
                 <IconSend className="w-5 h-5" />
@@ -140,7 +140,7 @@ export default async function Dashboard(props: any) {
           </div>
 
 
-          <div className="bg-[#f8fafc] dark:bg-[#152336] p-6 rounded-3xl border border-zinc-100 dark:border-white/[0.07] shadow-sm flex flex-col justify-between h-40">
+          <div className="bg-surface dark:bg-surface p-6 rounded-3xl border border-zinc-100 dark:border-white/7 shadow-sm flex flex-col justify-between h-40">
             <div className="flex justify-between items-start">
               <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
                 <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" /></svg>
@@ -160,7 +160,7 @@ export default async function Dashboard(props: any) {
 
           <div className="lg:col-span-2 space-y-6">
 
-            <div className="bg-[#f8fafc] dark:bg-[#152336] p-8 rounded-3xl border border-zinc-100 dark:border-white/[0.07] shadow-sm">
+            <div className="bg-surface dark:bg-surface p-8 rounded-3xl border border-zinc-100 dark:border-white/7 shadow-sm">
               <div className="flex justify-between items-start mb-8">
                 <div>
                   <h3 className="text-xl font-bold text-zinc-700 dark:text-zinc-100 mb-1">Recebimentos por Dia</h3>
@@ -171,7 +171,7 @@ export default async function Dashboard(props: any) {
 
 
               <div className="h-48 flex items-end justify-between gap-2 mt-10">
-                {chartData.map((d: any, i: number) => (
+                {chartData.map((d: { label: string; amount: number; heightPercentage: number; isToday?: boolean; count?: number }, i: number) => (
                   <div
                     key={i}
                     className={`w-full rounded-t-lg relative flex items-end justify-center pb-2 ${d.isToday ? 'bg-green-500' : 'bg-green-100 dark:bg-green-500/15'}`}
@@ -206,14 +206,14 @@ export default async function Dashboard(props: any) {
             </div>
 
             {/* Top Clientes */}
-            <div className="bg-[#f8fafc] dark:bg-[#152336] p-8 rounded-3xl border border-zinc-100 dark:border-white/[0.07] shadow-sm">
+            <div className="bg-surface dark:bg-surface p-8 rounded-3xl border border-zinc-100 dark:border-white/7 shadow-sm">
               <h3 className="text-sm font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-6">Top Clientes</h3>
 
               <div className="space-y-5">
                 {topClients.length === 0 ? (
                   <p className="text-sm text-zinc-400 dark:text-zinc-500">Nenhum cliente com pendências.</p>
                 ) : (
-                  topClients.map((client: any, i: number) => (
+                  topClients.map((client: { id: string; name: string; initials: string; totalAmount: number }, i: number) => (
                     <div key={client.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs ${i % 2 === 0 ? 'bg-[#c9e038] text-[#4d5c0b]' : 'bg-[#d6e4ff] text-[#1b3d8c]'}`}>
@@ -232,8 +232,8 @@ export default async function Dashboard(props: any) {
         </div>
 
         {/* Atividade Recente Table */}
-        <div className="bg-[#f8fafc] dark:bg-[#152336] rounded-3xl border border-zinc-100 dark:border-white/[0.07] shadow-sm overflow-hidden">
-          <div className="p-8 border-b border-zinc-100 dark:border-white/[0.06] flex items-center justify-between">
+        <div className="bg-surface dark:bg-surface rounded-3xl border border-zinc-100 dark:border-white/7 shadow-sm overflow-hidden">
+          <div className="p-8 border-b border-zinc-100 dark:border-white/6 flex items-center justify-between">
             <div>
               <h3 className="text-xl font-bold text-zinc-700 dark:text-zinc-100 mb-1">Atividade Recente</h3>
               <p className="text-sm text-zinc-400 dark:text-zinc-500">Gestão detalhada de entradas e pendências</p>
@@ -263,3 +263,5 @@ export default async function Dashboard(props: any) {
     </DashboardLayout>
   );
 }
+
+
