@@ -26,8 +26,10 @@ import {
   IconClock,
   IconAlertCircle,
   IconSend,
-  IconTrash
+  IconTrash,
+  IconRepeat
 } from '@/components/ui/Icons';
+import Link from 'next/link';
 import { formatMoney, maskPhone } from '@/lib/formatters';
 import { NewChargeModal } from '@/components/forms/NewChargeModal';
 import { ChargeDetailsDrawer } from '@/components/dashboard/ChargeDetailsDrawer';
@@ -261,18 +263,26 @@ export function ChargesClient({
           <h1 className="text-3xl font-extrabold text-zinc-800 dark:text-zinc-100 tracking-tight">Cobranças</h1>
           <p className="text-zinc-400 dark:text-zinc-500 mt-1">Gerencie seus recebimentos e automações.</p>
         </div>
-        <button
-          onClick={() => {
-            if (usage.count >= usage.limit) {
-              toast.error(`Você atingiu o limite de ${usage.limit} cobranças do plano ${plan}. Faça upgrade para continuar!`);
-            } else {
-              setDrawerOpen(true);
-            }
-          }}
-          className={`flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold transition-all ${usage.count >= usage.limit ? 'bg-zinc-200 dark:bg-white/10 text-zinc-400 dark:text-zinc-600 cursor-not-allowed' : 'bg-zinc-900 dark:bg-green-500 text-white shadow-lg shadow-zinc-900/20 dark:shadow-green-500/20 hover:bg-zinc-800 dark:hover:bg-green-600 active:scale-95'}`}
-        >
-          <IconPlus className="w-5 h-5" /> Nova Cobrança
-        </button>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/dashboard/cobrancas/recorrentes"
+            className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/5 transition-all"
+          >
+            <IconRepeat className="w-5 h-5" /> Regras de Recorrência
+          </Link>
+          <button
+            onClick={() => {
+              if (usage.count >= usage.limit) {
+                toast.error(`Você atingiu o limite de ${usage.limit} cobranças do plano ${plan}. Faça upgrade para continuar!`);
+              } else {
+                setDrawerOpen(true);
+              }
+            }}
+            className={`flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold transition-all ${usage.count >= usage.limit ? 'bg-zinc-200 dark:bg-white/10 text-zinc-400 dark:text-zinc-600 cursor-not-allowed' : 'bg-zinc-900 dark:bg-green-500 text-white shadow-lg shadow-zinc-900/20 dark:shadow-green-500/20 hover:bg-zinc-800 dark:hover:bg-green-600 active:scale-95'}`}
+          >
+            <IconPlus className="w-5 h-5" /> Nova Cobrança
+          </button>
+        </div>
       </div>
 
       {/* UPSELL / USAGE CARD (Apenas para FREE e STARTER) */}

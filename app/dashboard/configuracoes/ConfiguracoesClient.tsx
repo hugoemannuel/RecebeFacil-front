@@ -11,14 +11,16 @@ import { useTheme } from '@/context/ThemeContext';
 import { ThemeToggle } from '@/components/layout/ThemeToggle/ThemeToggle';
 import {
   IconUser, IconMail, IconPhone, IconCamera, IconShieldCheck,
-  IconCreditCard, IconTrash, IconCheck,
-  IconAlertOctagon, IconSun, IconMoon,
+  IconCreditCard, IconTrash, IconCheck, IconWallet,
+  IconAlertOctagon, IconSun, IconMoon, IconQrCode
 } from '@/components/ui/Icons';
 import {
   updateProfileAction,
   uploadAvatarAction,
   updatePasswordAction,
   deleteAccountAction,
+  getCreditorProfileAction,
+  updateCreditorProfileAction,
 } from '@/app/actions/profile';
 import { cancelSubscriptionAction } from '@/app/actions/subscription';
 import { RHFInput } from '@/components/forms/rhf/RHFInput';
@@ -30,6 +32,7 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal';
 interface Props {
   profile: { id: string; name: string; email: string; phone: string; avatar_url?: string } | null;
   subscription: { plan: string; status: string; sentThisMonth?: number; current_period_end?: string; cancel_at_period_end?: boolean } | null;
+  creditorProfile: { business_name?: string; document?: string; pix_key?: string; pix_key_type?: string; pix_merchant_name?: string } | null;
 }
 
 const PLAN_LIMIT: Record<string, number> = { FREE: 10, STARTER: 50, PRO: 200, UNLIMITED: Infinity };
@@ -56,17 +59,34 @@ const passwordSchema = z.object({
   path: ['confirm_password'],
 });
 
+const creditorSchema = z.object({
+  business_name: z.string().min(2, 'Nome deve ter ao menos 2 caracteres').optional().or(z.literal('')),
+  document: z.string().optional().or(z.literal('')),
+  pix_key: z.string().min(1, 'Chave PIX é obrigatória').optional().or(z.literal('')),
+  pix_key_type: z.enum(['CPF', 'CNPJ', 'PHONE', 'EMAIL', 'EVP']).optional(),
+  pix_merchant_name: z.string().max(25, 'Máximo 25 caracteres').optional().or(z.literal('')),
+});
+
 type ProfileForm = z.infer<typeof profileSchema>;
 type PasswordForm = z.infer<typeof passwordSchema>;
+type CreditorForm = z.infer<typeof creditorSchema>;
 
 // ─── Componente ───────────────────────────────────────────────────────
-export function ConfiguracoesClient({ profile, subscription }: Props) {
-  const [tab, setTab] = useState<'perfil' | 'plano' | 'seguranca'>('perfil');
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(profile?.avatar_url ?? null);
+export function ConfiguracoesClient({ profile, subscription, creditorProfile }: Props) {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const initialAvatar = profile?.avatar_url 
+    ? (profile.avatar_url.startsWith('http') ? profile.avatar_url : `${apiUrl}${profile.avatar_url}`)
+    : null;
+
+  const [tab, setTab] = useState<'perfil' | 'recebimento' | 'plano' | 'seguranca'>('perfil');
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(initialAvatar);
   const [showDelete, setShowDelete] = useState(false);
   const [showCancelPlan, setShowCancelPlan] = useState(false);
   const [cancelPlanLoading, setCancelPlanLoading] = useState(false);
   const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = useState(subscription?.cancel_at_period_end ?? false);
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [creditorLoading, setCreditorLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
   const fileRef = useRef<HTMLInputElement>(null);
   const { theme } = useTheme();
@@ -83,10 +103,12 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
   });
 
   function onSaveProfile(data: ProfileForm) {
+    setProfileLoading(true);
     startTransition(async () => {
       const res = await updateProfileAction(data);
       if (res.success) toast.success('Perfil atualizado com sucesso!');
       else toast.error(res.error ?? 'Ops, algo deu errado. Tente novamente.');
+      setProfileLoading(false);
     });
   }
 
@@ -106,16 +128,31 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
   function onAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    
+    // Preview imediato
     const reader = new FileReader();
     reader.onload = () => setAvatarPreview(reader.result as string);
     reader.readAsDataURL(file);
 
+    setAvatarLoading(true);
     startTransition(async () => {
-      const fd = new FormData();
-      fd.append('file', file);
-      const res = await uploadAvatarAction(fd);
-      if (res.success) toast.success('Foto atualizada!');
-      else toast.error(res.error ?? 'Erro ao enviar foto.');
+      try {
+        const fd = new FormData();
+        fd.append('file', file);
+        const res = await uploadAvatarAction(fd);
+        if (res.success) {
+          toast.success('Foto atualizada!');
+        } else {
+          toast.error(res.error ?? 'Erro ao enviar foto.');
+          // Reverter preview em caso de erro
+          setAvatarPreview(initialAvatar);
+        }
+      } catch (err) {
+        toast.error('Erro de conexão ao enviar foto.');
+        setAvatarPreview(initialAvatar);
+      } finally {
+        setAvatarLoading(false);
+      }
     });
   }
 
@@ -140,9 +177,32 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
     });
   }
 
+  // ── Recebimento Form ─────────────────────────────────────────────
+  const creditorForm = useForm<CreditorForm>({
+    resolver: zodResolver(creditorSchema),
+    defaultValues: {
+      business_name: creditorProfile?.business_name ?? '',
+      document: creditorProfile?.document ?? '',
+      pix_key: creditorProfile?.pix_key ?? '',
+      pix_key_type: (creditorProfile?.pix_key_type as any) ?? 'PHONE',
+      pix_merchant_name: creditorProfile?.pix_merchant_name ?? '',
+    },
+  });
+
+  function onSaveCreditor(data: CreditorForm) {
+    setCreditorLoading(true);
+    startTransition(async () => {
+      const res = await updateCreditorProfileAction(data);
+      if (res.success) toast.success('Configurações salvas!');
+      else toast.error(res.error ?? 'Erro ao salvar.');
+      setCreditorLoading(false);
+    });
+  }
+
   // ─── Render ────────────────────────────────────────────────────────
   const tabs = [
     { id: 'perfil', label: 'Perfil', icon: IconUser },
+    { id: 'recebimento', label: 'Recebimento', icon: IconWallet },
     { id: 'plano', label: 'Plano', icon: IconCreditCard },
     { id: 'seguranca', label: 'Segurança', icon: IconShieldCheck },
   ] as const;
@@ -211,9 +271,10 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
               <p className="font-bold text-zinc-800 dark:text-zinc-200">{profile?.name ?? 'Usuário'}</p>
               <button
                 onClick={() => fileRef.current?.click()}
-                className="text-sm text-green-600 dark:text-green-400 hover:underline mt-0.5"
+                disabled={avatarLoading}
+                className="text-sm text-green-600 dark:text-green-400 hover:underline mt-0.5 disabled:opacity-50"
               >
-                Alterar foto
+                {avatarLoading ? 'Enviando...' : 'Alterar foto'}
               </button>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onAvatarChange} />
             </div>
@@ -251,15 +312,83 @@ export function ConfiguracoesClient({ profile, subscription }: Props) {
 
             <button
               type="submit"
-              disabled={isPending}
+              disabled={profileLoading}
               className="w-full bg-green-500 hover:bg-green-600 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-green-500/20 hover:scale-[1.01] flex items-center justify-center gap-2"
             >
-              {isPending ? (
+              {profileLoading ? (
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <IconCheck className="w-4 h-4" />
               )}
               Salvar alterações
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* ── ABA: RECEBIMENTO ────────────────────────────────────────── */}
+      {tab === 'recebimento' && (
+        <div className="bg-white dark:bg-surface border border-zinc-100 dark:border-white/6 rounded-3xl p-6 md:p-8 space-y-6 transition-colors duration-300">
+          <div>
+            <p className="font-bold text-zinc-800 dark:text-zinc-200 mb-1">Dados de Recebimento</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-5">Configure como seus clientes verão sua empresa e como você receberá os pagamentos via PIX.</p>
+          </div>
+
+          <form onSubmit={creditorForm.handleSubmit(onSaveCreditor)} className="space-y-4">
+            <RHFInput<CreditorForm>
+              name="business_name"
+              control={creditorForm.control}
+              label="Nome da Empresa / Profissional"
+              placeholder="Ex: Hugo Soluções Digitais"
+              icon={<IconUser className="w-4 h-4" />}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <RHFInput<CreditorForm>
+                name="pix_key"
+                control={creditorForm.control}
+                label="Chave PIX"
+                placeholder="E-mail, CPF, CNPJ ou Telefone"
+                icon={<IconQrCode className="w-4 h-4" />}
+              />
+              
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 ml-1">Tipo de Chave</label>
+                <select
+                  {...creditorForm.register('pix_key_type')}
+                  className="w-full bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-hidden focus:ring-2 focus:ring-green-500/20 transition-all"
+                >
+                  <option value="PHONE">Celular</option>
+                  <option value="EMAIL">E-mail</option>
+                  <option value="CPF">CPF</option>
+                  <option value="CNPJ">CNPJ</option>
+                  <option value="EVP">Chave Aleatória</option>
+                </select>
+              </div>
+            </div>
+
+            <RHFInput<CreditorForm>
+              name="pix_merchant_name"
+              control={creditorForm.control}
+              label="Nome no PIX (Máx 25 caracteres)"
+              placeholder="Ex: HUGO SOLUCOES"
+              icon={<IconUser className="w-4 h-4" />}
+            />
+            <p className="text-[11px] text-zinc-400 dark:text-zinc-500 -mt-2 ml-1">
+              Este é o nome que aparecerá no aplicativo do banco do cliente ao escanear o QR Code.
+            </p>
+
+            <button
+              type="submit"
+              disabled={creditorLoading}
+              className="w-full bg-green-500 hover:bg-green-600 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-green-500/20 hover:scale-[1.01] flex items-center justify-center gap-2"
+            >
+              {creditorLoading ? (
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <IconCheck className="w-4 h-4" />
+              )}
+              Salvar configurações
             </button>
           </form>
         </div>

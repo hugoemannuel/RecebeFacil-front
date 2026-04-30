@@ -45,11 +45,13 @@ export function ClientDetailsModal({ clientId, onClose, onNewCharge, onChargeCli
   const [client, setClient] = useState<any>(null);
 
   useEffect(() => {
-    if (!clientId) { setClient(null); return; }
-    setLoading(true);
-    getClientDetailsAction(clientId)
-      .then(res => setClient(res.success ? res.data : null))
-      .finally(() => setLoading(false));
+    setClient(null);
+    if (clientId) {
+      setLoading(true);
+      getClientDetailsAction(clientId)
+        .then(res => setClient(res.success ? res.data : null))
+        .finally(() => setLoading(false));
+    }
   }, [clientId]);
 
   if (!clientId) return null;

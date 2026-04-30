@@ -38,15 +38,28 @@ export async function updateProfileAction(payload: { name: string; email: string
 export async function uploadAvatarAction(formData: FormData) {
   const token = await getToken();
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me/avatar`, {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const res = await fetch(`${apiUrl}/users/me/avatar`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        // ATENÇÃO: NÃO definir Content-Type aqui, o fetch definirá automaticamente com o boundary correto para FormData
+      },
       body: formData,
     });
-    if (!res.ok) return { success: false, error: 'Erro ao enviar foto.' };
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      return { 
+        success: false, 
+        error: errorData.message || 'Erro ao enviar foto.' 
+      };
+    }
+
     const data = await res.json();
     return { success: true, data };
-  } catch {
+  } catch (error) {
+    console.error('Erro no uploadAvatarAction:', error);
     return { success: false, error: 'Erro de comunicação.' };
   }
 }
@@ -74,4 +87,28 @@ export async function deleteAccountAction() {
     return { success: false, error: 'Erro ao excluir conta. Tente novamente.' };
   }
   redirect('/login');
+}
+
+export async function getCreditorProfileAction() {
+  const token = await getToken();
+  try {
+    const res = await api.get('/profiles/me', { headers: { Authorization: `Bearer ${token}` } });
+    return { success: true, data: res.data };
+  } catch {
+    return { success: false, data: null };
+  }
+}
+
+export async function updateCreditorProfileAction(payload: any) {
+  const token = await getToken();
+  try {
+    const res = await api.patch('/profiles/me', payload, { headers: { Authorization: `Bearer ${token}` } });
+    return { success: true, data: res.data };
+  } catch (error) {
+    if (isAxiosError(error)) {
+      const msg = error.response?.data?.message;
+      return { success: false, error: Array.isArray(msg) ? msg[0] : msg ?? 'Erro ao salvar configurações.' };
+    }
+    return { success: false, error: 'Erro de comunicação.' };
+  }
 }

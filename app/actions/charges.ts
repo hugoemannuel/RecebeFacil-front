@@ -130,3 +130,37 @@ export async function bulkRemindAction(chargeIds: string[]) {
     return { success: false, error: 'Servidor indisponível' };
   }
 }
+
+export async function getRecurringChargesAction() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('recebefacil_token')?.value;
+  if (!token) return { success: false, error: 'Não autorizado' };
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/charges/recurring`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return { success: false, error: 'Erro ao buscar recorrências' };
+    const data = await res.json();
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: 'Servidor indisponível' };
+  }
+}
+
+export async function cancelRecurringChargeAction(ruleId: string) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('recebefacil_token')?.value;
+  if (!token) return { success: false, error: 'Não autorizado' };
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/charges/recurring/${ruleId}/cancel`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return { success: false, error: 'Erro ao cancelar regra' };
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: 'Servidor indisponível' };
+  }
+}

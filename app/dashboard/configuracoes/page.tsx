@@ -11,13 +11,15 @@ export default async function ConfiguracoesPage() {
 
   const authHeaders = { Authorization: `Bearer ${token}` };
 
-  const [profileRes, subscriptionRes] = await Promise.allSettled([
+  const [profileRes, subscriptionRes, creditorRes] = await Promise.allSettled([
     api.get('/users/me', { headers: authHeaders }),
     api.get('/subscription/status', { headers: authHeaders }),
+    api.get('/profiles/me', { headers: authHeaders }),
   ]);
-
+ 
   const profile = profileRes.status === 'fulfilled' ? profileRes.value.data : null;
   const subscriptionData = subscriptionRes.status === 'fulfilled' ? subscriptionRes.value.data : null;
+  const creditorProfile = creditorRes.status === 'fulfilled' ? creditorRes.value.data : null;
 
   const subscription: SubscriptionStatus = {
     plan: subscriptionData?.plan ?? 'FREE',
@@ -35,6 +37,7 @@ export default async function ConfiguracoesPage() {
       <ConfiguracoesClient
         profile={profile}
         subscription={subscriptionData}
+        creditorProfile={creditorProfile}
       />
     </DashboardLayout>
   );

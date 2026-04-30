@@ -15,20 +15,16 @@ export function ChargeDetailsDrawer({ chargeId, onClose }: Props) {
   const [charge, setCharge] = useState<any>(null); // Keeping any for now as the Charge type might vary, but simplified the check below
 
   useEffect(() => {
+    setCharge(null);
     if (chargeId) {
       setLoading(true);
       getChargeDetailsAction(chargeId).then(res => {
         if (res.success) {
           setCharge(res.data);
-        } else {
-          console.error(res.error);
-          setCharge(null);
         }
       }).finally(() => setLoading(false));
-    } else if (charge !== null) {
-      setCharge(null);
     }
-  }, [chargeId, charge]);
+  }, [chargeId]);
 
   const getRealMessage = (messageTemplate: string) => {
     if (!messageTemplate || !charge) return messageTemplate;
