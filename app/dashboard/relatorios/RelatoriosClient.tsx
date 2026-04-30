@@ -26,20 +26,27 @@ import {
   Area 
 } from 'recharts';
 
+import { RelatorioPDF } from './RelatorioPDF';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+
 interface RelatoriosClientProps {
   isUnlimited: boolean;
   plan: string;
   token: string;
+  userName: string;
 }
 
-export function RelatoriosClient({ isUnlimited, plan, token }: RelatoriosClientProps) {
+export function RelatoriosClient({ isUnlimited, plan, token, userName }: RelatoriosClientProps) {
   const [showUpgrade, setShowUpgrade] = useState(!isUnlimited);
   const [loading, setLoading] = useState(isUnlimited);
   const [summary, setSummary] = useState<any>(null);
   const [performance, setPerformance] = useState<any>(null);
   const [customers, setCustomers] = useState<any[]>([]);
+  const [forecast, setForecast] = useState<any[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     if (isUnlimited) {
       loadData();
     }
@@ -50,15 +57,17 @@ export function RelatoriosClient({ isUnlimited, plan, token }: RelatoriosClientP
       setLoading(true);
       const headers = { Authorization: `Bearer ${token}` };
       
-      const [sumRes, perfRes, custRes] = await Promise.all([
+      const [sumRes, perfRes, custRes, foreRes] = await Promise.all([
         api.get('/reports/summary', { headers }),
         api.get('/reports/performance', { headers }),
         api.get('/reports/customers', { headers }),
+        api.get('/reports/forecast', { headers }),
       ]);
 
       setSummary(sumRes.data);
       setPerformance(perfRes.data);
       setCustomers(custRes.data);
+      setForecast(foreRes.data);
     } catch (error) {
       console.error('Erro ao carregar relatórios:', error);
     } finally {
@@ -66,12 +75,10 @@ export function RelatoriosClient({ isUnlimited, plan, token }: RelatoriosClientP
     }
   }
 
-  // Dados mockados para os gráficos se não houver dados reais suficientes
-  const forecastData = [
-    { name: 'Hoje', valor: 1200 },
-    { name: '+7d', valor: 4500 },
-    { name: '+15d', valor: 8900 },
-    { name: '+30d', valor: 15600 },
+  // Se o forecast vier vazio, mostramos um estado base amigável
+  const chartData = forecast.length > 0 ? forecast : [
+    { name: 'Hoje', valor: 0 },
+    { name: '+30d', valor: 0 },
   ];
 
   if (!isUnlimited) {
@@ -119,10 +126,29 @@ export function RelatoriosClient({ isUnlimited, plan, token }: RelatoriosClientP
             <IconCalendar className="w-4 h-4" />
             Últimos 30 dias
           </div>
-          <button className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-4 py-2 rounded-2xl flex items-center gap-2 text-sm font-bold hover:bg-zinc-800 dark:hover:bg-white transition-colors">
-            <IconDownload className="w-4 h-4" />
-            Exportar PDF
-          </button>
+          
+          {isMounted && (
+            <PDFDownloadLink 
+              document={
+                <RelatorioPDF 
+                  summary={summary} 
+                  performance={performance} 
+                  customers={customers} 
+                  forecast={forecast}
+                  userName={userName}
+                />
+              } 
+              fileName={`relatorio-recebefacil-${new Date().toISOString().split('T')[0]}.pdf`}
+              className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-4 py-2 rounded-2xl flex items-center gap-2 text-sm font-bold hover:bg-zinc-800 dark:hover:bg-white transition-colors"
+            >
+              {({ loading }) => (
+                <>
+                  <IconDownload className="w-4 h-4" />
+                  {loading ? 'Gerando...' : 'Exportar PDF'}
+                </>
+              )}
+            </PDFDownloadLink>
+          )}
         </div>
       </div>
 
@@ -203,7 +229,7 @@ export function RelatoriosClient({ isUnlimited, plan, token }: RelatoriosClientP
           
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={forecastData}>
+              <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="colorValor" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2}/>
