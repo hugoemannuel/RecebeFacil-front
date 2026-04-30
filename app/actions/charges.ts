@@ -91,6 +91,47 @@ export async function getChargeDetailsAction(chargeId: string) {
   }
 }
 
+export async function updateChargeStatusAction(chargeId: string, status: string) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('recebefacil_token')?.value;
+  if (!token) return { success: false, error: 'Não autorizado' };
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/charges/${chargeId}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ status }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      return { success: false, error: err?.message || 'Erro ao atualizar status' };
+    }
+    return { success: true };
+  } catch {
+    return { success: false, error: 'Servidor indisponível' };
+  }
+}
+
+export async function deleteChargeAction(chargeId: string) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('recebefacil_token')?.value;
+  if (!token) return { success: false, error: 'Não autorizado' };
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/charges/permanent/${chargeId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      return { success: false, error: err?.message || 'Erro ao excluir cobrança' };
+    }
+    return { success: true };
+  } catch {
+    return { success: false, error: 'Servidor indisponível' };
+  }
+}
+
 export async function bulkCancelAction(chargeIds: string[]) {
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;
@@ -161,6 +202,68 @@ export async function cancelRecurringChargeAction(ruleId: string) {
     if (!res.ok) return { success: false, error: 'Erro ao cancelar regra' };
     return { success: true };
   } catch (error) {
+    return { success: false, error: 'Servidor indisponível' };
+  }
+}
+
+export interface UpdateRecurringPayload {
+  frequency?: 'WEEKLY' | 'MONTHLY' | 'YEARLY';
+  description?: string;
+  next_generation_date?: string;
+  custom_message?: string;
+}
+
+export async function updateRecurringAction(ruleId: string, payload: UpdateRecurringPayload) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('recebefacil_token')?.value;
+  if (!token) return { success: false, error: 'Não autorizado' };
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/charges/recurring/${ruleId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      return { success: false, error: err?.message || 'Erro ao atualizar automação' };
+    }
+    return { success: true };
+  } catch {
+    return { success: false, error: 'Servidor indisponível' };
+  }
+}
+
+export async function deleteRecurringAction(ruleId: string) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('recebefacil_token')?.value;
+  if (!token) return { success: false, error: 'Não autorizado' };
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/charges/recurring/${ruleId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return { success: false, error: 'Erro ao excluir regra' };
+    return { success: true };
+  } catch {
+    return { success: false, error: 'Servidor indisponível' };
+  }
+}
+
+export async function reactivateRecurringAction(ruleId: string) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('recebefacil_token')?.value;
+  if (!token) return { success: false, error: 'Não autorizado' };
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/charges/recurring/${ruleId}/reactivate`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return { success: false, error: 'Erro ao reativar automação' };
+    return { success: true };
+  } catch {
     return { success: false, error: 'Servidor indisponível' };
   }
 }

@@ -1,24 +1,27 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { 
-  IconRepeat, IconCalendar, IconUser, IconTrash, 
-  IconCheckCircle, IconAlertCircle, IconArrowLeft, IconLock
+import {
+  IconRepeat, IconCalendar, IconUser, IconTrash,
+  IconCheckCircle, IconAlertCircle, IconArrowLeft, IconEdit, IconBot, IconX
 } from '@/components/ui/Icons';
-import { cancelRecurringChargeAction } from '@/app/actions/charges';
+import { cancelRecurringChargeAction, reactivateRecurringAction, deleteRecurringAction } from '@/app/actions/charges';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { AutomacaoModal } from '@/components/forms/AutomacaoModal';
 import Link from 'next/link';
 
 interface RecurringRule {
   id: string;
   amount: number;
   description: string;
-  frequency: string;
+  frequency: 'WEEKLY' | 'MONTHLY' | 'YEARLY';
   nextGenerationDate: string;
   active: boolean;
   debtorName: string;
   totalGenerated: number;
+  custom_message?: string | null;
 }
 
 interface Props {
@@ -29,27 +32,19 @@ interface Props {
 export function RecorrentesClient({ initialData, plan }: Props) {
   const [rules, setRules] = useState<RecurringRule[]>(initialData);
   const [selectedRule, setSelectedRule] = useState<string | null>(null);
+  const [deletingRule, setDeletingRule] = useState<string | null>(null);
+  const [editingRule, setEditingRule] = useState<RecurringRule | null>(null);
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value / 100);
-  };
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value / 100);
 
-  const translateFrequency = (freq: string) => {
-    const map: Record<string, string> = {
-      WEEKLY: 'Semanal',
-      MONTHLY: 'Mensal',
-      YEARLY: 'Anual',
-    };
-    return map[freq] || freq;
-  };
+  const translateFrequency = (freq: string) =>
+    ({ WEEKLY: 'Semanal', MONTHLY: 'Mensal', YEARLY: 'Anual' }[freq] ?? freq);
 
   function handleCancelRule() {
     if (!selectedRule) return;
-
     startTransition(async () => {
       const res = await cancelRecurringChargeAction(selectedRule);
       if (res.success) {
@@ -62,13 +57,39 @@ export function RecorrentesClient({ initialData, plan }: Props) {
     });
   }
 
+  function handleReactivate(ruleId: string) {
+    startTransition(async () => {
+      const res = await reactivateRecurringAction(ruleId);
+      if (res.success) {
+        toast.success('Automação reativada!');
+        setRules(prev => prev.map(r => r.id === ruleId ? { ...r, active: true } : r));
+      } else {
+        toast.error(res.error || 'Erro ao reativar.');
+      }
+    });
+  }
+
+  function handleDelete() {
+    if (!deletingRule) return;
+    startTransition(async () => {
+      const res = await deleteRecurringAction(deletingRule);
+      if (res.success) {
+        toast.success('Regra excluída permanentemente.');
+        setRules(prev => prev.filter(r => r.id !== deletingRule));
+        setDeletingRule(null);
+      } else {
+        toast.error(res.error || 'Erro ao excluir.');
+      }
+    });
+  }
+
   return (
     <div className="p-6 md:p-8 space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <Link 
-            href="/dashboard/cobrancas" 
+          <Link
+            href="/dashboard/cobrancas"
             className="flex items-center gap-1 text-sm text-zinc-500 dark:text-zinc-400 hover:text-green-600 dark:hover:text-green-400 transition-colors mb-2"
           >
             <IconArrowLeft className="w-4 h-4" />
@@ -96,7 +117,7 @@ export function RecorrentesClient({ initialData, plan }: Props) {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {rules.map((rule) => (
-            <div 
+            <div
               key={rule.id}
               className={`bg-white dark:bg-surface border ${rule.active ? 'border-zinc-100 dark:border-white/6' : 'border-zinc-100 dark:border-white/6 opacity-60'} rounded-3xl p-6 transition-all hover:shadow-xl hover:shadow-black/5 group`}
             >
@@ -123,15 +144,43 @@ export function RecorrentesClient({ initialData, plan }: Props) {
                     </div>
                   </div>
                 </div>
-                {rule.active && (
-                  <button 
-                    onClick={() => setSelectedRule(rule.id)}
-                    className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all opacity-0 group-hover:opacity-100"
-                    title="Cancelar recorrência"
+
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                  {rule.active ? (
+                    <>
+                      <button
+                        onClick={() => setEditingRule(rule)}
+                        className="p-2 text-zinc-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-500/10 rounded-xl transition-all"
+                        title="Editar automação"
+                      >
+                        <IconEdit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => setSelectedRule(rule.id)}
+                        className="p-2 text-zinc-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-xl transition-all"
+                        title="Pausar recorrência"
+                      >
+                        <IconTrash className="w-4 h-4" />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => handleReactivate(rule.id)}
+                      disabled={isPending}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-500/10 hover:bg-green-100 dark:hover:bg-green-500/20 border border-green-200 dark:border-green-500/30 rounded-xl transition-colors disabled:opacity-50"
+                    >
+                      <IconBot className="w-3.5 h-3.5" />
+                      Reativar
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setDeletingRule(rule.id)}
+                    className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all"
+                    title="Excluir permanentemente"
                   >
-                    <IconTrash className="w-5 h-5" />
+                    <IconX className="w-4 h-4" />
                   </button>
-                )}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4 pt-4 border-t border-zinc-50 dark:border-white/5">
@@ -160,6 +209,13 @@ export function RecorrentesClient({ initialData, plan }: Props) {
                   <p className="text-sm font-bold text-zinc-700 dark:text-zinc-200 mt-1">{rule.totalGenerated} cobranças</p>
                 </div>
               </div>
+
+              {rule.custom_message && (
+                <div className="mt-4 pt-4 border-t border-zinc-50 dark:border-white/5">
+                  <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Mensagem</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">{rule.custom_message}</p>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -175,6 +231,37 @@ export function RecorrentesClient({ initialData, plan }: Props) {
         onConfirm={handleCancelRule}
         onCancel={() => setSelectedRule(null)}
       />
+
+      <ConfirmModal
+        open={!!deletingRule}
+        title="Excluir regra permanentemente?"
+        description="Esta ação não pode ser desfeita. A regra e seu histórico de geração serão removidos."
+        confirmLabel="Sim, excluir"
+        variant="danger"
+        loading={isPending}
+        onConfirm={handleDelete}
+        onCancel={() => setDeletingRule(null)}
+      />
+
+      {editingRule && (
+        <AutomacaoModal
+          isOpen={!!editingRule}
+          onClose={() => setEditingRule(null)}
+          recurringChargeId={editingRule.id}
+          initialData={{
+            frequency: editingRule.frequency,
+            description: editingRule.description,
+            nextGenerationDate: editingRule.nextGenerationDate,
+            custom_message: editingRule.custom_message,
+            debtorName: editingRule.debtorName,
+            amount: editingRule.amount,
+          }}
+          onSuccess={() => {
+            setEditingRule(null);
+            router.refresh();
+          }}
+        />
+      )}
     </div>
   );
 }

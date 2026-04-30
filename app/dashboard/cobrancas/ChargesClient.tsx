@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -28,7 +28,8 @@ import {
   IconSend,
   IconTrash,
   IconRepeat,
-  IconFileText
+  IconFileText,
+  IconX
 } from '@/components/ui/Icons';
 import Link from 'next/link';
 import { formatMoney, maskPhone } from '@/lib/formatters';
@@ -37,8 +38,10 @@ import { ChargeDetailsDrawer } from '@/components/dashboard/ChargeDetailsDrawer'
 import { Input } from '@/components/ui/Input/Input';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { toast } from 'sonner';
-import { bulkCancelAction, bulkRemindAction } from '@/app/actions/charges';
+import { bulkCancelAction, bulkRemindAction, deleteChargeAction, updateChargeStatusAction } from '@/app/actions/charges';
 import { UpgradeModal } from '@/components/ui/UpgradeModal';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { AutomacaoModal } from '@/components/forms/AutomacaoModal';
 
 type Charge = {
   id: string;
@@ -49,6 +52,7 @@ type Charge = {
   status: string;
   recurrence: 'ONCE' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
   automationEnabled: boolean;
+  recurringChargeId: string | null;
 };
 
 const columnHelper = createColumnHelper<Charge>();
@@ -73,6 +77,13 @@ export function ChargesClient({
   const [dateFilter, setDateFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showRecurrenceUpgrade, setShowRecurrenceUpgrade] = useState(false);
+  const [automacaoModalOpen, setAutomacaoModalOpen] = useState(false);
+  const [selectedRecurringId, setSelectedRecurringId] = useState<string | null>(null);
+  const [automacaoChargePreview, setAutomacaoChargePreview] = useState<{ debtorName: string; amount: number; dueDate: string } | null>(null);
+  const [deletingChargeId, setDeletingChargeId] = useState<string | null>(null);
+  const [cancelingChargeId, setCancelingChargeId] = useState<string | null>(null);
+  const [statusUpdate, setStatusUpdate] = useState<{ chargeId: string; status: string; label: string } | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
   
   const searchParams = useSearchParams();
 
@@ -150,6 +161,7 @@ export function ChargesClient({
         const status = info.getValue();
         if (status === 'PAID') return <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400"><IconCheckCircle className="w-3 h-3" /> Pago</span>;
         if (status === 'OVERDUE') return <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-400"><IconAlertCircle className="w-3 h-3" /> Atrasado</span>;
+        if (status === 'CANCELED') return <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-zinc-100 text-zinc-500 dark:bg-white/8 dark:text-zinc-400"><IconX className="w-3 h-3" /> Cancelada</span>;
         return <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400"><IconClock className="w-3 h-3" /> Pendente</span>;
       }
     }),
@@ -158,18 +170,28 @@ export function ChargesClient({
       cell: info => {
         const isEnabled = info.getValue();
         const isLocked = plan === 'FREE' || plan === 'STARTER';
+        const recurringId = info.row.original.recurringChargeId;
+        const hasAutomation = !!recurringId;
         return (
           <button
             onClick={(e) => {
               e.stopPropagation();
               if (isLocked) {
                 setShowRecurrenceUpgrade(true);
+              } else if (!hasAutomation) {
+                toast.info('Esta cobrança não possui recorrência configurada.');
               } else {
-                toast.success(`Automação ${!isEnabled ? 'ativada' : 'desativada'} para esta cobrança.`);
+                setSelectedRecurringId(recurringId);
+                setAutomacaoChargePreview({
+                  debtorName: info.row.original.debtorName,
+                  amount: info.row.original.amount,
+                  dueDate: info.row.original.dueDate,
+                });
+                setAutomacaoModalOpen(true);
               }
             }}
             className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${isEnabled ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-500/30' : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-white/10'} relative`}
-            title={isEnabled ? 'Robô ativo' : 'Robô inativo'}
+            title={isLocked ? 'Requer plano PRO ou superior' : isEnabled ? 'Editar automação' : 'Sem automação'}
           >
             <IconBot className="w-4 h-4" />
             {isLocked && (
@@ -203,8 +225,11 @@ export function ChargesClient({
                 </button>
               </DropdownMenu.Trigger>
               <DropdownMenu.Portal>
-                <DropdownMenu.Content align="end" className="min-w-[180px] bg-surface dark:bg-[#1a2d42] rounded-xl shadow-xl border border-zinc-200/80 dark:border-white/8 p-1.5 text-sm z-50 animate-in fade-in zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-95">
-                  <DropdownMenu.Item className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg text-zinc-600 dark:text-zinc-300 font-medium">
+                <DropdownMenu.Content align="end" className="min-w-[190px] bg-surface dark:bg-[#1a2d42] rounded-xl shadow-xl border border-zinc-200/80 dark:border-white/8 p-1.5 text-sm z-50 animate-in fade-in zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-95">
+                  <DropdownMenu.Item
+                    className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg text-zinc-600 dark:text-zinc-300 font-medium"
+                    onClick={() => setDetailsChargeId(row.original.id)}
+                  >
                     <IconExternalLink className="w-4 h-4 text-zinc-400 dark:text-zinc-500" /> Ver Detalhes
                   </DropdownMenu.Item>
                   <DropdownMenu.Item className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg text-zinc-600 dark:text-zinc-300 font-medium" onClick={() => {
@@ -213,24 +238,49 @@ export function ChargesClient({
                   }}>
                     <IconCopy className="w-4 h-4 text-zinc-400" /> Copiar Link
                   </DropdownMenu.Item>
+
                   <DropdownMenu.Separator className="h-px bg-zinc-200/80 dark:bg-white/6 my-1" />
-                  <DropdownMenu.Item 
-                    className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg text-red-600 dark:text-red-400 font-medium"
-                    onClick={async () => {
-                      try {
-                        const res = await bulkCancelAction([row.original.id]);
-                        if (res.success) {
-                          setData(prev => prev.map(c => c.id === row.original.id ? { ...c, status: 'CANCELED' } : c));
-                          toast.success('Cobrança cancelada.');
-                        } else {
-                          toast.error(res.error || 'Erro ao cancelar.');
-                        }
-                      } catch {
-                        toast.error('Erro ao cancelar.');
-                      }
-                    }}
+
+                  {/* Alterar status */}
+                  {(['PENDING', 'PAID', 'OVERDUE'] as const)
+                    .filter(s => s !== row.original.status)
+                    .map(s => {
+                      const labels: Record<string, string> = { PENDING: 'Marcar como Pendente', PAID: 'Marcar como Pago', OVERDUE: 'Marcar como Atrasado' };
+                      const colors: Record<string, string> = {
+                        PENDING: 'hover:bg-amber-50 dark:hover:bg-amber-500/10 text-amber-600 dark:text-amber-400',
+                        PAID: 'hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+                        OVERDUE: 'hover:bg-red-50 dark:hover:bg-red-500/10 text-red-600 dark:text-red-400',
+                      };
+                      const icons: Record<string, React.ReactNode> = {
+                        PENDING: <IconClock className="w-4 h-4" />,
+                        PAID: <IconCheckCircle className="w-4 h-4" />,
+                        OVERDUE: <IconAlertCircle className="w-4 h-4" />,
+                      };
+                      return (
+                        <DropdownMenu.Item
+                          key={s}
+                          className={`flex items-center gap-2 px-3 py-2 outline-none cursor-pointer rounded-lg font-medium ${colors[s]}`}
+                          onClick={() => setStatusUpdate({ chargeId: row.original.id, status: s, label: labels[s] })}
+                        >
+                          {icons[s]} {labels[s]}
+                        </DropdownMenu.Item>
+                      );
+                    })
+                  }
+
+                  <DropdownMenu.Separator className="h-px bg-zinc-200/80 dark:bg-white/6 my-1" />
+
+                  <DropdownMenu.Item
+                    className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg text-zinc-500 dark:text-zinc-400 font-medium"
+                    onClick={() => setCancelingChargeId(row.original.id)}
                   >
-                    <IconTrash className="w-4 h-4 text-red-500" /> Cancelar Cobrança
+                    <IconTrash className="w-4 h-4" /> Cancelar Cobrança
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    className="flex items-center gap-2 px-3 py-2 outline-none cursor-pointer hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg text-red-600 dark:text-red-400 font-medium"
+                    onClick={() => setDeletingChargeId(row.original.id)}
+                  >
+                    <IconX className="w-4 h-4" /> Excluir Permanentemente
                   </DropdownMenu.Item>
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>
@@ -369,7 +419,7 @@ export function ChargesClient({
                   key={row.id}
                   className={`border-b border-zinc-100 dark:border-white/4 transition-colors hover:bg-zinc-100/60 dark:hover:bg-white/3 cursor-pointer ${row.getIsSelected() ? 'bg-green-50/40 dark:bg-green-500/5' : ''}`}
                   onClick={(e) => {
-                    if ((e.target as HTMLElement).closest('input[type="checkbox"]')) return;
+                    if ((e.target as HTMLElement).closest('button, a, input, [role="menuitem"], [data-radix-collection-item]')) return;
                     setDetailsChargeId(row.original.id);
                   }}
                 >
@@ -494,6 +544,94 @@ export function ChargesClient({
         <UpgradeModal
           moduleName="RECURRENCE"
           onClose={() => setShowRecurrenceUpgrade(false)}
+        />
+      )}
+
+      {/* Cancelar cobrança */}
+      <ConfirmModal
+        open={!!cancelingChargeId}
+        title="Cancelar cobrança?"
+        description="A cobrança será marcada como cancelada. Cobranças canceladas não geram novas notificações."
+        confirmLabel="Sim, cancelar"
+        variant="danger"
+        loading={actionLoading}
+        onConfirm={async () => {
+          if (!cancelingChargeId) return;
+          setActionLoading(true);
+          const res = await bulkCancelAction([cancelingChargeId]);
+          setActionLoading(false);
+          if (res.success) {
+            toast.success('Cobrança cancelada.');
+            setData(prev => prev.map(c => c.id === cancelingChargeId ? { ...c, status: 'CANCELED' } : c));
+            setCancelingChargeId(null);
+          } else {
+            toast.error(res.error || 'Erro ao cancelar.');
+          }
+        }}
+        onCancel={() => setCancelingChargeId(null)}
+      />
+
+      {/* Alterar status */}
+      <ConfirmModal
+        open={!!statusUpdate}
+        title={statusUpdate?.label ?? 'Alterar status?'}
+        description="O status da cobrança será atualizado imediatamente."
+        confirmLabel="Confirmar"
+        variant="primary"
+        loading={actionLoading}
+        onConfirm={async () => {
+          if (!statusUpdate) return;
+          setActionLoading(true);
+          const res = await updateChargeStatusAction(statusUpdate.chargeId, statusUpdate.status);
+          setActionLoading(false);
+          if (res.success) {
+            toast.success('Status atualizado.');
+            setData(prev => prev.map(c => c.id === statusUpdate.chargeId ? { ...c, status: statusUpdate.status } : c));
+            setStatusUpdate(null);
+          } else {
+            toast.error(res.error || 'Erro ao atualizar status.');
+          }
+        }}
+        onCancel={() => setStatusUpdate(null)}
+      />
+
+      {/* Excluir permanentemente */}
+      <ConfirmModal
+        open={!!deletingChargeId}
+        title="Excluir cobrança permanentemente?"
+        description="Esta ação não pode ser desfeita. A cobrança e todo seu histórico de mensagens serão removidos."
+        confirmLabel="Sim, excluir"
+        variant="danger"
+        loading={actionLoading}
+        onConfirm={async () => {
+          if (!deletingChargeId) return;
+          setActionLoading(true);
+          const res = await deleteChargeAction(deletingChargeId);
+          setActionLoading(false);
+          if (res.success) {
+            toast.success('Cobrança excluída.');
+            setData(prev => prev.filter(c => c.id !== deletingChargeId));
+            setDeletingChargeId(null);
+          } else {
+            toast.error(res.error || 'Erro ao excluir.');
+          }
+        }}
+        onCancel={() => setDeletingChargeId(null)}
+      />
+
+      {automacaoModalOpen && selectedRecurringId && (
+        <AutomacaoModal
+          isOpen={automacaoModalOpen}
+          onClose={() => { setAutomacaoModalOpen(false); setSelectedRecurringId(null); setAutomacaoChargePreview(null); }}
+          recurringChargeId={selectedRecurringId}
+          initialData={automacaoChargePreview ? {
+            frequency: 'MONTHLY',
+            description: '',
+            nextGenerationDate: automacaoChargePreview.dueDate,
+            debtorName: automacaoChargePreview.debtorName,
+            amount: automacaoChargePreview.amount,
+          } : undefined}
+          onSuccess={() => router.refresh()}
         />
       )}
     </div>
