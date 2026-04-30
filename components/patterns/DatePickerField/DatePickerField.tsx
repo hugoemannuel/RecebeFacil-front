@@ -6,10 +6,10 @@ import { DayPicker } from "react-day-picker";
 
 type Props = {
   name: string;
-  control: Control<FieldValues>;
+  control: any;
   label?: string;
   icon?: React.ReactNode;
-  disabled?: boolean | ((date: Date) => boolean) | Date | Date[] | { from: Date; to: Date };
+  disabled?: any;
 };
 
 export function DatePickerField({

@@ -35,7 +35,14 @@ export const baseSchema = z.object({
   send_pix_button: z.boolean(),
   pix_key: z.string().optional(),
   pix_key_type: z.enum(['CPF', 'CNPJ', 'PHONE', 'EMAIL', 'EVP']).optional(),
-  save_as_template: z.boolean().optional(),
+  save_as_template: z.boolean().default(false),
+  template_name: z.string().optional(),
+}).refine((data) => {
+  if (data.save_as_template && !data.template_name) return false;
+  return true;
+}, {
+  message: 'Nome do template é obrigatório',
+  path: ['template_name'],
 });
 
 export type ChargeFormData = z.infer<typeof baseSchema>;

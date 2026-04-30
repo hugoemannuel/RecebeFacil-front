@@ -29,6 +29,7 @@ import {
   IconTrash,
   IconRepeat,
   IconFileText,
+  IconSparkles,
   IconX
 } from '@/components/ui/Icons';
 import Link from 'next/link';
@@ -320,6 +321,13 @@ export function ChargesClient({
             Importar Excel
             <span className="bg-zinc-200 dark:bg-white/10 text-zinc-500 dark:text-zinc-400 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase">Breve</span>
           </div>
+          <Link
+            href="/dashboard/cobrancas/templates"
+            className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/5 transition-all"
+          >
+            <IconSparkles className="w-5 h-5" />
+            Templates
+          </Link>
           <Link
             href={plan === 'FREE' || plan === 'STARTER' ? '#' : "/dashboard/cobrancas/recorrentes"}
             onClick={(e) => {

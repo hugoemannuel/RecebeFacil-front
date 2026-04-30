@@ -12,10 +12,11 @@ type SelectProps = {
   onChange?: (value: string) => void;
   options: Option[];
   className?: string;
+  disabled?: boolean;
 };
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, error, value, onChange, options, className = "" }, ref) => {
+  ({ label, error, value, onChange, options, className = "", disabled }, ref) => {
     return (
       <div className="w-full">
         {label && (
@@ -28,6 +29,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           ref={ref}
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
+          disabled={disabled}
           className={`
             w-full px-4 py-2.5
             border border-zinc-200/80 dark:border-white/7
@@ -36,6 +38,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             rounded-xl text-sm
             focus:outline-none focus:ring-2 focus:ring-green-500/30
             transition-all
+            disabled:opacity-50 disabled:cursor-not-allowed
             ${className}
           `}
         >

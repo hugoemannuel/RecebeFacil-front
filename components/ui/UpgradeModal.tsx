@@ -14,9 +14,10 @@ const MODULE_LABELS: Record<string, { label: string; requiredPlan: string }> = {
   REPORTS: { label: 'Relatórios Detalhados', requiredPlan: 'UNLIMITED' },
   EXCEL_IMPORT: { label: 'Importação via Excel', requiredPlan: 'STARTER' },
   LIMIT_REACHED: { label: 'Limite de cobranças atingido', requiredPlan: 'STARTER' },
-  RECURRENCE: { label: 'Regras de Recorrência', requiredPlan: 'PRO' },
+   RECURRENCE: { label: 'Regras de Recorrência', requiredPlan: 'PRO' },
   NEW_CHARGE: { label: 'Cobrança Direta pelo Dashboard', requiredPlan: 'PRO' },
   FINANCE: { label: 'Módulo Financeiro', requiredPlan: 'PRO' },
+  CUSTOM_TEMPLATES: { label: 'Templates Personalizados', requiredPlan: 'STARTER' },
 };
 
 

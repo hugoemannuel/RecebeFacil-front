@@ -19,6 +19,8 @@ import { StepMessage } from './components/StepMessage';
 import { StepConfirm } from './components/StepConfirm';
 import { ModalFooter } from './components/ModalFooter';
 
+import { UpgradeModal } from '@/components/ui/UpgradeModal';
+
 export function NewChargeModal({
   open,
   onClose,
@@ -31,20 +33,12 @@ export function NewChargeModal({
 }: NewChargeModalProps) {
   const [step, setStep] = useState(0);
   const [sending, setSending] = useState(false);
+  const [upgradeModule, setUpgradeModule] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const schema = baseSchema.superRefine((data, ctx) => {
-    if (data.send_pix_button && !hasPixKey) {
-      if (!data.pix_key || data.pix_key.length < 5) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A chave PIX é obrigatória', path: ['pix_key'] });
-      }
-      if (!data.pix_key_type) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Tipo da chave é obrigatório', path: ['pix_key_type'] });
-      }
-    }
-  });
+  const schema = baseSchema;
 
-  const form = useForm<ChargeFormData>({
+  const form = useForm<any>({
     resolver: zodResolver(schema),
     defaultValues: {
       debtor_name: '', debtor_phone: '', amount_display: '',
@@ -53,6 +47,8 @@ export function NewChargeModal({
       send_pix_button: true,
       pix_key: creditorProfile?.pix_key || '', 
       pix_key_type: creditorProfile?.pix_key_type || 'CPF',
+      save_as_template: false,
+      template_name: '',
     },
   });
 
@@ -74,6 +70,8 @@ export function NewChargeModal({
         amount_display: '', description: '', recurrence: 'ONCE',
         custom_message: DEFAULT_TEMPLATE, send_pix_button: true,
         pix_key: '', pix_key_type: 'CPF',
+        save_as_template: false,
+        template_name: '',
       });
       setStep(1);
     }
@@ -104,12 +102,12 @@ export function NewChargeModal({
     const fieldsPerStep: (keyof ChargeFormData)[][] = [
       ['debtor_name', 'debtor_phone'],
       ['amount_display', 'due_date', 'description'],
-      ['custom_message', 'pix_key', 'pix_key_type'],
+      ['custom_message', 'pix_key', 'pix_key_type', 'save_as_template', 'template_name' as any],
     ];
     form.trigger(fieldsPerStep[step] as (keyof ChargeFormData)[]).then((ok) => { if (ok) setStep((s) => s + 1); });
   }
 
-  async function onSubmit(data: ChargeFormData) {
+  async function onSubmit(data: any) {
     setSending(true);
     try {
       const result = await createChargeAction({
@@ -123,6 +121,8 @@ export function NewChargeModal({
         send_pix_button: data.send_pix_button,
         pix_key: data.send_pix_button && !hasPixKey ? data.pix_key : undefined,
         pix_key_type: data.send_pix_button && !hasPixKey ? data.pix_key_type : undefined,
+        save_as_template: data.save_as_template,
+        template_name: data.template_name,
       });
       if (result.success) {
         toast.success('Cobrança enviada via WhatsApp! ✅');
@@ -139,68 +139,78 @@ export function NewChargeModal({
   if (!open) return null;
 
   return (
-    <div
-      className="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 sm:p-6"
-      onClick={handleClose}
-    >
+    <>
       <div
-        className={`w-full ${step === 2 ? 'max-w-5xl' : 'max-w-3xl'} bg-zinc-50 dark:bg-surface-soft rounded-4xl shadow-2xl flex flex-col max-h-[95vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-transparent dark:border-white/7`}
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 sm:p-6"
+        onClick={handleClose}
       >
-        <ModalHeader step={step} totalSteps={STEPS.length} onClose={handleClose} />
-        <StepProgressBar steps={STEPS} currentStep={step} />
+        <div
+          className={`w-full ${step === 2 ? 'max-w-5xl' : 'max-w-3xl'} bg-zinc-50 dark:bg-surface-soft rounded-4xl shadow-2xl flex flex-col max-h-[95vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-transparent dark:border-white/7`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <ModalHeader step={step} totalSteps={STEPS.length} onClose={handleClose} />
+          <StepProgressBar steps={STEPS} currentStep={step} />
 
-        <FormProvider {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-hidden flex flex-col">
-            <div className={`flex-1 overflow-hidden flex ${step === 2 ? 'flex-col md:flex-row' : 'flex-col'}`}>
-              <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
-                {step === 0 && <StepDebtor />}
-                {step === 1 && <StepChargeDetails planType={planType!} />}
+          <FormProvider {...form}>
+            <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-hidden flex flex-col">
+              <div className={`flex-1 overflow-hidden flex ${step === 2 ? 'flex-col md:flex-row' : 'flex-col'}`}>
+                <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
+                  {step === 0 && <StepDebtor />}
+                  {step === 1 && <StepChargeDetails planType={planType!} />}
+                  {step === 2 && (
+                    <StepMessage 
+                      hasPixKey={hasPixKey} 
+                      textareaRef={textareaRef} 
+                      insertVariable={insertVariable} 
+                      plan={planType!} 
+                      onUpgrade={setUpgradeModule}
+                    />
+                  )}
+                  {step === 3 && <StepConfirm hasPixKey={hasPixKey} plan={planType!} />}
+                </div>
+
                 {step === 2 && (
-                  <StepMessage 
-                    hasPixKey={hasPixKey} 
-                    textareaRef={textareaRef} 
-                    insertVariable={insertVariable} 
-                    plan={planType!} 
-                  />
-                )}
-                {step === 3 && <StepConfirm hasPixKey={hasPixKey} plan={planType!} />}
-              </div>
-
-              {step === 2 && (
-                <div className="w-full md:w-[380px] border-t md:border-t-0 md:border-l border-zinc-100 dark:border-white/7 flex flex-col bg-zinc-50 dark:bg-[#0b1521] shrink-0">
-                  <div className="px-5 py-4 border-b border-zinc-100 dark:border-white/7">
-                    <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <IconSparkles className="w-3.5 h-3.5 text-green-500" /> Preview ao vivo
-                    </p>
-                  </div>
-                  <div className="flex-1 p-4 overflow-hidden">
-                    <div className="h-full rounded-2xl overflow-hidden shadow-md">
-                      <WhatsAppPreview
-                        senderName={userName}
-                        message={previewMessage}
-                        showQrCode={false}
-                        showPixButton={values.send_pix_button}
-                        amount={values.amount_display}
-                      />
+                  <div className="w-full md:w-[380px] border-t md:border-t-0 md:border-l border-zinc-100 dark:border-white/7 flex flex-col bg-zinc-50 dark:bg-[#0b1521] shrink-0">
+                    <div className="px-5 py-4 border-b border-zinc-100 dark:border-white/7">
+                      <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <IconSparkles className="w-3.5 h-3.5 text-green-500" /> Preview ao vivo
+                      </p>
+                    </div>
+                    <div className="flex-1 p-4 overflow-hidden">
+                      <div className="h-full rounded-2xl overflow-hidden shadow-md">
+                        <WhatsAppPreview
+                          senderName={userName}
+                          message={previewMessage}
+                          showQrCode={false}
+                          showPixButton={values.send_pix_button}
+                          amount={values.amount_display}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
 
-            <ModalFooter
-              step={step}
-              totalSteps={STEPS.length}
-              sending={sending}
-              onBack={() => setStep((s) => s - 1)}
-              onNext={nextStep}
-              onSubmit={handleSubmit(onSubmit)}
-            />
-          </form>
-        </FormProvider>
+              <ModalFooter
+                step={step}
+                totalSteps={STEPS.length}
+                sending={sending}
+                onBack={() => setStep((s) => s - 1)}
+                onNext={nextStep}
+                onSubmit={handleSubmit(onSubmit)}
+              />
+            </form>
+          </FormProvider>
+        </div>
       </div>
-    </div>
+
+      {upgradeModule && (
+        <UpgradeModal
+          onClose={() => setUpgradeModule(null)}
+          moduleName={upgradeModule}
+        />
+      )}
+    </>
   );
 }
 

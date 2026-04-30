@@ -13,7 +13,10 @@ export interface CreateChargePayload {
   send_pix_button: boolean;
   pix_key?: string;
   pix_key_type?: 'CPF' | 'CNPJ' | 'PHONE' | 'EMAIL' | 'EVP' | string;
+  save_as_template?: boolean;
+  template_name?: string;
 }
+
 
 export interface CreateChargeResult {
   success: boolean;

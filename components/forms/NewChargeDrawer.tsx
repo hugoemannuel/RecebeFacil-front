@@ -15,6 +15,8 @@ import { createChargeAction } from '@/app/actions/charges';
 import {
   maskMoney, parseMoney, maskPhone, formatDate, interpolateTemplate,
 } from '@/lib/formatters';
+import { getTemplates, MessageTemplate } from '@/services/templates';
+import { getTemplatesAction } from '@/app/actions/templates';
 import {
   IconX, IconUser, IconPhone, IconDollarSign, IconCalendar,
   IconRepeat, IconSparkles, IconSend, IconChevronRight,
@@ -25,22 +27,6 @@ import { RHFSelect } from './rhf/RHFSelect';
 import { DatePickerField } from '../patterns/DatePickerField/DatePickerField';
 import { Select } from '../ui/Select/Select';
 import { Chip } from '../ui/Chip';
-
-const DEFAULT_TEMPLATE = `Olá *{{nome}}*! 👋
-
-Passando para lembrar da sua cobrança:
-
-💰 Valor: *{{valor}}*
-📅 Vencimento: *{{vencimento}}*
-📝 Referência: {{descricao}}
-
-Para pagar via PIX, clique no botão abaixo! ✅`;
-
-const TEMPLATE_OPTIONS = [
-  { label: 'Cobrança Inicial', value: DEFAULT_TEMPLATE },
-  { label: 'Lembrete Amigável', value: `Oi *{{nome}}*! 😊\n\nSua cobrança de *{{valor}}* vence em *{{vencimento}}*.\n\nPague via PIX rapidinho! 💳` },
-  { label: 'Urgente', value: `⚠️ *{{nome}}*, sua cobrança de *{{valor}}* vence *hoje*!\n\nEvite atrasos — pague agora via PIX.` },
-];
 
 const VARIABLES = ['{{nome}}', '{{valor}}', '{{vencimento}}', '{{descricao}}', '{{nome_empresa}}'];
 
@@ -61,6 +47,14 @@ const baseSchema = z.object({
   send_pix_button: z.boolean(),
   pix_key: z.string().optional(),
   pix_key_type: z.enum(['CPF', 'CNPJ', 'PHONE', 'EMAIL', 'EVP']).optional(),
+  save_as_template: z.boolean().default(false),
+  template_name: z.string().optional(),
+}).refine((data) => {
+  if (data.save_as_template && !data.template_name) return false;
+  return true;
+}, {
+  message: "Nome do template é obrigatório para salvar",
+  path: ["template_name"],
 });
 
 export type ChargeFormData = z.infer<typeof baseSchema>;
@@ -79,6 +73,8 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
   const [step, setStep] = useState(0);
   const [showCalendar, setShowCalendar] = useState(false);
   const [sending, setSending] = useState(false);
+  const [templates, setTemplates] = useState<MessageTemplate[]>([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Schema gerado dinamicamente para validar os campos de PIX apenas se necessário
@@ -98,7 +94,7 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
     defaultValues: {
       debtor_name: '', debtor_phone: '', amount_display: '',
       description: '', recurrence: 'ONCE',
-      custom_message: DEFAULT_TEMPLATE,
+      custom_message: '',
       send_pix_button: true,
       pix_key: '', pix_key_type: 'CPF',
     },
@@ -106,6 +102,29 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
 
   const { register, watch, setValue, handleSubmit, reset, formState: { errors } } = form;
   const values = watch();
+
+  // Busca templates da API
+  useEffect(() => {
+    if (open) {
+      setLoadingTemplates(true);
+      getTemplatesAction()
+        .then((res) => {
+          if (res.success) {
+            const data = res.data;
+            setTemplates(data);
+            // Se não houver mensagem customizada definida, usa o default
+            const defaultTmpl = data.find((t: any) => t.is_default) || data[0];
+            if (defaultTmpl && !form.getValues('custom_message')) {
+              setValue('custom_message', defaultTmpl.body);
+            }
+          } else {
+            toast.error(res.error || 'Erro ao carregar templates');
+          }
+        })
+        .finally(() => setLoadingTemplates(false));
+    }
+  }, [open, setValue, form]);
+
 
   // Fecha com ESC
   useEffect(() => {
@@ -137,7 +156,7 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
     setTimeout(() => { el.selectionStart = el.selectionEnd = start + variable.length; el.focus(); }, 0);
   }
 
-  async function onSubmit(data: ChargeFormData) {
+  async function onSubmit(data: any) {
     setSending(true);
     try {
       const result = await createChargeAction({
@@ -151,6 +170,8 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
         send_pix_button: data.send_pix_button,
         pix_key: data.send_pix_button && !hasPixKey ? data.pix_key : undefined,
         pix_key_type: data.send_pix_button && !hasPixKey ? data.pix_key_type : undefined,
+        save_as_template: data.save_as_template,
+        template_name: data.template_name,
       });
       if (result.success) {
         toast.success('Cobrança enviada via WhatsApp! ✅');
@@ -237,6 +258,9 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
                       hasPixKey={hasPixKey}
                       textareaRef={textareaRef}
                       insertVariable={insertVariable}
+                      templates={templates}
+                      loadingTemplates={loadingTemplates}
+                      planType={planType}
                     />
                   )}
 
@@ -399,24 +423,52 @@ function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCa
   );
 }
 
-function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: boolean, textareaRef: React.RefObject<HTMLTextAreaElement | null>, insertVariable: (v: string) => void }) {
+function StepMessage({
+  hasPixKey,
+  textareaRef,
+  insertVariable,
+  templates,
+  loadingTemplates,
+  planType
+}: {
+  hasPixKey: boolean,
+  textareaRef: React.RefObject<HTMLTextAreaElement | null>,
+  insertVariable: (v: string) => void,
+  templates: MessageTemplate[],
+  loadingTemplates: boolean,
+  planType?: string
+}) {
   const { control, watch, setValue, formState: { errors } } = useFormContext<ChargeFormData>();
   const values = watch();
+
+  const templateOptions = templates.map(t => ({
+    label: t.name,
+    value: t.body,
+    is_system: t.is_system
+  }));
 
   return (
     <>
       <p className="text-sm text-zinc-500">Personalize a mensagem que será enviada</p>
       <div className="space-y-4">
-        <Select
-          label="Template base"
-          value={values.custom_message}
-          onChange={(value) =>
-            setValue("custom_message", value, {
-              shouldValidate: true,
-            })
-          }
-          options={TEMPLATE_OPTIONS}
-        />
+        <div className="relative">
+          <Select
+            label="Template base"
+            value={values.custom_message}
+            onChange={(value) =>
+              setValue("custom_message", value, {
+                shouldValidate: true,
+              })
+            }
+            options={templateOptions}
+            disabled={loadingTemplates}
+          />
+          {loadingTemplates && (
+            <div className="absolute right-3 top-[34px]">
+              <div className="w-4 h-4 border-2 border-zinc-200 border-t-zinc-400 rounded-full animate-spin" />
+            </div>
+          )}
+        </div>
 
         {/* Chips de variáveis */}
         <div>
@@ -455,6 +507,34 @@ function StepMessage({ hasPixKey, textareaRef, insertVariable }: { hasPixKey: bo
             rows={9}
           />
         </div>
+
+        {/* Salvar como template (apenas se não for FREE) */}
+        {planType !== 'FREE' && (
+          <div className="pt-2">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="save_as_template"
+                {...control.register("save_as_template")}
+                className="w-4 h-4 rounded border-zinc-300 text-green-600 focus:ring-green-500"
+              />
+              <label htmlFor="save_as_template" className="text-sm font-medium text-zinc-600 dark:text-zinc-400 cursor-pointer select-none">
+                Salvar como novo template
+              </label>
+            </div>
+
+            {watch("save_as_template") && (
+              <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                <RHFInput
+                  name="template_name"
+                  control={control}
+                  label="Nome do template"
+                  placeholder="Ex: Cobrança de Varejo"
+                />
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Toggles PIX Simples */}
         <div className="space-y-3 pt-2">
