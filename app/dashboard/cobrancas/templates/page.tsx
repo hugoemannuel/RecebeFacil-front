@@ -1,5 +1,5 @@
 import { DashboardLayout } from '@/components/layout/DashboardLayout/DashboardLayout';
-import { TemplatesClient } from './TemplatesClient';
+import { TemplatesClient } from '@/app/dashboard/cobrancas/templates/TemplatesClient';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { api } from '@/services/api';

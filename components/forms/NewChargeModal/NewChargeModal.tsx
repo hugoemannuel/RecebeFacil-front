@@ -38,15 +38,15 @@ export function NewChargeModal({
 
   const schema = baseSchema;
 
-  const form = useForm<any>({
-    resolver: zodResolver(schema),
+  const form = useForm<ChargeFormData>({
+    resolver: zodResolver(schema) as any,
     defaultValues: {
       debtor_name: '', debtor_phone: '', amount_display: '',
       description: '', recurrence: 'ONCE',
       custom_message: DEFAULT_TEMPLATE,
       send_pix_button: true,
       pix_key: creditorProfile?.pix_key || '', 
-      pix_key_type: creditorProfile?.pix_key_type || 'CPF',
+      pix_key_type: (creditorProfile?.pix_key_type as any) || 'CPF',
       save_as_template: false,
       template_name: '',
     },

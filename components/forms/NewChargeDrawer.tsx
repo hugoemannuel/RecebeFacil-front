@@ -90,7 +90,7 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
   });
 
   const form = useForm<ChargeFormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as any,
     defaultValues: {
       debtor_name: '', debtor_phone: '', amount_display: '',
       description: '', recurrence: 'ONCE',

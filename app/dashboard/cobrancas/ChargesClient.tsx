@@ -43,6 +43,7 @@ import { bulkCancelAction, bulkRemindAction, deleteChargeAction, updateChargeSta
 import { UpgradeModal } from '@/components/ui/UpgradeModal';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { AutomacaoModal } from '@/components/forms/AutomacaoModal';
+import { CreditorProfile } from '@/types/user';
 
 type Charge = {
   id: string;
@@ -67,7 +68,7 @@ export function ChargesClient({
   initialData: Charge[],
   plan: 'FREE' | 'STARTER' | 'PRO' | 'UNLIMITED',
   usage: { count: number, limit: number },
-  creditorProfile?: any
+  creditorProfile?: CreditorProfile
 }) {
   const [data, setData] = useState(initialData);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -374,7 +375,7 @@ export function ChargesClient({
               ></div>
             </div>
           </div>
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <button className="w-full md:w-auto px-6 py-2.5 bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-500/30 rounded-xl font-bold hover:bg-green-100 dark:hover:bg-green-500/20 transition-colors shadow-sm">
               Fazer Upgrade
             </button>

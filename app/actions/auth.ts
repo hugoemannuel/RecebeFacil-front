@@ -3,8 +3,10 @@
 import { cookies } from 'next/headers';
 import { api } from '@/services/api';
 import { isAxiosError } from 'axios';
+import { ActionResult } from '@/types/actions';
+import { User } from '@/types/user';
 
-export async function loginAction(data: any) {
+export async function loginAction(data: any): Promise<ActionResult<{ user: User }>> {
   try {
     const response = await api.post('/auth/login', data);
 
@@ -17,7 +19,7 @@ export async function loginAction(data: any) {
       maxAge: 7 * 24 * 60 * 60,
     });
 
-    return { success: true, user: response.data.user };
+    return { success: true, data: { user: response.data.user } };
   } catch (error) {
     if (isAxiosError(error)) {
       const data = error.response?.data;
@@ -31,7 +33,7 @@ export async function loginAction(data: any) {
   }
 }
 
-export async function registerAction(data: any) {
+export async function registerAction(data: any): Promise<ActionResult<{ user: User }>> {
   try {
     const response = await api.post('/auth/register', data);
 
@@ -44,7 +46,7 @@ export async function registerAction(data: any) {
       maxAge: 7 * 24 * 60 * 60,
     });
 
-    return { success: true, user: response.data.user };
+    return { success: true, data: { user: response.data.user } };
   } catch (error) {
     if (isAxiosError(error)) {
       const data = error.response?.data;

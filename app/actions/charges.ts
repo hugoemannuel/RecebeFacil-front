@@ -1,6 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
+import { ActionResult } from '@/types/actions';
 
 export interface CreateChargePayload {
   debtor_name: string;
@@ -18,11 +19,6 @@ export interface CreateChargePayload {
 }
 
 
-export interface CreateChargeResult {
-  success: boolean;
-  error?: string;
-  chargeId?: string;
-}
 
 /**
  * Server Action: Cria uma cobrança e dispara o envio via WhatsApp.
@@ -30,7 +26,7 @@ export interface CreateChargeResult {
  */
 export async function createChargeAction(
   payload: CreateChargePayload
-): Promise<CreateChargeResult> {
+): Promise<ActionResult<{ chargeId: string }>> {
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;
 
@@ -64,14 +60,14 @@ export async function createChargeAction(
     const data = await res.json();
     return {
       success: true,
-      chargeId: data.chargeId,
+      data: { chargeId: data.chargeId },
     };
   } catch (error) {
     return { success: false, error: 'Servidor indisponível no momento.' };
   }
 }
 
-export async function getChargeDetailsAction(chargeId: string) {
+export async function getChargeDetailsAction(chargeId: string): Promise<ActionResult> {
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;
 
@@ -94,7 +90,7 @@ export async function getChargeDetailsAction(chargeId: string) {
   }
 }
 
-export async function updateChargeStatusAction(chargeId: string, status: string) {
+export async function updateChargeStatusAction(chargeId: string, status: string): Promise<ActionResult> {
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;
   if (!token) return { success: false, error: 'Não autorizado' };
@@ -115,7 +111,7 @@ export async function updateChargeStatusAction(chargeId: string, status: string)
   }
 }
 
-export async function deleteChargeAction(chargeId: string) {
+export async function deleteChargeAction(chargeId: string): Promise<ActionResult> {
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;
   if (!token) return { success: false, error: 'Não autorizado' };
@@ -135,7 +131,7 @@ export async function deleteChargeAction(chargeId: string) {
   }
 }
 
-export async function bulkCancelAction(chargeIds: string[]) {
+export async function bulkCancelAction(chargeIds: string[]): Promise<ActionResult> {
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;
 
@@ -155,7 +151,7 @@ export async function bulkCancelAction(chargeIds: string[]) {
   }
 }
 
-export async function bulkRemindAction(chargeIds: string[]) {
+export async function bulkRemindAction(chargeIds: string[]): Promise<ActionResult> {
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;
 
@@ -175,7 +171,7 @@ export async function bulkRemindAction(chargeIds: string[]) {
   }
 }
 
-export async function getRecurringChargesAction() {
+export async function getRecurringChargesAction(): Promise<ActionResult> {
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;
   if (!token) return { success: false, error: 'Não autorizado' };
@@ -192,7 +188,7 @@ export async function getRecurringChargesAction() {
   }
 }
 
-export async function cancelRecurringChargeAction(ruleId: string) {
+export async function cancelRecurringChargeAction(ruleId: string): Promise<ActionResult> {
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;
   if (!token) return { success: false, error: 'Não autorizado' };
@@ -216,7 +212,7 @@ export interface UpdateRecurringPayload {
   custom_message?: string;
 }
 
-export async function updateRecurringAction(ruleId: string, payload: UpdateRecurringPayload) {
+export async function updateRecurringAction(ruleId: string, payload: UpdateRecurringPayload): Promise<ActionResult> {
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;
   if (!token) return { success: false, error: 'Não autorizado' };
@@ -237,7 +233,7 @@ export async function updateRecurringAction(ruleId: string, payload: UpdateRecur
   }
 }
 
-export async function deleteRecurringAction(ruleId: string) {
+export async function deleteRecurringAction(ruleId: string): Promise<ActionResult> {
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;
   if (!token) return { success: false, error: 'Não autorizado' };
@@ -254,7 +250,7 @@ export async function deleteRecurringAction(ruleId: string) {
   }
 }
 
-export async function reactivateRecurringAction(ruleId: string) {
+export async function reactivateRecurringAction(ruleId: string): Promise<ActionResult> {
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;
   if (!token) return { success: false, error: 'Não autorizado' };

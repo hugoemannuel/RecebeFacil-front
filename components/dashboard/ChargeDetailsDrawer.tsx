@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { getChargeDetailsAction } from '@/app/actions/charges';
 import { IconX, IconUser, IconPhone, IconCalendar, IconCheckCircle, IconAlertCircle, IconClock, IconMessageCircle, IconRefreshCcw } from '@/components/ui/Icons';
 import { formatMoney, maskPhone } from '@/lib/formatters';
+import { Charge } from '@/types/charge';
 
 interface Props {
   chargeId: string | null;
@@ -12,7 +13,7 @@ interface Props {
 
 export function ChargeDetailsDrawer({ chargeId, onClose }: Props) {
   const [loading, setLoading] = useState(false);
-  const [charge, setCharge] = useState<any>(null); // Keeping any for now as the Charge type might vary, but simplified the check below
+  const [charge, setCharge] = useState<Charge | null>(null);
 
   useEffect(() => {
     setCharge(null);
@@ -60,7 +61,7 @@ export function ChargeDetailsDrawer({ chargeId, onClose }: Props) {
         </div>
 
         {/* CONTENT */}
-        <div className="flex-1 overflow-y-auto bg-zinc-50/50 dark:bg-[#0b1521]/50 p-6 space-y-8">
+        <div className="flex-1 overflow-y-auto bg-zinc-50/50 dark:bg-zinc-900/50 p-6 space-y-8">
           {loading ? (
             <div className="flex justify-center items-center h-40">
               <IconRefreshCcw className="w-8 h-8 text-green-500 animate-spin" />

@@ -28,6 +28,7 @@ import {
 
 import { RelatorioPDF } from './RelatorioPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
+import { ReportSummary, PerformanceData, TopCustomer, ForecastData } from '@/types/reports';
 
 interface RelatoriosClientProps {
   isUnlimited: boolean;
@@ -39,10 +40,10 @@ interface RelatoriosClientProps {
 export function RelatoriosClient({ isUnlimited, plan, token, userName }: RelatoriosClientProps) {
   const [showUpgrade, setShowUpgrade] = useState(!isUnlimited);
   const [loading, setLoading] = useState(isUnlimited);
-  const [summary, setSummary] = useState<any>(null);
-  const [performance, setPerformance] = useState<any>(null);
-  const [customers, setCustomers] = useState<any[]>([]);
-  const [forecast, setForecast] = useState<any[]>([]);
+  const [summary, setSummary] = useState<ReportSummary | null>(null);
+  const [performance, setPerformance] = useState<PerformanceData | null>(null);
+  const [customers, setCustomers] = useState<TopCustomer[]>([]);
+  const [forecast, setForecast] = useState<ForecastData[]>([]);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -77,8 +78,8 @@ export function RelatoriosClient({ isUnlimited, plan, token, userName }: Relator
 
   // Se o forecast vier vazio, mostramos um estado base amigável
   const chartData = forecast.length > 0 ? forecast : [
-    { name: 'Hoje', valor: 0 },
-    { name: '+30d', valor: 0 },
+    { date: 'Hoje', expected: 0 },
+    { date: '+30d', expected: 0 },
   ];
 
   if (!isUnlimited) {
