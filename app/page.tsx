@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DemoButton } from "@/components/landing/DemoButton";
+import { LandingCarousel } from "@/components/landing/LandingCarousel";
 
 export default function Home() {
   return (
@@ -51,43 +52,7 @@ export default function Home() {
           <DemoButton />
         </div>
 
-        <div className="mt-12 w-full max-w-4xl rounded-xl md:rounded-2xl shadow-2xl overflow-hidden border border-zinc-200/60 bg-slate-900 p-2 md:p-4">
-          <div className="bg-[#0f172a] rounded-lg md:rounded-xl overflow-hidden relative">
-            <div className="flex border-b border-slate-800 p-3 items-center gap-4">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-              </div>
-              <div className="h-4 w-32 bg-slate-800 rounded-md"></div>
-            </div>
-            <div className="p-4 md:p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 col-span-2 md:col-span-1">
-                <div className="h-3 w-20 bg-slate-700 rounded mb-3"></div>
-                <div className="h-6 w-24 bg-green-500/20 rounded"></div>
-              </div>
-              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
-                <div className="h-3 w-20 bg-slate-700 rounded mb-3"></div>
-                <div className="h-6 w-16 bg-slate-600 rounded"></div>
-              </div>
-              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
-                <div className="h-3 w-20 bg-slate-700 rounded mb-3"></div>
-                <div className="h-6 w-16 bg-slate-600 rounded"></div>
-              </div>
-              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 hidden md:block">
-                <div className="h-3 w-20 bg-slate-700 rounded mb-3"></div>
-                <div className="h-6 w-16 bg-slate-600 rounded"></div>
-              </div>
-            </div>
-            <div className="px-4 md:px-6 pb-6">
-              <div className="w-full h-32 md:h-48 bg-slate-800/30 rounded-xl border border-slate-700/50 relative overflow-hidden flex items-end justify-between px-4 pb-4">
-                {[40, 60, 30, 80, 50, 90, 70].map((h, i) => (
-                  <div key={i} className="w-[8%] md:w-8 bg-green-500/80 rounded-t-sm" style={{ height: `${h}%` }}></div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
+        <LandingCarousel />
       </section>
 
 
