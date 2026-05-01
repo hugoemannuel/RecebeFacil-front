@@ -13,6 +13,7 @@ import { RHFTextarea } from '@/components/forms/rhf/RHFTextarea';
 import { IconBot, IconX, IconCheck } from '@/components/ui/Icons';
 import { interpolateTemplate, formatMoney } from '@/lib/formatters';
 import { updateRecurringAction, getRecurringChargeAction } from '@/app/actions/charges';
+import { getTemplatesAction } from '@/app/actions/templates';
 import { DEFAULT_TEMPLATE, TEMPLATE_OPTIONS, VARIABLES } from '@/components/forms/NewChargeModal/interfaces';
 
 const schema = z.object({
@@ -47,6 +48,8 @@ export function AutomacaoModal({ isOpen, onClose, recurringChargeId, onSuccess }
   const [loading, setLoading] = useState(true);
   const [debtorName, setDebtorName] = useState('Cliente');
   const [amount, setAmount] = useState(0);
+  const [selectedTemplate, setSelectedTemplate] = useState('');
+  const [allTemplates, setAllTemplates] = useState<{ label: string; value: string }[]>(TEMPLATE_OPTIONS);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { handleSubmit, watch, setValue, control, reset } = useForm<FormData>({
@@ -62,21 +65,40 @@ export function AutomacaoModal({ isOpen, onClose, recurringChargeId, onSuccess }
   const values = watch();
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      setSelectedTemplate('');
+      return;
+    }
     setLoading(true);
     setServerError(null);
 
-    getRecurringChargeAction(recurringChargeId).then((res) => {
-      if (res.success && res.data) {
-        const d = res.data;
+    Promise.all([
+      getRecurringChargeAction(recurringChargeId),
+      getTemplatesAction(),
+    ]).then(([chargeRes, tplRes]) => {
+      const userTemplates = tplRes.success && Array.isArray(tplRes.data)
+        ? tplRes.data.map((t: { name: string; body: string }) => ({ label: t.name, value: t.body }))
+        : [];
+      const presetLabels = new Set(TEMPLATE_OPTIONS.map(t => t.label));
+      const combined = [
+        ...TEMPLATE_OPTIONS,
+        ...userTemplates.filter(t => !presetLabels.has(t.label)),
+      ];
+      setAllTemplates(combined);
+
+      if (chargeRes.success && chargeRes.data) {
+        const d = chargeRes.data;
+        const message = d.custom_message ?? DEFAULT_TEMPLATE;
         reset({
           frequency: d.frequency,
           description: d.description,
           next_generation_date: d.nextGenerationDate ? toDateInput(d.nextGenerationDate) : '',
-          custom_message: d.custom_message ?? DEFAULT_TEMPLATE,
+          custom_message: message,
         });
         setDebtorName(d.debtorName ?? 'Cliente');
         setAmount(d.amount ?? 0);
+        const match = combined.find(t => t.value === message);
+        setSelectedTemplate(match?.label ?? '');
       } else {
         toast.error('Não foi possível carregar a automação.');
         onClose();
@@ -207,15 +229,17 @@ export function AutomacaoModal({ isOpen, onClose, recurringChargeId, onSuccess }
                     Template base
                   </label>
                   <select
-                    value=""
+                    value={selectedTemplate}
                     onChange={(e) => {
-                      if (e.target.value) setValue('custom_message', e.target.value, { shouldValidate: true });
+                      const tpl = allTemplates.find(t => t.label === e.target.value);
+                      setSelectedTemplate(e.target.value);
+                      if (tpl) setValue('custom_message', tpl.value, { shouldValidate: true });
                     }}
                     className="w-full px-4 py-2.5 border border-zinc-200/80 dark:border-white/7 bg-white dark:bg-surface-soft text-zinc-700 dark:text-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 transition-all"
                   >
                     <option value="">Selecionar template...</option>
-                    {TEMPLATE_OPTIONS.map(t => (
-                      <option key={t.label} value={t.value}>{t.label}</option>
+                    {allTemplates.map((t, i) => (
+                      <option key={i} value={t.label}>{t.label}</option>
                     ))}
                   </select>
                 </div>

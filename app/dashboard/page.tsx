@@ -87,12 +87,12 @@ export default async function Dashboard(props: { searchParams: Promise<{ period?
               Bom dia, {userName}.
             </h1>
             <p className="text-zinc-500 dark:text-zinc-400 mt-1">
-              Aqui está o que está acontecendo com suas cobranças hoje.
+              Aqui está o que está acontecendo com suas cobranças
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Link 
-              href="/dashboard/cobrancas" 
+            <Link
+              href="/dashboard/cobrancas"
               className="px-5 py-2.5 bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-300 font-bold rounded-xl hover:bg-zinc-200 dark:hover:bg-white/10 transition-all text-sm"
             >
               Ver tudo
