@@ -11,22 +11,31 @@ when_to_use: Qualquer tarefa de front-end — criar página, componente, form, S
 **Estrutura de pastas:**
 ```
 app/
-  actions/           ← Server Actions ('use server'): auth.ts, charges.ts, subscription.ts
+  actions/           ← Server Actions ('use server')
+                       auth.ts | charges.ts | clients.ts | demo.ts | profile.ts | subscription.ts | templates.ts
   dashboard/         ← Páginas autenticadas (Server Components)
-    cobrancas/
-      page.tsx       ← Server Component: busca dados, ≤50 linhas, sem estado
-      ChargesClient.tsx ← 'use client': tabela, filtros, seleção, drawers
-  layout.tsx / page.tsx (Landing — Server Component)
+    cobrancas/       ← Cobranças + ChargesClient.tsx
+      recorrentes/   ← Cobranças recorrentes + RecorrentesClient.tsx
+      templates/     ← Templates de mensagem + TemplatesClient.tsx
+    clientes/        ← Clientes + ClientsClient.tsx
+    financeiro/      ← Financeiro + FinanceiroClient.tsx
+      extrato/ | saques/
+    relatorios/      ← Relatórios + RelatoriosClient.tsx + RelatorioPDF.tsx
+    configuracoes/   ← Configurações + ConfiguracoesClient.tsx
+  login/ | cadastro/ | planos/
+  layout.tsx | page.tsx (Landing Page)
 
 components/
-  ui/       ← Atômicos: Icons.tsx, UpgradeModal.tsx, WhatsAppPreview.tsx, ConfirmModal.tsx
-  layout/   ← Cascas: DashboardLayout.tsx, AuthLayout.tsx, ThemeContext.tsx, ThemeToggle.tsx
-  forms/    ← Formulários com RHF+Zod: NewChargeDrawer.tsx
-  patterns/ ← Padrões reutilizáveis: DatePickerField.tsx
-  dashboard/← Específicos: ChargeDetailsDrawer.tsx, PeriodSelect.tsx, RecentActivityClient.tsx
+  ui/       ← Icons.tsx, UpgradeModal.tsx, WhatsAppPreview.tsx, ConfirmModal.tsx, Chip/
+  layout/   ← DashboardLayout.tsx, AuthLayout.tsx, ThemeContext.tsx, ThemeToggle.tsx
+  forms/    ← NewChargeDrawer.tsx (drawer), NewChargeModal/ (modal refatorado c/ sub-componentes)
+             AutomacaoModal.tsx, NewClientModal.tsx, FormField/, rhf/
+  patterns/ ← DatePickerField.tsx
+  dashboard/← ChargeDetailsDrawer.tsx, ClientDetailsModal.tsx, PeriodSelect.tsx, RecentActivityClient.tsx
+  landing/  ← DemoButton.tsx, DemoModal.tsx, DemoBlockedModal.tsx, LandingCarousel.tsx
 
-services/api.ts   ← Instância axios com interceptor de token
-lib/formatters.ts ← Funções puras: formatMoney, maskMoney, parseMoney, maskPhone, formatDate, interpolateTemplate
+services/api.ts   ← Axios instance com interceptor de token (client-side only)
+lib/formatters.ts ← formatMoney, maskMoney, parseMoney, maskPhone, formatDate, interpolateTemplate
 ```
 
 **Regra Server/Client:**
@@ -264,11 +273,14 @@ const allowed = { FREE: ['ONCE'], STARTER: ['ONCE','WEEKLY'], PRO: ['ONCE','WEEK
 
 ---
 
-## NewChargeDrawer
+## NewChargeDrawer / NewChargeModal
 
-**Estrutura:** 4 steps → `[Devedor] → [Cobrança] → [Mensagem] → [Confirmar]`
+**Duas variantes** com o mesmo fluxo 4 steps: `[Devedor] → [Cobrança] → [Mensagem] → [Confirmar]`
 
-Step 2 (Mensagem): drawer expande para `maxWidth: '900px'` com layout dual-column (editor + WhatsAppPreview ao vivo).
+- `NewChargeDrawer.tsx` — variante drawer (slide lateral)
+- `NewChargeModal/` — variante modal refatorada com sub-componentes dedicados: `ModalHeader`, `ModalFooter`, `StepProgressBar`, `StepDebtor`, `StepChargeDetails`, `StepMessage`, `StepConfirm`; interfaces em `interfaces/`
+
+Step Mensagem: área expande para `maxWidth: '900px'` com layout dual-column (editor + WhatsAppPreview ao vivo).
 
 **WhatsAppPreview:** fundo `#e5ddd5`, atualiza em tempo real via `interpolateTemplate()`.
 

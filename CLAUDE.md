@@ -44,6 +44,8 @@ The API defaults to `http://localhost:3001` if the variable is absent.
 
 All mutations go through `app/actions/`. Actions return `{ success: true, data }` or `{ success: false, error: string }`. Error messages are in Portuguese. Plan-limit errors arrive as HTTP 403 with codes like `LIMIT_REACHED` or `RECURRENCE_NOT_ALLOWED`.
 
+Available actions: `auth.ts`, `charges.ts`, `clients.ts`, `demo.ts`, `profile.ts`, `subscription.ts`, `templates.ts`.
+
 ### Subscription / plan gating
 
 `app/actions/subscription.ts` fetches `/subscription/status`, returning:
@@ -69,19 +71,28 @@ components/
     Icons.tsx           # All SVGs as React components — do not add icon libraries
     UpgradeModal.tsx    # Plan upgrade modal
     WhatsAppPreview.tsx
-    Checkbox/index.tsx  # Generic checkbox (tables, auth forms). Props: checked, onChange, indeterminate, size
+    Checkbox/index.tsx  # Generic checkbox. Props: checked, onChange, indeterminate, size
     ConfirmModal.tsx    # Generic destructive confirmation modal
+    Chip/index.tsx      # Chip/tag component
     Input/Input.tsx     # Base input. variant="default"|"auth", icon, rightSlot, label, error
     Textarea/Textarea.tsx
     Select/Select.tsx
   forms/
-    NewChargeDrawer.tsx  # 4-step multi-step form
+    NewChargeDrawer.tsx    # 4-step multi-step form (drawer variant)
+    NewChargeModal/        # Refactored multi-step modal with sub-components:
+      NewChargeModal.tsx   #   ModalHeader, ModalFooter, StepProgressBar
+      components/          #   StepDebtor, StepChargeDetails, StepMessage, StepConfirm
+    AutomacaoModal.tsx     # Automation settings modal
+    NewClientModal.tsx     # New client creation modal
+    FormField/FormField.tsx
     rhf/
-      RHFInput.tsx        # Controller-wrapped Input (fully typed generic)
+      RHFInput.tsx         # Controller-wrapped Input (fully typed generic)
       RHFPasswordInput.tsx # Password input with built-in show/hide toggle
-      RHFTextarea.tsx     # Controller-wrapped Textarea. Supports inputRef for cursor control
-      RHFSelect.tsx       # Controller-wrapped Select
-  dashboard/  # RecentActivityClient, ChargeDetailsDrawer, PeriodSelect
+      RHFTextarea.tsx      # Supports inputRef for cursor control
+      RHFSelect.tsx        # Controller-wrapped Select
+  dashboard/    # RecentActivityClient, ChargeDetailsDrawer, ClientDetailsModal, PeriodSelect
+  landing/      # DemoButton, DemoModal, DemoBlockedModal, LandingCarousel
+  patterns/     # DatePickerField (DayPicker-based)
 ```
 
 Pages are thin server components that fetch with `Promise.allSettled()` and pass results to client components.
@@ -116,7 +127,14 @@ All SVG icons live in `components/ui/Icons.tsx` as React components — do not a
 | `/` | `app/page.tsx` | Landing page (server component) |
 | `/login` | `app/login/page.tsx` | Auth form |
 | `/cadastro` | `app/cadastro/page.tsx` | Registration form |
+| `/planos` | `app/planos/page.tsx` | Plans/pricing |
 | `/dashboard` | `app/dashboard/page.tsx` | Metrics overview |
 | `/dashboard/cobrancas` | `app/dashboard/cobrancas/page.tsx` | Charges list + management |
-| `/dashboard/configuracoes` | `app/dashboard/configuracoes/page.tsx` | Settings |
-| `/planos` | `app/planos/page.tsx` | Plans/pricing |
+| `/dashboard/cobrancas/recorrentes` | `app/dashboard/cobrancas/recorrentes/page.tsx` | Recurring charges management |
+| `/dashboard/cobrancas/templates` | `app/dashboard/cobrancas/templates/page.tsx` | Message templates |
+| `/dashboard/clientes` | `app/dashboard/clientes/page.tsx` | Clients management |
+| `/dashboard/financeiro` | `app/dashboard/financeiro/page.tsx` | Financial overview |
+| `/dashboard/financeiro/extrato` | `app/dashboard/financeiro/extrato/page.tsx` | Statement |
+| `/dashboard/financeiro/saques` | `app/dashboard/financeiro/saques/page.tsx` | Withdrawals |
+| `/dashboard/relatorios` | `app/dashboard/relatorios/page.tsx` | Reports + PDF export |
+| `/dashboard/configuracoes` | `app/dashboard/configuracoes/page.tsx` | Settings (profile, PIX, integrations) |

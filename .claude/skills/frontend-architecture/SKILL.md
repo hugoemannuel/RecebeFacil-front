@@ -8,43 +8,71 @@ when_to_use: Quando criar page.tsx, componentes, actions, serviços de API, ou a
 
 ```
 app/
-  actions/          ← Server Actions ('use server') — auth.ts, charges.ts, subscription.ts
-  dashboard/        ← Páginas autenticadas (Server Components)
+  actions/           ← Server Actions ('use server')
+    auth.ts          ← loginAction, registerAction, logoutAction
+    charges.ts       ← createChargeAction, updateChargeStatusAction, ...
+    clients.ts       ← createClientAction, updateClientAction
+    demo.ts          ← sendDemoAction (pública, sem token)
+    profile.ts       ← updateProfileAction (CreditorProfile, PIX)
+    subscription.ts  ← getSubscriptionStatusAction
+    templates.ts     ← createTemplateAction, updateTemplateAction, deleteTemplateAction
+  dashboard/         ← Páginas autenticadas (Server Components)
+    page.tsx         ← Métricas overview
     cobrancas/
-      page.tsx      ← Server Component: busca dados, passa para ChargesClient
-      ChargesClient.tsx ← 'use client': toda interatividade aqui
+      page.tsx + ChargesClient.tsx
+      recorrentes/   ← Cobranças recorrentes
+      templates/     ← Templates de mensagem WhatsApp
+    clientes/
+      page.tsx + ClientsClient.tsx
+    financeiro/
+      page.tsx + FinanceiroClient.tsx
+      extrato/       ← Extrato financeiro
+      saques/        ← Saques
+    relatorios/
+      page.tsx + RelatoriosClient.tsx + RelatorioPDF.tsx
     configuracoes/
-      page.tsx      ← Configurações do usuário (perfil, senha, PIX, integrações)
-  layout.tsx
-  page.tsx          ← Landing Page (Server Component, sem 'use client')
+      page.tsx + ConfiguracoesClient.tsx  ← Perfil, senha, PIX, integrações
+  login/ | cadastro/ | planos/
+  layout.tsx | page.tsx (Landing Page)
 
 components/
   ui/
-    Icons.tsx            ← Todos os SVGs como React components — nunca instalar lib de ícones
+    Icons.tsx            ← Todos os SVGs — nunca instalar lib de ícones
     UpgradeModal.tsx     ← Modal de upgrade de plano
     WhatsAppPreview.tsx
-    Checkbox/index.tsx   ← Checkbox genérico: checked, onChange, indeterminate, size="sm"|"md"
-    ConfirmModal.tsx     ← Modal de confirmação destrutiva genérico
-    Input/Input.tsx      ← Base input: variant="default"|"auth", icon, rightSlot, label, error
-    Textarea/Textarea.tsx
-    Select/Select.tsx
-  layout/           ← Cascas de página (DashboardLayout.tsx, AuthLayout.tsx, ThemeContext.tsx)
+    Checkbox/index.tsx   ← checked, onChange, indeterminate, size="sm"|"md"
+    ConfirmModal.tsx     ← Modal de confirmação destrutiva
+    Chip/index.tsx       ← Chip/tag component
+    Input/Input.tsx      ← variant="default"|"auth", icon, rightSlot, label, error
+    Textarea/Textarea.tsx | Select/Select.tsx
+  layout/          ← DashboardLayout.tsx, AuthLayout.tsx, ThemeContext.tsx, ThemeToggle
   forms/
-    NewChargeDrawer.tsx  ← Formulário multi-step 4 passos
+    NewChargeDrawer.tsx    ← Drawer multi-step 4 passos (variante drawer)
+    NewChargeModal/        ← Modal multi-step 4 passos (variante modal, refatorado)
+      NewChargeModal.tsx
+      components/          ← ModalHeader, ModalFooter, StepProgressBar
+                              StepDebtor, StepChargeDetails, StepMessage, StepConfirm
+      interfaces/          ← ChargeFormData.ts, NewChargeModalProps.ts
+    AutomacaoModal.tsx     ← Configurações de automação
+    NewClientModal.tsx     ← Criação de cliente
+    FormField/FormField.tsx
     rhf/
-      RHFInput.tsx        ← Controller-wrapped Input (genérico tipado). Props: name, control, label, icon, mask, variant
-      RHFPasswordInput.tsx ← Senha com show/hide embutido. Props: name, control, label, placeholder, variant
-      RHFTextarea.tsx     ← Controller-wrapped Textarea. Props: name, control, label, rows, inputRef
-      RHFSelect.tsx       ← Controller-wrapped Select. Props: name, control, label, options
-  dashboard/        ← Específicos do dashboard (ChargeDetailsDrawer.tsx, PeriodSelect.tsx)
+      RHFInput.tsx         ← Controller-wrapped Input. Props: name, control, label, icon, mask, variant
+      RHFPasswordInput.tsx ← Senha com show/hide. Props: name, control, label, placeholder, variant
+      RHFTextarea.tsx      ← Props: name, control, label, rows, inputRef
+      RHFSelect.tsx        ← Props: name, control, label, options
+  dashboard/       ← ChargeDetailsDrawer, ClientDetailsModal, PeriodSelect, RecentActivityClient
   patterns/
     DatePickerField.tsx  ← Seleção de data com react-day-picker
+  landing/
+    DemoButton.tsx | DemoModal.tsx | DemoBlockedModal.tsx | LandingCarousel.tsx
 
 services/
-  api.ts            ← Instância axios padronizada (baseURL, interceptor de token)
+  api.ts     ← Axios instance com interceptor de token (client-side)
+  templates.ts
 
 lib/
-  formatters.ts     ← Funções puras: formatMoney, maskMoney, parseMoney, maskPhone, interpolateTemplate
+  formatters.ts  ← formatMoney, maskMoney, parseMoney, maskPhone, formatDate, interpolateTemplate
 ```
 
 ## Regra Server Component → Client Component
