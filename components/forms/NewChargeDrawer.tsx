@@ -7,7 +7,6 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/style.css';
 
 import { WhatsAppPreview } from '@/components/ui/WhatsAppPreview';
@@ -15,11 +14,11 @@ import { createChargeAction } from '@/app/actions/charges';
 import {
   maskMoney, parseMoney, maskPhone, formatDate, interpolateTemplate,
 } from '@/lib/formatters';
-import { getTemplates, MessageTemplate } from '@/services/templates';
+import { MessageTemplate } from '@/services/templates';
 import { getTemplatesAction } from '@/app/actions/templates';
 import {
   IconX, IconUser, IconPhone, IconDollarSign, IconCalendar,
-  IconRepeat, IconSparkles, IconSend, IconChevronRight,
+  IconRepeat, IconSparkles, IconSend, IconChevronRight, IconLock
 } from '@/components/ui/Icons';
 import { RHFTextarea } from './rhf/RHFTextarea';
 import { RHFInput } from './rhf/RHFInput';
@@ -27,9 +26,9 @@ import { RHFSelect } from './rhf/RHFSelect';
 import { DatePickerField } from '../patterns/DatePickerField/DatePickerField';
 import { Select } from '../ui/Select/Select';
 import { Chip } from '../ui/Chip';
+import { UpgradeModal } from '@/components/ui/UpgradeModal';
 
 const VARIABLES = ['{{nome}}', '{{valor}}', '{{vencimento}}', '{{descricao}}', '{{nome_empresa}}'];
-
 const STEPS = ['Devedor', 'Cobrança', 'Mensagem', 'Confirmar'];
 
 const baseSchema = z.object({
@@ -59,7 +58,6 @@ const baseSchema = z.object({
 
 export type ChargeFormData = z.infer<typeof baseSchema>;
 
-// ── Component ────────────────────────────────────────────────────────────────
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -75,9 +73,9 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
   const [sending, setSending] = useState(false);
   const [templates, setTemplates] = useState<MessageTemplate[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(false);
+  const [upgradeModule, setUpgradeModule] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Schema gerado dinamicamente para validar os campos de PIX apenas se necessário
   const schema = baseSchema.superRefine((data, ctx) => {
     if (data.send_pix_button && !hasPixKey) {
       if (!data.pix_key || data.pix_key.length < 5) {
@@ -97,13 +95,14 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
       custom_message: '',
       send_pix_button: true,
       pix_key: '', pix_key_type: 'CPF',
+      save_as_template: false,
+      template_name: '',
     },
   });
 
-  const { register, watch, setValue, handleSubmit, reset, formState: { errors } } = form;
+  const { watch, setValue, handleSubmit, reset } = form;
   const values = watch();
 
-  // Busca templates da API
   useEffect(() => {
     if (open) {
       setLoadingTemplates(true);
@@ -112,7 +111,6 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
           if (res.success) {
             const data = res.data;
             setTemplates(data);
-            // Se não houver mensagem customizada definida, usa o default
             const defaultTmpl = data.find((t: any) => t.is_default) || data[0];
             if (defaultTmpl && !form.getValues('custom_message')) {
               setValue('custom_message', defaultTmpl.body);
@@ -125,17 +123,15 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
     }
   }, [open, setValue, form]);
 
-
-  // Fecha com ESC
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose(); };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleClose() { reset(); setStep(0); setShowCalendar(false); onClose(); }
 
-  // Interpolação ao vivo
   const previewMessage = interpolateTemplate(values.custom_message || '', {
     nome: values.debtor_name || 'Cliente',
     valor: values.amount_display || 'R$ 0,00',
@@ -144,7 +140,6 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
     nome_empresa: userName,
   });
 
-  // Inserir variável no cursor do textarea
   function insertVariable(variable: string) {
     const el = textareaRef.current;
     if (!el) return;
@@ -186,7 +181,6 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
   }
 
   function nextStep() {
-    // Validação por step antes de avançar
     const fieldsPerStep: (keyof ChargeFormData)[][] = [
       ['debtor_name', 'debtor_phone'],
       ['amount_display', 'due_date', 'description'],
@@ -195,64 +189,44 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
     form.trigger(fieldsPerStep[step] as any).then((ok) => { if (ok) setStep((s) => s + 1); });
   }
 
+  if (!open) return null;
+
   return (
     <>
-      {/* Overlay */}
       <div
         className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={handleClose}
       />
 
-      {/* Drawer */}
       <div className={`fixed top-0 right-0 h-full z-50 flex transition-transform duration-300 ease-out ${open ? 'translate-x-0' : 'translate-x-full'}`}
-        style={{ width: '100%', maxWidth: step === 2 ? '900px' : '480px' }}>
+        style={{ width: '100%', maxWidth: step === 2 ? '1000px' : '520px' }}>
 
         <div className="flex-1 bg-surface dark:bg-surface flex flex-col shadow-2xl overflow-hidden transition-colors duration-300">
 
-          {/* Header */}
           <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-200/80 dark:border-white/7 shrink-0">
             <div>
-              <h2 className="text-lg font-extrabold text-zinc-800 dark:text-zinc-100 tracking-tight">Nova Cobrança</h2>
-              <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">Etapa {step + 1} de {STEPS.length}</p>
+              <h2 className="text-xl font-black text-zinc-800 dark:text-zinc-100 tracking-tight">Nova Cobrança</h2>
+              <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mt-0.5">Etapa {step + 1} de {STEPS.length} • {STEPS[step]}</p>
             </div>
             <button onClick={handleClose} className="p-2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg transition-colors">
               <IconX className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Progress bar */}
-          <div className="flex gap-1 px-6 pt-4 shrink-0">
+          <div className="flex gap-1.5 px-6 pt-4 shrink-0">
             {STEPS.map((s, i) => (
-              <div key={s} className="flex-1 flex flex-col items-center gap-1">
-                <div className={`h-1.5 w-full rounded-full transition-all duration-300 ${i <= step ? 'bg-green-500' : 'bg-zinc-200 dark:bg-white/10'}`} />
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${i === step ? 'text-green-600 dark:text-green-400' : 'text-zinc-300 dark:text-zinc-600'}`}>{s}</span>
+              <div key={s} className="flex-1">
+                <div className={`h-1.5 w-full rounded-full transition-all duration-500 ${i <= step ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]' : 'bg-zinc-200 dark:bg-white/10'}`} />
               </div>
             ))}
           </div>
 
-          {/* Body */}
           <FormProvider {...form}>
-            <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-hidden flex">
-
-              {/* ── Step content + preview ── */}
+            <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-hidden flex flex-col">
               <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-
-                {/* Steps */}
-                <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
-
-                  {/* STEP 0 — Devedor */}
+                <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
                   {step === 0 && <StepDebtor />}
-
-                  {/* STEP 1 — Cobrança */}
-                  {step === 1 && (
-                    <StepChargeDetails
-                      showCalendar={showCalendar}
-                      setShowCalendar={setShowCalendar}
-                      planType={planType}
-                    />
-                  )}
-
-                  {/* STEP 2 — Mensagem WhatsApp */}
+                  {step === 1 && <StepChargeDetails planType={planType} onUpgrade={setUpgradeModule} />}
                   {step === 2 && (
                     <StepMessage
                       hasPixKey={hasPixKey}
@@ -261,23 +235,21 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
                       templates={templates}
                       loadingTemplates={loadingTemplates}
                       planType={planType}
+                      onUpgrade={setUpgradeModule}
                     />
                   )}
-
-                  {/* STEP 3 — Confirmar */}
                   {step === 3 && <StepConfirm hasPixKey={hasPixKey} />}
                 </div>
 
-                {/* Preview WhatsApp — só no step 2 */}
                 {step === 2 && (
-                  <div className="w-full md:w-[380px] border-t md:border-t-0 md:border-l border-zinc-100 dark:border-white/7 flex flex-col bg-zinc-50 dark:bg-background shrink-0">
+                  <div className="w-full md:w-[420px] border-t md:border-t-0 md:border-l border-zinc-100 dark:border-white/7 flex flex-col bg-zinc-50 dark:bg-background shrink-0">
                     <div className="px-5 py-4 border-b border-zinc-100 dark:border-white/7">
                       <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
                         <IconSparkles className="w-3.5 h-3.5 text-green-500" /> Preview ao vivo
                       </p>
                     </div>
-                    <div className="flex-1 p-4 overflow-hidden">
-                      <div className="h-full rounded-2xl overflow-hidden shadow-md">
+                    <div className="flex-1 p-6 overflow-hidden">
+                      <div className="h-full rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-zinc-200 dark:border-white/10">
                         <WhatsAppPreview
                           senderName={userName}
                           message={previewMessage}
@@ -290,89 +262,99 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
                   </div>
                 )}
               </div>
+
+              <div className="px-6 py-5 border-t border-zinc-100 dark:border-white/7 flex gap-3 shrink-0 bg-white dark:bg-surface">
+                {step > 0 && (
+                  <button type="button" onClick={() => setStep((s) => s - 1)}
+                    className="flex-1 border border-zinc-200 dark:border-white/8 text-zinc-600 dark:text-zinc-300 font-bold py-3.5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors text-sm">
+                    Voltar
+                  </button>
+                )}
+
+                {step < 3 ? (
+                  <button type="button" onClick={nextStep}
+                    className="flex-1 bg-zinc-900 dark:bg-green-500 hover:bg-zinc-800 dark:hover:bg-green-600 text-white font-bold py-3.5 rounded-2xl transition-all text-sm flex items-center justify-center gap-2 shadow-lg shadow-zinc-900/10 dark:shadow-green-500/10 active:scale-[0.98]">
+                    Próximo <IconChevronRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <button onClick={handleSubmit(onSubmit)} disabled={sending}
+                    className="flex-1 bg-green-500 hover:bg-green-600 hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100 text-white font-bold py-3.5 rounded-2xl transition-all text-sm flex items-center justify-center gap-2 shadow-xl shadow-green-500/20 active:scale-[0.98]">
+                    {sending ? (
+                      <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Enviando...</>
+                    ) : (
+                      <><IconSend className="w-4 h-4" /> Enviar via WhatsApp</>
+                    )}
+                  </button>
+                )}
+              </div>
             </form>
           </FormProvider>
-
-          {/* Footer */}
-          <div className="px-6 py-5 border-t border-zinc-100 dark:border-white/7 flex gap-3 shrink-0">
-            {step > 0 && (
-              <button type="button" onClick={() => setStep((s) => s - 1)}
-                className="flex-1 border border-zinc-200 dark:border-white/8 text-zinc-600 dark:text-zinc-300 font-bold py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors text-sm">
-                Voltar
-              </button>
-            )}
-
-            {step < 3 ? (
-              <button type="button" onClick={nextStep}
-                className="flex-1 bg-zinc-900 dark:bg-green-500 hover:bg-zinc-800 dark:hover:bg-green-600 text-white font-bold py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2">
-                Próximo <IconChevronRight className="w-4 h-4" />
-              </button>
-            ) : (
-              <button onClick={handleSubmit(onSubmit)} disabled={sending}
-                className="flex-1 bg-green-500 hover:bg-green-600 hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100 text-white font-bold py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2 shadow-lg shadow-green-500/20">
-                {sending ? (
-                  <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Enviando...</>
-                ) : (
-                  <><IconSend className="w-4 h-4" /> Enviar via WhatsApp</>
-                )}
-              </button>
-            )}
-          </div>
         </div>
       </div>
+
+      {upgradeModule && (
+        <UpgradeModal
+          moduleName={upgradeModule}
+          onClose={() => setUpgradeModule(null)}
+        />
+      )}
     </>
   );
 }
 
-// ── Sub-componentes dos Steps ───────────────────────────────────────────────
-
 function StepDebtor() {
-  const { control, watch, setValue, formState: { errors } } = useFormContext<ChargeFormData>();
-  const values = watch();
+  const { control } = useFormContext<ChargeFormData>();
 
   return (
-    <>
-      <p className="text-sm text-zinc-500">Quem vai receber a cobrança?</p>
+    <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+      <h3 className="text-lg font-bold text-zinc-800 dark:text-zinc-100 mb-1">Dados do Cliente</h3>
+      <p className="text-sm text-zinc-500 mb-6">Quem vai receber a cobrança?</p>
+      
       <div className="space-y-4">
         <RHFInput
           name="debtor_name"
           control={control}
-          label="Nome"
+          label="Nome completo ou Razão Social"
           placeholder="Ex: João Silva"
           icon={<IconUser />}
         />
         <RHFInput
           name="debtor_phone"
           control={control}
-          label="WhatsApp"
+          label="Número do WhatsApp"
           placeholder="(11) 99999-9999"
           icon={<IconPhone />}
           mask={maskPhone}
         />
       </div>
-    </>
+    </div>
   );
 }
 
-function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCalendar: boolean, setShowCalendar: (v: boolean) => void, planType: 'FREE' | 'STARTER' | 'PRO' | 'UNLIMITED' }) {
-  const { control, watch, setValue, formState: { errors } } = useFormContext<ChargeFormData>();
+function StepChargeDetails({ planType, onUpgrade }: { 
+  planType: string,
+  onUpgrade?: (mod: string) => void
+}) {
+  const { control, watch, setValue } = useFormContext<ChargeFormData>();
   const values = watch();
 
-  const allowedRecurrences = {
+  const allowedRecurrences = ({
     FREE: ['ONCE'],
     STARTER: ['ONCE', 'WEEKLY'],
     PRO: ['ONCE', 'WEEKLY', 'MONTHLY', 'YEARLY'],
     UNLIMITED: ['ONCE', 'WEEKLY', 'MONTHLY', 'YEARLY'],
-  }[planType] || ['ONCE'];
+  } as Record<string, string[]>)[planType as any] || ['ONCE'];
 
   return (
-    <>
-      <p className="text-sm text-zinc-500">Detalhes da cobrança</p>
-      <div className="space-y-4">
+    <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+      <h3 className="text-lg font-bold text-zinc-800 dark:text-zinc-100 mb-1">Valores e Prazos</h3>
+      <p className="text-sm text-zinc-500 mb-6">Defina o valor e quando vence.</p>
+
+      <div className="space-y-5">
         <RHFInput
           name="amount_display"
           control={control}
-          label="Valor"
+          label="Valor da cobrança"
           placeholder="R$ 0,00"
           icon={<IconDollarSign />}
           mask={maskMoney}
@@ -381,7 +363,7 @@ function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCa
         <DatePickerField
           name="due_date"
           control={control}
-          label="Vencimento"
+          label="Data de Vencimento"
           icon={<IconCalendar />}
           disabled={{ before: new Date() }}
         />
@@ -389,16 +371,16 @@ function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCa
         <RHFTextarea
           name="description"
           control={control}
-          label="Descrição"
+          label="Descrição do serviço/produto"
           rows={2}
-          placeholder="Ex: Corte de cabelo — Abril/2026"
+          placeholder="Ex: Consultoria de Marketing — Março"
         />
 
         <div>
-          <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider block mb-1.5">Recorrência</label>
+          <label className="text-xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest block mb-2.5">Recorrência</label>
           <div className="grid grid-cols-2 gap-2">
             {(['ONCE', 'WEEKLY', 'MONTHLY', 'YEARLY'] as const).map((r) => {
-              const labels = { ONCE: '1× Única', WEEKLY: 'Semanal', MONTHLY: 'Mensal', YEARLY: 'Anual' };
+              const labels = { ONCE: 'Única', WEEKLY: 'Semanal', MONTHLY: 'Mensal', YEARLY: 'Anual' };
               const isAllowed = allowedRecurrences.includes(r);
 
               return (
@@ -407,19 +389,19 @@ function StepChargeDetails({ showCalendar, setShowCalendar, planType }: { showCa
                   type="button"
                   onClick={() => {
                     if (isAllowed) setValue('recurrence', r);
-                    else toast.error(`O plano ${planType} não permite recorrência ${labels[r]}. Faça upgrade!`);
+                    else onUpgrade?.('RECURRENCE');
                   }}
-                  className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all overflow-hidden ${!isAllowed ? 'opacity-50 cursor-not-allowed bg-zinc-50 border-zinc-200 text-zinc-400' : values.recurrence === r ? 'bg-green-50 border-green-400 text-green-700' : 'border-zinc-200 text-zinc-500 hover:border-zinc-300'}`}>
-                  <IconRepeat className="w-3.5 h-3.5" />
+                  className={`relative flex items-center gap-2.5 px-4 py-3 rounded-2xl border text-sm font-bold transition-all ${!isAllowed ? 'opacity-60 bg-zinc-50 dark:bg-white/2 border-zinc-200 dark:border-white/5 text-zinc-400' : values.recurrence === r ? 'bg-green-50 dark:bg-green-500/10 border-green-400 text-green-700 dark:text-green-400 shadow-sm' : 'border-zinc-200 dark:border-white/10 text-zinc-500 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-white/20 hover:bg-zinc-50 dark:hover:bg-white/2'}`}>
+                  <IconRepeat className="w-4 h-4" />
                   {labels[r]}
-                  {!isAllowed && <span className="absolute top-0 right-0 bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400 text-[8px] uppercase px-1.5 py-0.5 rounded-bl-lg font-extrabold">Pro</span>}
+                  {!isAllowed && <IconLock className="w-3 h-3 ml-auto text-zinc-300" />}
                 </button>
               );
             })}
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -429,16 +411,18 @@ function StepMessage({
   insertVariable,
   templates,
   loadingTemplates,
-  planType
+  planType,
+  onUpgrade
 }: {
   hasPixKey: boolean,
   textareaRef: React.RefObject<HTMLTextAreaElement | null>,
   insertVariable: (v: string) => void,
   templates: MessageTemplate[],
   loadingTemplates: boolean,
-  planType?: string
+  planType?: string,
+  onUpgrade?: (mod: string) => void
 }) {
-  const { control, watch, setValue, formState: { errors } } = useFormContext<ChargeFormData>();
+  const { control, watch, setValue } = useFormContext<ChargeFormData>();
   const values = watch();
 
   const templateOptions = templates.map(t => ({
@@ -448,55 +432,44 @@ function StepMessage({
   }));
 
   return (
-    <>
-      <p className="text-sm text-zinc-500">Personalize a mensagem que será enviada</p>
-      <div className="space-y-4">
+    <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+      <h3 className="text-lg font-bold text-zinc-800 dark:text-zinc-100 mb-1">Mensagem de Cobrança</h3>
+      <p className="text-sm text-zinc-500 mb-6">Como o cliente receberá no WhatsApp.</p>
+
+      <div className="space-y-6">
         <div className="relative">
           <Select
-            label="Template base"
+            label="Escolher um Template"
             value={values.custom_message}
-            onChange={(value) =>
-              setValue("custom_message", value, {
-                shouldValidate: true,
-              })
-            }
+            onChange={(value) => setValue("custom_message", value, { shouldValidate: true })}
             options={templateOptions}
             disabled={loadingTemplates}
           />
           {loadingTemplates && (
-            <div className="absolute right-3 top-[34px]">
-              <div className="w-4 h-4 border-2 border-zinc-200 border-t-zinc-400 rounded-full animate-spin" />
+            <div className="absolute right-3 top-[38px]">
+              <div className="w-4 h-4 border-2 border-zinc-200 border-t-green-500 rounded-full animate-spin" />
             </div>
           )}
         </div>
 
-        {/* Chips de variáveis */}
         <div>
-          <p className="text-xs text-zinc-400 mb-2">
-            Clique para inserir no cursor:
-          </p>
-
+          <p className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-2.5">Variáveis Dinâmicas</p>
           <div className="flex flex-wrap gap-1.5">
             {VARIABLES.map((v) => (
-              <Chip
-                key={v}
-                label={v}
-                onClick={() => insertVariable(v)}
-              />
+              <Chip key={v} label={v} onClick={() => insertVariable(v)} />
             ))}
           </div>
         </div>
 
-        {/* Editor */}
         <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider">Mensagem</label>
-            <div className="flex gap-1">
-              <button type="button" onClick={() => insertVariable('*')} className="text-xs font-bold text-zinc-500 hover:text-zinc-800 px-1.5 py-0.5 rounded hover:bg-zinc-100">N</button>
-              <button type="button" onClick={() => insertVariable('_')} className="text-xs italic font-serif text-zinc-500 hover:text-zinc-800 px-1.5 py-0.5 rounded hover:bg-zinc-100">I</button>
-              <div className="w-px h-3.5 bg-zinc-200 my-auto mx-1"></div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Editor de Mensagem</label>
+            <div className="flex gap-1.5 bg-zinc-100 dark:bg-white/5 p-1 rounded-lg">
+              <button type="button" onClick={() => insertVariable('*')} className="w-6 h-6 flex items-center justify-center font-bold text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 rounded hover:bg-white dark:hover:bg-white/10 transition-colors text-xs" title="Negrito">B</button>
+              <button type="button" onClick={() => insertVariable('_')} className="w-6 h-6 flex items-center justify-center italic font-serif text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 rounded hover:bg-white dark:hover:bg-white/10 transition-colors text-xs" title="Itálico">I</button>
+              <div className="w-px h-3 bg-zinc-200 dark:bg-white/10 my-auto mx-0.5" />
               {['💰', '📅', '✅', '⚠️'].map(emoji => (
-                <button key={emoji} type="button" onClick={() => insertVariable(emoji)} className="text-xs px-1 hover:bg-zinc-100 rounded">{emoji}</button>
+                <button key={emoji} type="button" onClick={() => insertVariable(emoji)} className="w-6 h-6 flex items-center justify-center hover:bg-white dark:hover:bg-white/10 rounded transition-colors text-xs">{emoji}</button>
               ))}
             </div>
           </div>
@@ -504,60 +477,70 @@ function StepMessage({
             name="custom_message"
             control={control}
             inputRef={textareaRef}
-            rows={9}
+            rows={8}
+            className="font-mono text-sm"
           />
         </div>
 
-        {/* Salvar como template (apenas se não for FREE) */}
-        {planType !== 'FREE' && (
-          <div className="pt-2">
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="save_as_template"
-                {...control.register("save_as_template")}
-                className="w-4 h-4 rounded border-zinc-300 text-green-600 focus:ring-green-500"
-              />
-              <label htmlFor="save_as_template" className="text-sm font-medium text-zinc-600 dark:text-zinc-400 cursor-pointer select-none">
-                Salvar como novo template
-              </label>
-            </div>
-
-            {watch("save_as_template") && (
-              <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                <RHFInput
-                  name="template_name"
-                  control={control}
-                  label="Nome do template"
-                  placeholder="Ex: Cobrança de Varejo"
-                />
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Toggles PIX Simples */}
-        <div className="space-y-3 pt-2">
-          <button type="button" onClick={() => setValue('send_pix_button', !values.send_pix_button)}
-            className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all text-left ${values.send_pix_button ? 'bg-green-50 dark:bg-green-500/10 border-green-300 dark:border-green-500/30' : 'border-zinc-200 dark:border-white/7 bg-white dark:bg-surface-soft hover:border-zinc-300 dark:hover:border-white/[0.12]'}`}>
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${values.send_pix_button ? 'bg-green-100' : 'bg-zinc-100'}`}>
-              <IconDollarSign className={`w-4 h-4 ${values.send_pix_button ? 'text-green-600' : 'text-zinc-400'}`} />
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={() => {
+              if (planType === 'FREE') {
+                onUpgrade?.('CUSTOM_TEMPLATES');
+              } else {
+                setValue('save_as_template', !values.save_as_template);
+              }
+            }}
+            className={`w-full flex items-center gap-3 p-4 rounded-2xl border transition-all text-left ${values.save_as_template ? 'bg-amber-50 dark:bg-amber-500/10 border-amber-300 dark:border-amber-500/30' : 'border-zinc-200 dark:border-white/10 bg-white dark:bg-surface hover:border-zinc-300 dark:hover:border-white/20'}`}
+          >
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${values.save_as_template ? 'bg-amber-100 text-amber-600' : 'bg-zinc-100 text-zinc-400 dark:bg-white/5'}`}>
+              <IconSparkles className="w-5 h-5" />
             </div>
             <div className="flex-1">
-              <p className={`text-sm font-bold ${values.send_pix_button ? 'text-green-800' : 'text-zinc-600'}`}>Incluir Pagamento via PIX</p>
-              <p className="text-[11px] text-zinc-500">Gera um botão e linha digitável na mensagem</p>
+              <div className="flex items-center gap-2">
+                <p className={`text-sm font-bold ${values.save_as_template ? 'text-amber-800 dark:text-amber-400' : 'text-zinc-600 dark:text-zinc-300'}`}>Salvar como novo template</p>
+                {planType === 'FREE' && <IconLock className="w-3 h-3 text-zinc-400" />}
+              </div>
+              <p className="text-[11px] text-zinc-500">Reutilize esta mensagem em cobranças futuras</p>
             </div>
-            <div className={`w-10 h-5 rounded-full transition-colors flex items-center px-0.5 ${values.send_pix_button ? 'bg-green-500' : 'bg-zinc-200'}`}>
+            <div className={`w-10 h-5 rounded-full transition-colors flex items-center px-0.5 ${values.save_as_template ? 'bg-amber-500' : 'bg-zinc-200 dark:bg-white/10'}`}>
+              <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${values.save_as_template ? 'translate-x-5' : 'translate-x-0'}`} />
+            </div>
+          </button>
+
+          {values.save_as_template && (
+            <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-200">
+              <RHFInput
+                name="template_name"
+                control={control}
+                label="Nome do template"
+                placeholder="Ex: Cobrança de Varejo"
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-3 pt-2">
+          <button type="button" onClick={() => setValue('send_pix_button', !values.send_pix_button)}
+            className={`w-full flex items-center gap-3 p-4 rounded-2xl border transition-all text-left ${values.send_pix_button ? 'bg-green-50 dark:bg-green-500/10 border-green-300 dark:border-green-500/30' : 'border-zinc-200 dark:border-white/10 bg-white dark:bg-surface hover:border-zinc-300 dark:hover:border-white/20'}`}>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${values.send_pix_button ? 'bg-green-100 text-green-600' : 'bg-zinc-100 text-zinc-400 dark:bg-white/5'}`}>
+              <IconDollarSign className="w-5 h-5" />
+            </div>
+            <div className="flex-1">
+              <p className={`text-sm font-bold ${values.send_pix_button ? 'text-green-800 dark:text-green-400' : 'text-zinc-600 dark:text-zinc-300'}`}>Incluir Pagamento via PIX</p>
+              <p className="text-[11px] text-zinc-500">Adiciona o código Copia e Cola automaticamente</p>
+            </div>
+            <div className={`w-10 h-5 rounded-full transition-colors flex items-center px-0.5 ${values.send_pix_button ? 'bg-green-500' : 'bg-zinc-200 dark:bg-white/10'}`}>
               <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${values.send_pix_button ? 'translate-x-5' : 'translate-x-0'}`} />
             </div>
           </button>
 
-          {/* Campos de PIX Inline (se não tiver configurado globalmente) */}
           {values.send_pix_button && !hasPixKey && (
-            <div className="bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/7 p-4 rounded-xl space-y-3 animate-in fade-in slide-in-from-top-2">
-              <div className="flex items-start gap-2 mb-2">
-                <IconSparkles className="w-4 h-4 text-zinc-400 mt-0.5 shrink-0" />
-                <p className="text-xs text-zinc-600 dark:text-zinc-400">Como você não possui uma chave salva, insira abaixo para onde o dinheiro deve ir nesta cobrança:</p>
+            <div className="bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/7 p-5 rounded-2xl space-y-4 animate-in fade-in slide-in-from-top-2">
+              <div className="flex items-start gap-2.5">
+                <IconSparkles className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                <p className="text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">Você ainda não configurou uma chave PIX global. Informe abaixo para onde este valor deve ser enviado:</p>
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-1">
@@ -568,19 +551,18 @@ function StepMessage({
                     options={[
                       { label: 'CPF', value: 'CPF' },
                       { label: 'CNPJ', value: 'CNPJ' },
-                      { label: 'Celular', value: 'PHONE' },
+                      { label: 'WhatsApp', value: 'PHONE' },
                       { label: 'E-mail', value: 'EMAIL' },
-                      { label: 'Aleatória', value: 'EVP' },
+                      { label: 'Chave Aleat.', value: 'EVP' },
                     ]}
                   />
                 </div>
-
                 <div className="col-span-2">
                   <RHFInput
                     name="pix_key"
                     control={control}
                     label="Chave PIX"
-                    placeholder="Ex: 123.456.789-00"
+                    placeholder="Sua chave aqui"
                   />
                 </div>
               </div>
@@ -588,7 +570,7 @@ function StepMessage({
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -597,42 +579,45 @@ function StepConfirm({ hasPixKey }: { hasPixKey: boolean }) {
   const values = watch();
 
   return (
-    <div className="space-y-4">
-      <p className="text-sm text-zinc-500">Revise e confirme o envio</p>
-      <div className="bg-zinc-50 dark:bg-white/5 rounded-2xl p-5 space-y-3 border border-transparent dark:border-white/6">
+    <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+      <h3 className="text-lg font-bold text-zinc-800 dark:text-zinc-100 mb-1">Confirmar Envio</h3>
+      <p className="text-sm text-zinc-500 mb-6">Confira os detalhes antes de disparar.</p>
+
+      <div className="bg-zinc-50 dark:bg-white/5 rounded-4xl p-6 space-y-4 border border-zinc-100 dark:border-white/5 shadow-inner">
         {[
-          { label: 'Para', value: `${values.debtor_name} • ${values.debtor_phone}` },
-          { label: 'Valor', value: values.amount_display },
-          { label: 'Vencimento', value: values.due_date ? format(values.due_date, "dd/MM/yyyy") : '-' },
-          { label: 'Descrição', value: values.description },
-          { label: 'Recorrência', value: { ONCE: 'Única', WEEKLY: 'Semanal', MONTHLY: 'Mensal', YEARLY: 'Anual' }[values.recurrence as string] || values.recurrence },
-        ].map(({ label, value }) => (
-          <div key={label} className="flex items-start justify-between gap-4">
-            <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider shrink-0 pt-0.5">{label}</span>
-            <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 text-right">{value}</span>
+          { label: 'Cliente', value: values.debtor_name },
+          { label: 'WhatsApp', value: values.debtor_phone },
+          { label: 'Valor Total', value: values.amount_display, highlight: true },
+          { label: 'Vencimento', value: values.due_date ? format(values.due_date, "dd 'de' MMMM, yyyy", { locale: ptBR }) : '-' },
+          { label: 'Frequência', value: { ONCE: 'Única', WEEKLY: 'Semanal', MONTHLY: 'Mensal', YEARLY: 'Anual' }[values.recurrence as string] || values.recurrence },
+        ].map(({ label, value, highlight }) => (
+          <div key={label} className="flex items-center justify-between gap-4">
+            <span className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">{label}</span>
+            <span className={`text-sm font-bold ${highlight ? 'text-green-600 dark:text-green-400 text-base' : 'text-zinc-800 dark:text-zinc-200'}`}>{value}</span>
           </div>
         ))}
-        {values.send_pix_button && !hasPixKey && values.pix_key && (
-          <div className="flex items-start justify-between gap-4 border-t border-zinc-200 dark:border-white/7 pt-3 mt-1">
-            <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider shrink-0 pt-0.5">Pagamento para</span>
-            <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 text-right">{values.pix_key_type}: {values.pix_key}</span>
+        
+        {values.send_pix_button && (
+          <div className="pt-4 border-t border-zinc-200 dark:border-white/10">
+             <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Recebimento</span>
+                <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-white/5 px-3 py-1 rounded-full flex items-center gap-1.5">
+                  <IconDollarSign className="w-3 h-3" /> Pix Ativo
+                </span>
+             </div>
           </div>
         )}
       </div>
 
-      <div className="bg-[#e5ddd5] rounded-2xl p-4 space-y-1.5 text-[11px] text-zinc-600">
-        <p className="font-bold text-zinc-700">📱 Mensagens que serão enviadas:</p>
-        <p className="flex items-center gap-1.5"><span className="text-green-600">✓</span> Mensagem de texto personalizada</p>
-        {values.send_pix_button && <p className="flex items-center gap-1.5"><span className="text-green-600">✓</span> Botão e código de pagamento PIX</p>}
-      </div>
-
-      <div className="bg-amber-50 dark:bg-amber-500/10 rounded-xl p-3 text-xs text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-500/20">
-        <p className="font-bold mb-0.5">⚡ Envio imediato</p>
-        <p>A mensagem será disparada assim que você confirmar.</p>
+      <div className="bg-green-500/10 rounded-2xl p-4 flex gap-3 border border-green-500/20">
+        <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center shrink-0">
+          <IconSend className="w-5 h-5 text-white" />
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-bold text-green-700 dark:text-green-400">Disparo Imediato</p>
+          <p className="text-xs text-green-600/80">O cliente receberá a notificação em instantes após a confirmação.</p>
+        </div>
       </div>
     </div>
   );
 }
-
-
-

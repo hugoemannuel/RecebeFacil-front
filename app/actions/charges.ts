@@ -1,6 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 import { ActionResult } from '@/types/actions';
 
 export interface CreateChargePayload {
@@ -18,11 +19,8 @@ export interface CreateChargePayload {
   template_name?: string;
 }
 
-
-
 /**
  * Server Action: Cria uma cobrança e dispara o envio via WhatsApp.
- * Por enquanto retorna mock — será conectado ao back-end na próxima fase.
  */
 export async function createChargeAction(
   payload: CreateChargePayload
@@ -58,6 +56,11 @@ export async function createChargeAction(
     }
 
     const data = await res.json();
+    
+    // Revalidação de cache
+    revalidatePath('/dashboard/cobrancas');
+    revalidatePath('/dashboard');
+
     return {
       success: true,
       data: { chargeId: data.chargeId },
@@ -105,6 +108,10 @@ export async function updateChargeStatusAction(chargeId: string, status: string)
       const err = await res.json().catch(() => null);
       return { success: false, error: err?.message || 'Erro ao atualizar status' };
     }
+    
+    revalidatePath('/dashboard/cobrancas');
+    revalidatePath('/dashboard');
+    
     return { success: true };
   } catch {
     return { success: false, error: 'Servidor indisponível' };
@@ -125,6 +132,10 @@ export async function deleteChargeAction(chargeId: string): Promise<ActionResult
       const err = await res.json().catch(() => null);
       return { success: false, error: err?.message || 'Erro ao excluir cobrança' };
     }
+
+    revalidatePath('/dashboard/cobrancas');
+    revalidatePath('/dashboard');
+
     return { success: true };
   } catch {
     return { success: false, error: 'Servidor indisponível' };
@@ -145,6 +156,10 @@ export async function bulkCancelAction(chargeIds: string[]): Promise<ActionResul
     });
 
     if (!res.ok) return { success: false, error: 'Erro ao cancelar cobranças' };
+    
+    revalidatePath('/dashboard/cobrancas');
+    revalidatePath('/dashboard');
+    
     return { success: true };
   } catch (error) {
     return { success: false, error: 'Servidor indisponível' };
@@ -199,6 +214,9 @@ export async function cancelRecurringChargeAction(ruleId: string): Promise<Actio
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) return { success: false, error: 'Erro ao cancelar regra' };
+    
+    revalidatePath('/dashboard/cobrancas');
+    
     return { success: true };
   } catch (error) {
     return { success: false, error: 'Servidor indisponível' };
@@ -227,6 +245,9 @@ export async function updateRecurringAction(ruleId: string, payload: UpdateRecur
       const err = await res.json().catch(() => null);
       return { success: false, error: err?.message || 'Erro ao atualizar automação' };
     }
+    
+    revalidatePath('/dashboard/cobrancas');
+    
     return { success: true };
   } catch {
     return { success: false, error: 'Servidor indisponível' };
@@ -244,6 +265,9 @@ export async function deleteRecurringAction(ruleId: string): Promise<ActionResul
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) return { success: false, error: 'Erro ao excluir regra' };
+    
+    revalidatePath('/dashboard/cobrancas');
+    
     return { success: true };
   } catch {
     return { success: false, error: 'Servidor indisponível' };
@@ -261,6 +285,9 @@ export async function reactivateRecurringAction(ruleId: string): Promise<ActionR
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) return { success: false, error: 'Erro ao reativar automação' };
+    
+    revalidatePath('/dashboard/cobrancas');
+    
     return { success: true };
   } catch {
     return { success: false, error: 'Servidor indisponível' };

@@ -11,7 +11,8 @@ import { ThemeToggle } from '@/components/layout/ThemeToggle/ThemeToggle';
 import {
   IconUser, IconMail, IconPhone, IconCamera, IconShieldCheck,
   IconCreditCard, IconTrash, IconCheck, IconWallet,
-  IconAlertOctagon, IconSun, IconMoon, IconQrCode
+  IconAlertOctagon, IconSun, IconMoon, IconQrCode,
+  IconZap, IconFileText, IconAlertTriangle, IconClock
 } from '@/components/ui/Icons';
 import {
   updateProfileAction,
@@ -22,6 +23,7 @@ import {
   updateCreditorProfileAction,
 } from '@/app/actions/profile';
 import { cancelSubscriptionAction } from '@/app/actions/subscription';
+import { updateAutomationConfigAction, updateTemplateAction } from '@/app/actions/automation';
 import { RHFInput } from '@/components/forms/rhf/RHFInput';
 import { RHFPasswordInput } from '@/components/forms/rhf/RHFPasswordInput';
 import { Input } from '@/components/ui/Input/Input';
@@ -33,6 +35,8 @@ interface Props {
   profile: { id: string; name: string; email: string; phone: string; avatar_url?: string } | null;
   subscription: { plan: string; status: string; sentThisMonth?: number; current_period_end?: string; cancel_at_period_end?: boolean } | null;
   creditorProfile: { business_name?: string; document?: string; pix_key?: string; pix_key_type?: string; pix_merchant_name?: string } | null;
+  automationConfig: { allows_automation: boolean; automation_days_before: number; automation_days_after: number } | null;
+  templates: { id: string; name: string; trigger: string; body: string }[];
 }
 
 const PLAN_LIMIT: Record<string, number> = { FREE: 10, STARTER: 50, PRO: 200, UNLIMITED: Infinity };
@@ -72,13 +76,13 @@ type PasswordForm = z.infer<typeof passwordSchema>;
 type CreditorForm = z.infer<typeof creditorSchema>;
 
 // ─── Componente ───────────────────────────────────────────────────────
-export function ConfiguracoesClient({ profile, subscription, creditorProfile }: Props) {
+export function ConfiguracoesClient({ profile, subscription, creditorProfile, automationConfig, templates }: Props) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   const initialAvatar = profile?.avatar_url 
     ? (profile.avatar_url.startsWith('http') ? profile.avatar_url : `${apiUrl}${profile.avatar_url}`)
     : null;
 
-  const [tab, setTab] = useState<'perfil' | 'recebimento' | 'plano' | 'seguranca'>('perfil');
+  const [tab, setTab] = useState<'perfil' | 'recebimento' | 'automacao' | 'templates' | 'plano' | 'seguranca'>('perfil');
   const [avatarPreview, setAvatarPreview] = useState<string | null>(initialAvatar);
   const [showDelete, setShowDelete] = useState(false);
   const [showCancelPlan, setShowCancelPlan] = useState(false);
@@ -87,7 +91,17 @@ export function ConfiguracoesClient({ profile, subscription, creditorProfile }: 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [creditorLoading, setCreditorLoading] = useState(false);
+  const [automationLoading, setAutomationLoading] = useState(false);
+  const [templatesLoading, setTemplatesLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  // Estados de Automação
+  const [allowsAutomation, setAllowsAutomation] = useState(automationConfig?.allows_automation ?? true);
+  const [daysBefore, setDaysBefore] = useState(automationConfig?.automation_days_before ?? 1);
+  const [daysAfter, setDaysAfter] = useState(automationConfig?.automation_days_after ?? 1);
+
+  // Estados de Templates
+  const [localTemplates, setLocalTemplates] = useState(templates);
   const [mounted, setMounted] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   
@@ -208,10 +222,44 @@ export function ConfiguracoesClient({ profile, subscription, creditorProfile }: 
     });
   }
 
+  async function onSaveAutomation() {
+    setAutomationLoading(true);
+    const res = await updateAutomationConfigAction({
+      allows_automation: allowsAutomation,
+      automation_days_before: Number(daysBefore),
+      automation_days_after: Number(daysAfter),
+    });
+    if (res.success) toast.success('Régua de automação salva!');
+    else toast.error(res.error ?? 'Erro ao salvar automação.');
+    setAutomationLoading(false);
+  }
+
+  async function onSaveTemplates() {
+    setTemplatesLoading(true);
+    let errorOccurred = false;
+    for (const t of localTemplates) {
+      const res = await updateTemplateAction(t.id, t.body);
+      if (!res.success) {
+        toast.error(`Erro ao salvar template ${t.name}`);
+        errorOccurred = true;
+        break;
+      }
+    }
+    if (!errorOccurred) toast.success('Todos os templates foram salvos!');
+    setTemplatesLoading(false);
+  }
+
+  function handleTemplateChange(id: string, body: string) {
+    setLocalTemplates(prev => prev.map(t => t.id === id ? { ...t, body } : t));
+  }
+
+
   // ─── Render ────────────────────────────────────────────────────────
   const tabs = [
     { id: 'perfil', label: 'Perfil', icon: IconUser },
     { id: 'recebimento', label: 'Recebimento', icon: IconWallet },
+    { id: 'automacao', label: 'Automação', icon: IconZap },
+    { id: 'templates', label: 'Templates', icon: IconFileText },
     { id: 'plano', label: 'Plano', icon: IconCreditCard },
     { id: 'seguranca', label: 'Segurança', icon: IconShieldCheck },
   ] as const;
@@ -586,6 +634,166 @@ export function ConfiguracoesClient({ profile, subscription, creditorProfile }: 
               <IconTrash className="w-4 h-4" />
               Excluir minha conta
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── ABA: AUTOMAÇÃO ─────────────────────────────────────────── */}
+      {tab === 'automacao' && (
+        <div className="bg-white dark:bg-surface border border-zinc-100 dark:border-white/6 rounded-3xl p-6 md:p-8 space-y-8 transition-colors duration-300">
+          <div>
+            <p className="font-bold text-zinc-800 dark:text-zinc-200 mb-1">Régua de Cobrança Automática</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">Configure quando o sistema deve enviar lembretes automáticos para seus clientes.</p>
+          </div>
+
+          <div className="space-y-6">
+            {/* Gatilho 1: Antes do vencimento */}
+            <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-white/2 rounded-2xl border border-zinc-100 dark:border-white/5">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                  <IconClock className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="font-bold text-sm text-zinc-800 dark:text-zinc-200">Lembrete Preventivo</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">Enviado dias antes do vencimento</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <select 
+                  value={daysBefore}
+                  onChange={(e) => setDaysBefore(Number(e.target.value))}
+                  className="bg-white dark:bg-surface-soft border border-zinc-200 dark:border-white/10 rounded-lg px-2 py-1 text-xs font-bold outline-hidden focus:ring-2 focus:ring-green-500/20 transition-all"
+                >
+                  <option value="1">1 dia antes</option>
+                  <option value="2">2 dias antes</option>
+                  <option value="3">3 dias antes</option>
+                  <option value="5">5 dias antes</option>
+                </select>
+                <div 
+                  onClick={() => setAllowsAutomation(!allowsAutomation)}
+                  className={`w-10 h-6 rounded-full relative cursor-pointer transition-colors ${allowsAutomation ? 'bg-green-500' : 'bg-zinc-300 dark:bg-white/10'}`}
+                >
+                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${allowsAutomation ? 'right-1' : 'left-1'}`} />
+                </div>
+              </div>
+            </div>
+
+            {/* Gatilho 2: No dia do vencimento */}
+            <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-white/2 rounded-2xl border border-zinc-100 dark:border-white/5">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-500/10 flex items-center justify-center text-green-600 dark:text-green-400">
+                  <IconZap className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="font-bold text-sm text-zinc-800 dark:text-zinc-200">Cobrança no Dia</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">Enviado na manhã do vencimento</p>
+                </div>
+              </div>
+              <div 
+                onClick={() => setAllowsAutomation(!allowsAutomation)}
+                className={`w-10 h-6 rounded-full relative cursor-pointer transition-colors ${allowsAutomation ? 'bg-green-500' : 'bg-zinc-300 dark:bg-white/10'}`}
+              >
+                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${allowsAutomation ? 'right-1' : 'left-1'}`} />
+              </div>
+            </div>
+
+            {/* Gatilho 3: Após o vencimento */}
+            <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-white/2 rounded-2xl border border-zinc-100 dark:border-white/5">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/10 flex items-center justify-center text-red-600 dark:text-red-400">
+                  <IconAlertOctagon className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="font-bold text-sm text-zinc-800 dark:text-zinc-200">Aviso de Atraso</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">Enviado após o vencimento</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <select 
+                  value={daysAfter}
+                  onChange={(e) => setDaysAfter(Number(e.target.value))}
+                  className="bg-white dark:bg-surface-soft border border-zinc-200 dark:border-white/10 rounded-lg px-2 py-1 text-xs font-bold outline-hidden focus:ring-2 focus:ring-green-500/20 transition-all"
+                >
+                  <option value="1">1 dia após</option>
+                  <option value="2">2 dias após</option>
+                  <option value="3">3 dias após</option>
+                  <option value="7">7 dias após</option>
+                </select>
+                <div 
+                  onClick={() => setAllowsAutomation(!allowsAutomation)}
+                  className={`w-10 h-6 rounded-full relative cursor-pointer transition-colors ${allowsAutomation ? 'bg-green-500' : 'bg-zinc-300 dark:bg-white/10'}`}
+                >
+                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${allowsAutomation ? 'right-1' : 'left-1'}`} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-zinc-100 dark:border-white/5">
+            <p className="text-[11px] text-zinc-400 dark:text-zinc-500 leading-relaxed">
+              <strong>Nota:</strong> As mensagens automáticas são enviadas entre 09:00 e 10:00 da manhã. Se o cliente pagar antes desse horário, o lembrete não será enviado.
+            </p>
+          </div>
+
+          <button 
+            onClick={onSaveAutomation}
+            disabled={automationLoading}
+            className="w-full bg-zinc-900 dark:bg-green-500 hover:bg-zinc-800 dark:hover:bg-green-600 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-all shadow-lg hover:scale-[1.01] flex items-center justify-center gap-2"
+          >
+            {automationLoading && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+            Salvar Régua de Automação
+          </button>
+
+        </div>
+      )}
+
+      {/* ── ABA: TEMPLATES ─────────────────────────────────────────── */}
+      {tab === 'templates' && (
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-surface border border-zinc-100 dark:border-white/6 rounded-3xl p-6 md:p-8 transition-colors duration-300">
+            <div className="mb-6">
+              <p className="font-bold text-zinc-800 dark:text-zinc-200 mb-1">Templates de Mensagem</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">Personalize o texto que seus clientes recebem no WhatsApp.</p>
+            </div>
+
+            <div className="space-y-6">
+              {localTemplates.map((t) => (
+                <div key={t.id} className="space-y-2">
+                  <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 ml-1">{t.name}</label>
+                  <div className="relative group">
+                    <textarea 
+                      className="w-full h-32 bg-zinc-50 dark:bg-white/2 border border-zinc-200 dark:border-white/10 rounded-2xl p-4 text-sm outline-hidden focus:ring-2 focus:ring-green-500/20 transition-all resize-none"
+                      value={t.body}
+                      onChange={(e) => handleTemplateChange(t.id, e.target.value)}
+                    />
+                    <div className="absolute bottom-3 right-3 flex gap-2">
+                       <span className="text-[10px] bg-zinc-200/50 dark:bg-white/10 px-2 py-0.5 rounded text-zinc-500">{"{{nome_cliente}}"}</span>
+                       <span className="text-[10px] bg-zinc-200/50 dark:bg-white/10 px-2 py-0.5 rounded text-zinc-500">{"{{valor}}"}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {localTemplates.length === 0 && (
+                <p className="text-center text-sm text-zinc-500 py-10">Nenhum template encontrado.</p>
+              )}
+            </div>
+
+            <button 
+              onClick={onSaveTemplates}
+              disabled={templatesLoading || localTemplates.length === 0}
+              className="w-full bg-zinc-900 dark:bg-green-500 hover:bg-zinc-800 dark:hover:bg-green-600 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-all shadow-lg hover:scale-[1.01] mt-8 flex items-center justify-center gap-2"
+            >
+              {templatesLoading && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+              Salvar Templates
+            </button>
+
+          </div>
+          
+          <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-2xl p-4 flex gap-3">
+            <IconAlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
+            <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+              Mantenha as variáveis entre chaves duplas como <code>{"{{valor}}"}</code> para que o sistema possa substituí-las automaticamente pelos dados reais da cobrança.
+            </p>
           </div>
         </div>
       )}

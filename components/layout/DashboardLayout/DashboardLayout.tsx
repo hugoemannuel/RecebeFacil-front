@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   IconSearch,
   IconBell,
@@ -27,6 +27,7 @@ import { useUserStore } from '@/store/useUserStore';
 export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: DashboardLayoutProps) {
 
   const pathname = usePathname();
+  const router = useRouter();
   const [lockedModule, setLockedModule] = useState<string | null>(null);
   const [limitReached, setLimitReached] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -56,7 +57,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
     <div className="min-h-screen bg-surface dark:bg-background text-zinc-900 dark:text-zinc-50 font-sans flex overflow-hidden selection:bg-green-200 transition-colors duration-300">
 
       {/* ── Sidebar ────────────────────────────────────────── */}
-      <aside className="w-[280px] bg-white dark:bg-surface border-r border-zinc-200 dark:border-white/5 flex flex-col h-screen shrink-0 hidden md:flex transition-colors duration-300">
+      <aside className="w-[280px] bg-white dark:bg-surface border-r border-zinc-200 dark:border-white/5 hidden md:flex flex-col h-screen shrink-0 transition-colors duration-300">
 
         {/* Logo */}
         <div className="p-8 pb-10">
@@ -357,6 +358,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
         onClose={() => setDrawerOpen(false)}
         userName={currentSubscription.userName}
         planType={currentSubscription.plan}
+        onSuccess={() => router.refresh()}
       />
 
     </div>

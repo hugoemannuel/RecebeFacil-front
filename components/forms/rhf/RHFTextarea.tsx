@@ -8,9 +8,10 @@ type Props<T extends FieldValues> = {
   rows?: number;
   placeholder?: string;
   inputRef?: React.RefObject<HTMLTextAreaElement | null>;
+  className?: string;
 };
 
-export function RHFTextarea<T extends FieldValues>({ name, control, label, rows = 2, placeholder, inputRef }: Props<T>) {
+export function RHFTextarea<T extends FieldValues>({ name, control, label, rows = 2, placeholder, inputRef, className }: Props<T>) {
   return (
     <Controller
       name={name}
@@ -26,6 +27,7 @@ export function RHFTextarea<T extends FieldValues>({ name, control, label, rows 
           error={fieldState.error?.message}
           rows={rows}
           placeholder={placeholder}
+          className={className}
         />
       )}
     />
