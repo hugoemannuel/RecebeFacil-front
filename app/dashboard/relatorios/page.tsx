@@ -41,10 +41,11 @@ export default async function RelatoriosPage() {
 
   return (
     <DashboardLayout subscription={subscription}>
-      <RelatoriosClient 
-        isUnlimited={isUnlimited} 
+      <RelatoriosClient
+        isUnlimited={isUnlimited}
         plan={plan}
         token={token}
+        userName={profileData?.name ?? 'Usuário'}
       />
     </DashboardLayout>
   );

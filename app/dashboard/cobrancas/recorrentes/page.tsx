@@ -39,7 +39,7 @@ export default async function RecorrentesPage() {
 
   return (
     <DashboardLayout subscription={subscription}>
-      <RecorrentesClient initialData={recurringRes.data || []} plan={subscription.plan} />
+      <RecorrentesClient initialData={recurringRes.success ? recurringRes.data : []} plan={subscription.plan} />
     </DashboardLayout>
   );
 }
