@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { formatMoney } from '@/lib/formatters';
-import { IconCheckCircle, IconAlertCircle, IconClock, IconMoreVertical, IconSend } from '@/components/ui/Icons';
+import { IconCheckCircle, IconAlertCircle, IconClock, IconSend } from '@/components/ui/Icons';
 import { ChargeDetailsDrawer } from '@/components/dashboard/ChargeDetailsDrawer';
 
 interface Props {
@@ -57,15 +57,6 @@ export function RecentActivityClient({ recentActivity }: Props) {
               <span className="font-bold text-zinc-700 dark:text-zinc-200 text-lg">
                 {formatMoney(activity.amount)}
               </span>
-              <button 
-                className="p-2 text-zinc-400"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDetailsChargeId(activity.id);
-                }}
-              >
-                <IconMoreVertical className="w-5 h-5" />
-              </button>
             </div>
           </div>
         ))}
@@ -81,13 +72,12 @@ export function RecentActivityClient({ recentActivity }: Props) {
             <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/6">Valor</th>
             <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/6">Vencimento</th>
             <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/6">Status</th>
-            <th className="py-4 px-8 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-200/80 dark:border-white/6 text-right">Ações</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-zinc-100 dark:divide-white/5 text-sm">
           {recentActivity.length === 0 ? (
             <tr>
-              <td colSpan={5} className="py-16 text-center">
+              <td colSpan={4} className="py-16 text-center">
                 <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
                   <div className="w-16 h-16 bg-zinc-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
                     <IconSend className="w-8 h-8 text-zinc-300 dark:text-zinc-600" />
@@ -145,20 +135,6 @@ export function RecentActivityClient({ recentActivity }: Props) {
                         <IconClock className="w-3 h-3" /> Pendente
                       </span>
                     )}
-                  </td>
-                  <td className="py-5 px-8 text-right flex justify-end items-center gap-2">
-                    {isOverdue && (
-                      <Link 
-                        href="/dashboard/cobrancas" 
-                        className="bg-green-500 hover:bg-green-600 text-white font-bold py-1.5 px-3 rounded-lg text-xs transition-colors"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        Cobrar
-                      </Link>
-                    )}
-                    <button className="p-2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">
-                      <IconMoreVertical className="w-5 h-5" />
-                    </button>
                   </td>
                 </tr>
               );
