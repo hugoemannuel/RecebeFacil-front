@@ -178,3 +178,7 @@ export function IconStar({ className }: { className?: string }) {
 export function IconCheckCircle2({ className }: { className?: string }) {
   return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" /></svg>;
 }
+
+export function IconBank({ className }: { className?: string }) {
+  return <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18" /><path d="M19 21v-7" /><path d="M5 21v-7" /><path d="M12 21v-7" /><path d="M3 7l9-4 9 4v3H3z" /></svg>;
+}

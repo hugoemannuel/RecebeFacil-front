@@ -13,7 +13,9 @@ import {
   IconSparkles
 } from '@/components/ui/Icons';
 import { createCheckoutAction, getSubscriptionStatusAction, cancelSubscriptionAction } from '@/app/actions/subscription';
+import { acknowledgeSplitAction } from '@/app/actions/integrations';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { SplitOnboardingModal } from '@/components/ui/SplitOnboardingModal';
 import { toast } from 'sonner';
 
 // ─── Tipos ──────────────────────────────────────────────────────
@@ -83,8 +85,6 @@ const PLANS: Plan[] = [
       { text: 'Semanal, Mensal e Anual', included: true },
       { text: 'Lembretes automáticos', included: true },
       { text: 'Automação completa (Régua)', included: true, premium: true },
-      { text: 'Split Asaas (Recebimento Automático)', included: true, premium: true },
-      { text: 'Taxa de 2% por recebimento', included: true, premium: true },
       { text: 'Número de WhatsApp Compartilhado', included: true },
       { text: 'Cobrança em Massa', included: true },
       { text: 'Múltiplos usuários (em breve)', included: true },
@@ -105,8 +105,6 @@ const PLANS: Plan[] = [
       { text: 'Relatórios Avançados (PDF/Excel)', included: true, premium: true },
       { text: 'API de integração (em breve)', included: true },
       { text: 'Suporte dedicado 24h', included: true, premium: true },
-      { text: 'Split Asaas (Recebimento Automático)', included: true, premium: true },
-      { text: 'Taxa de 1% por recebimento', included: true, premium: true },
       { text: 'Número de WhatsApp Próprio', included: true, premium: true },
       { text: 'Webhooks para Integração Externa', included: true, premium: true },
       { text: 'Recibos em PDF com sua Logo', included: true, premium: true },
@@ -127,6 +125,8 @@ export default function PlanosPage() {
   const [cancelLoading, setCancelLoading] = useState(false);
   const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = useState(false);
   const [periodEnd, setPeriodEnd] = useState<string | null>(null);
+  const [splitModalOpen, setSplitModalOpen] = useState(false);
+  const [selectedPlanForSplit, setSelectedPlanForSplit] = useState<Plan | null>(null);
 
   useEffect(() => {
     async function loadStatus() {
@@ -171,8 +171,32 @@ export default function PlanosPage() {
     if (planId === currentPlan) return;
     if (planId === 'FREE') return;
 
+    // Interceptar planos com Split (PRO e UNLIMITED)
+    if (planId === 'PRO' || planId === 'UNLIMITED') {
+      const plan = PLANS.find(p => p.id === planId);
+      if (plan) {
+        setSelectedPlanForSplit(plan);
+        setSplitModalOpen(true);
+        return;
+      }
+    }
+
+    await executeSubscription(planId);
+  };
+
+  const executeSubscription = async (planId: string, splitData?: any) => {
     setLoading(planId);
     setError(null);
+
+    // Salvar aceite do split se houver dados
+    if (splitData) {
+      const ack = await acknowledgeSplitAction(splitData);
+      if (!ack.success) {
+        setError(ack.error || "Erro ao processar aceite dos termos.");
+        setLoading(null);
+        return;
+      }
+    }
 
     const result = await createCheckoutAction(planId, period);
 
@@ -381,6 +405,18 @@ export default function PlanosPage() {
         loading={cancelLoading}
         onConfirm={handleCancel}
         onCancel={() => setCancelModalOpen(false)}
+      />
+
+      <SplitOnboardingModal
+        isOpen={splitModalOpen}
+        planName={selectedPlanForSplit?.name || ''}
+        onClose={() => setSplitModalOpen(false)}
+        onConfirm={(data) => {
+          setSplitModalOpen(false);
+          if (selectedPlanForSplit) {
+            executeSubscription(selectedPlanForSplit.id, data);
+          }
+        }}
       />
     </div>
   );
