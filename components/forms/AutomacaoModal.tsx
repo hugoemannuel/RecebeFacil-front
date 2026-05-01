@@ -12,13 +12,13 @@ import { RHFSelect } from '@/components/forms/rhf/RHFSelect';
 import { RHFTextarea } from '@/components/forms/rhf/RHFTextarea';
 import { IconBot, IconX, IconCheck } from '@/components/ui/Icons';
 import { interpolateTemplate, formatMoney } from '@/lib/formatters';
-import { updateRecurringAction, getRecurringChargeAction } from '@/app/actions/charges';
+import { updateRecurringAction, getRecurringChargeAction, automateChargeAction } from '@/app/actions/charges';
 import { getTemplatesAction } from '@/app/actions/templates';
 import { DEFAULT_TEMPLATE, TEMPLATE_OPTIONS, VARIABLES } from '@/components/forms/NewChargeModal/interfaces';
 
 const schema = z.object({
   frequency: z.enum(['WEEKLY', 'MONTHLY', 'YEARLY']),
-  description: z.string().min(1, 'Informe uma descrição'),
+  description: z.string().optional(),
   next_generation_date: z.string().min(1, 'Informe a data do próximo envio'),
   custom_message: z.string().min(5, 'Mensagem muito curta'),
 });
@@ -28,7 +28,10 @@ type FormData = z.infer<typeof schema>;
 interface AutomacaoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  recurringChargeId: string;
+  recurringChargeId?: string;
+  chargeId?: string;
+  initialDebtorName?: string;
+  initialAmount?: number;
   onSuccess?: () => void;
 }
 
@@ -42,12 +45,22 @@ const toDateInput = (iso: string) => {
   try { return new Date(iso).toISOString().split('T')[0]; } catch { return ''; }
 };
 
-export function AutomacaoModal({ isOpen, onClose, recurringChargeId, onSuccess }: AutomacaoModalProps) {
+export function AutomacaoModal({
+  isOpen,
+  onClose,
+  recurringChargeId,
+  chargeId,
+  initialDebtorName,
+  initialAmount,
+  onSuccess,
+}: AutomacaoModalProps) {
+  const isCreateMode = !recurringChargeId && !!chargeId;
+
   const [isPending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [debtorName, setDebtorName] = useState('Cliente');
-  const [amount, setAmount] = useState(0);
+  const [debtorName, setDebtorName] = useState(initialDebtorName ?? 'Cliente');
+  const [amount, setAmount] = useState(initialAmount ?? 0);
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [allTemplates, setAllTemplates] = useState<{ label: string; value: string }[]>(TEMPLATE_OPTIONS);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -72,10 +85,12 @@ export function AutomacaoModal({ isOpen, onClose, recurringChargeId, onSuccess }
     setLoading(true);
     setServerError(null);
 
-    Promise.all([
-      getRecurringChargeAction(recurringChargeId),
-      getTemplatesAction(),
-    ]).then(([chargeRes, tplRes]) => {
+    const fetchTemplates = getTemplatesAction();
+    const fetchCharge = isCreateMode
+      ? Promise.resolve(null)
+      : getRecurringChargeAction(recurringChargeId!);
+
+    Promise.all([fetchCharge, fetchTemplates]).then(([chargeRes, tplRes]) => {
       const userTemplates = tplRes.success && Array.isArray(tplRes.data)
         ? tplRes.data.map((t: { name: string; body: string }) => ({ label: t.name, value: t.body }))
         : [];
@@ -86,7 +101,14 @@ export function AutomacaoModal({ isOpen, onClose, recurringChargeId, onSuccess }
       ];
       setAllTemplates(combined);
 
-      if (chargeRes.success && chargeRes.data) {
+      if (isCreateMode) {
+        const message = DEFAULT_TEMPLATE;
+        reset({ frequency: 'MONTHLY', description: '', next_generation_date: '', custom_message: message });
+        setDebtorName(initialDebtorName ?? 'Cliente');
+        setAmount(initialAmount ?? 0);
+        const match = combined.find(t => t.value === message);
+        setSelectedTemplate(match?.label ?? '');
+      } else if (chargeRes && chargeRes.success && chargeRes.data) {
         const d = chargeRes.data;
         const message = d.custom_message ?? DEFAULT_TEMPLATE;
         reset({
@@ -105,7 +127,7 @@ export function AutomacaoModal({ isOpen, onClose, recurringChargeId, onSuccess }
       }
       setLoading(false);
     });
-  }, [isOpen, recurringChargeId]);
+  }, [isOpen, recurringChargeId, chargeId]);
 
   const valor = amount ? formatMoney(amount) : 'R$ 0,00';
   const nextDate = values.next_generation_date
@@ -116,7 +138,7 @@ export function AutomacaoModal({ isOpen, onClose, recurringChargeId, onSuccess }
     nome: debtorName,
     valor,
     vencimento: nextDate,
-    descricao: values.description,
+    descricao: values.description ?? '',
     nome_empresa: 'RecebeFácil',
   });
 
@@ -142,13 +164,28 @@ export function AutomacaoModal({ isOpen, onClose, recurringChargeId, onSuccess }
   function onSubmit(data: FormData) {
     setServerError(null);
     startTransition(async () => {
-      const res = await updateRecurringAction(recurringChargeId, data);
-      if (res.success) {
-        toast.success('Automação atualizada com sucesso!');
-        onSuccess?.();
-        onClose();
+      if (isCreateMode) {
+        const res = await automateChargeAction(chargeId!, {
+          frequency: data.frequency,
+          next_generation_date: data.next_generation_date,
+          custom_message: data.custom_message,
+        });
+        if (res.success) {
+          toast.success('Automação criada com sucesso!');
+          onSuccess?.();
+          onClose();
+        } else {
+          setServerError(res.error ?? 'Erro ao criar automação. Tente novamente.');
+        }
       } else {
-        setServerError(res.error ?? 'Erro ao salvar. Tente novamente.');
+        const res = await updateRecurringAction(recurringChargeId!, data);
+        if (res.success) {
+          toast.success('Automação atualizada com sucesso!');
+          onSuccess?.();
+          onClose();
+        } else {
+          setServerError(res.error ?? 'Erro ao salvar. Tente novamente.');
+        }
       }
     });
   }
@@ -216,12 +253,14 @@ export function AutomacaoModal({ isOpen, onClose, recurringChargeId, onSuccess }
                   />
                 </div>
 
-                <RHFInput
-                  name="description"
-                  control={control}
-                  label="Descrição da cobrança"
-                  placeholder="Ex: Mensalidade academia"
-                />
+                {!isCreateMode && (
+                  <RHFInput
+                    name="description"
+                    control={control}
+                    label="Descrição da cobrança"
+                    placeholder="Ex: Mensalidade academia"
+                  />
+                )}
 
                 {/* Template selector */}
                 <div>
@@ -310,7 +349,7 @@ export function AutomacaoModal({ isOpen, onClose, recurringChargeId, onSuccess }
                 {isPending
                   ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   : <IconCheck className="w-4 h-4" />}
-                Salvar automação
+                {isCreateMode ? 'Criar automação' : 'Salvar automação'}
               </button>
             </div>
           </>

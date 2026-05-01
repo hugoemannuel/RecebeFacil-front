@@ -81,6 +81,9 @@ export function ChargesClient({
   const [upgradeModule, setUpgradeModule] = useState<string | null>(null);
   const [automacaoModalOpen, setAutomacaoModalOpen] = useState(false);
   const [selectedRecurringId, setSelectedRecurringId] = useState<string | null>(null);
+  const [selectedChargeId, setSelectedChargeId] = useState<string | null>(null);
+  const [selectedChargeDebtor, setSelectedChargeDebtor] = useState<string | undefined>(undefined);
+  const [selectedChargeAmount, setSelectedChargeAmount] = useState<number | undefined>(undefined);
   const [deletingChargeId, setDeletingChargeId] = useState<string | null>(null);
   const [cancelingChargeId, setCancelingChargeId] = useState<string | null>(null);
   const [statusUpdate, setStatusUpdate] = useState<{ chargeId: string; status: string; label: string } | null>(null);
@@ -179,15 +182,20 @@ export function ChargesClient({
               e.stopPropagation();
               if (isLocked) {
                 setUpgradeModule('RECURRENCE');
-              } else if (!hasAutomation) {
-                toast.info('Esta cobrança não possui recorrência configurada.');
-              } else {
+              } else if (hasAutomation) {
                 setSelectedRecurringId(recurringId);
+                setSelectedChargeId(null);
+                setAutomacaoModalOpen(true);
+              } else {
+                setSelectedChargeId(info.row.original.id);
+                setSelectedChargeDebtor(info.row.original.debtorName);
+                setSelectedChargeAmount(info.row.original.amount);
+                setSelectedRecurringId(null);
                 setAutomacaoModalOpen(true);
               }
             }}
             className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${isEnabled ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-500/30' : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-white/10'} relative`}
-            title={isLocked ? 'Requer plano PRO ou superior' : isEnabled ? 'Editar automação' : 'Sem automação'}
+            title={isLocked ? 'Requer plano PRO ou superior' : isEnabled ? 'Editar automação' : 'Configurar automação'}
           >
             <IconBot className="w-4 h-4" />
             {isLocked && (
@@ -666,11 +674,18 @@ export function ChargesClient({
         onCancel={() => setDeletingChargeId(null)}
       />
 
-      {automacaoModalOpen && selectedRecurringId && (
+      {automacaoModalOpen && (selectedRecurringId || selectedChargeId) && (
         <AutomacaoModal
           isOpen={automacaoModalOpen}
-          onClose={() => { setAutomacaoModalOpen(false); setSelectedRecurringId(null); }}
-          recurringChargeId={selectedRecurringId}
+          onClose={() => {
+            setAutomacaoModalOpen(false);
+            setSelectedRecurringId(null);
+            setSelectedChargeId(null);
+          }}
+          recurringChargeId={selectedRecurringId ?? undefined}
+          chargeId={selectedChargeId ?? undefined}
+          initialDebtorName={selectedChargeDebtor}
+          initialAmount={selectedChargeAmount}
           onSuccess={() => router.refresh()}
         />
       )}

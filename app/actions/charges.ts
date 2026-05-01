@@ -239,6 +239,31 @@ export async function cancelRecurringChargeAction(ruleId: string): Promise<Actio
   }
 }
 
+export async function automateChargeAction(
+  chargeId: string,
+  payload: { frequency: 'WEEKLY' | 'MONTHLY' | 'YEARLY'; next_generation_date: string; custom_message?: string },
+): Promise<ActionResult> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('recebefacil_token')?.value;
+  if (!token) return { success: false, error: 'Não autorizado' };
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/charges/${chargeId}/automate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      return { success: false, error: err?.message || 'Erro ao configurar automação' };
+    }
+    revalidatePath('/dashboard/cobrancas');
+    return { success: true, data: await res.json() };
+  } catch {
+    return { success: false, error: 'Servidor indisponível' };
+  }
+}
+
 export interface UpdateRecurringPayload {
   frequency?: 'WEEKLY' | 'MONTHLY' | 'YEARLY';
   description?: string;
