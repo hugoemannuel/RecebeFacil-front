@@ -52,8 +52,8 @@ export const useUserStore = create<UserState>((set) => ({
           }
         });
       }
-    } catch (error) {
-      console.error("Erro ao atualizar store do usuário:", error);
+    } catch {
+      // silencioso em produção — falha de refresh não quebra a sessão
     } finally {
       set({ loading: false });
     }

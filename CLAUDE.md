@@ -48,7 +48,7 @@ Available actions: `auth.ts`, `charges.ts`, `clients.ts`, `demo.ts`, `profile.ts
 
 ### Subscription / plan gating
 
-`app/actions/subscription.ts` fetches `/subscription/status`, returning:
+`app/dashboard/layout.tsx` (Server Component) fetches `/subscription/status` and `/users/me` on every navigation, then hydrates `useUserStore` via `StoreInitializer`. `DashboardLayout` reads from the store (`useUserStore`) with fallback to its prop for SSR. Module locking is UI-only — the backend enforces authorization independently.
 
 ```ts
 interface SubscriptionStatus {
@@ -56,17 +56,27 @@ interface SubscriptionStatus {
   status: 'ACTIVE' | 'CANCELED' | 'PAST_DUE' | 'NONE'
   allowed_modules: string[]
   current_period_end: string | null
+  cancel_at_period_end: boolean
+  payment_failed: boolean
+  payment_failed_at: string | null
   userName?: string
+  avatarUrl?: string
 }
 ```
 
-`DashboardLayout` uses `allowed_modules` to lock/hide sidebar items. Locked features render `<UpgradeModal />`.
+`DashboardLayout` uses `allowed_modules` to lock sidebar items. Locked features render `<UpgradeModal />`.
 
 ### Component structure
 
 ```
+store/
+  useThemeStore/          # Zustand: tema (light/dark). ThemeInitializer hidrata do localStorage
+  useUserStore/           # Zustand: user + subscription. StoreInitializer hidrata do servidor
+    StoreInitializer.tsx  # "use client" — hidrata store a partir de props do Server Component
+                          # Renderizado apenas no dashboard/layout.tsx (não duplicar em pages)
+
 components/
-  layout/     # DashboardLayout, AuthLayout, ThemeContext, ThemeToggle
+  layout/     # DashboardLayout, AuthLayout, ThemeToggle
   ui/
     Icons.tsx           # All SVGs as React components — do not add icon libraries
     UpgradeModal.tsx    # Plan upgrade modal
@@ -114,7 +124,7 @@ For UI inputs without a form (search bars, filters), use `Input` or `Select` dir
 
 ### Styling
 
-Tailwind CSS v4 only. No custom CSS except the theme variables in `app/globals.css`. Dark mode is toggled via `ThemeContext` (persisted in `localStorage`) which adds/removes `dark` on `document.documentElement`. Design tokens: background dark `#0b1521`, accent green `#22c55e`.
+Tailwind CSS v4 only. No custom CSS except the theme variables in `app/globals.css`. Dark mode is toggled via `useThemeStore` (Zustand, persisted in `localStorage`) which adds/removes `dark` on `document.documentElement`. The `ThemeInitializer` component (rendered in `app/layout.tsx`) hydrates the store from `localStorage` on mount. Design tokens: background dark `#0b1521`, accent green `#22c55e`.
 
 ### Icons
 

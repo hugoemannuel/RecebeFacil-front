@@ -9,7 +9,8 @@ export function ThemeInitializer() {
 
   useEffect(() => {
     if (!initialized.current) {
-      const savedTheme = localStorage.getItem('theme') as Theme;
+      const raw = localStorage.getItem('theme');
+      const savedTheme: Theme | null = raw === 'light' || raw === 'dark' ? raw : null;
       if (savedTheme) {
         useThemeStore.getState().setTheme(savedTheme);
       } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {

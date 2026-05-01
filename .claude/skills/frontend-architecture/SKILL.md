@@ -17,6 +17,7 @@ app/
     subscription.ts  ← getSubscriptionStatusAction
     templates.ts     ← createTemplateAction, updateTemplateAction, deleteTemplateAction
   dashboard/         ← Páginas autenticadas (Server Components)
+    layout.tsx       ← Busca user+subscription no servidor, hidrata useUserStore via StoreInitializer
     page.tsx         ← Métricas overview
     cobrancas/
       page.tsx + ChargesClient.tsx
@@ -45,7 +46,7 @@ components/
     Chip/index.tsx       ← Chip/tag component
     Input/Input.tsx      ← variant="default"|"auth", icon, rightSlot, label, error
     Textarea/Textarea.tsx | Select/Select.tsx
-  layout/          ← DashboardLayout.tsx, AuthLayout.tsx, ThemeContext.tsx, ThemeToggle
+  layout/          ← DashboardLayout.tsx, AuthLayout.tsx, ThemeToggle
   forms/
     NewChargeDrawer.tsx    ← Drawer multi-step 4 passos (variante drawer)
     NewChargeModal/        ← Modal multi-step 4 passos (variante modal, refatorado)
@@ -66,6 +67,17 @@ components/
     DatePickerField.tsx  ← Seleção de data com react-day-picker
   landing/
     DemoButton.tsx | DemoModal.tsx | DemoBlockedModal.tsx | LandingCarousel.tsx
+
+store/
+  useThemeStore/
+    index.ts             ← Zustand store: 'light'|'dark', setTheme, toggleTheme
+    ThemeInitializer.tsx ← "use client" — hidrata do localStorage no mount (em app/layout.tsx)
+    interface/index.ts
+  useUserStore/
+    index.ts             ← Zustand store: user, subscription, refresh(), updateLocalUser()
+    StoreInitializer.tsx ← "use client" — hidrata store a partir de props do Server Component
+                           ATENÇÃO: renderizar APENAS em dashboard/layout.tsx, nunca duplicar em pages
+    interface/index.ts
 
 services/
   api.ts     ← Axios instance com interceptor de token (client-side)
@@ -155,3 +167,5 @@ api.interceptors.request.use((config) => {
 - Nunca `<input>/<textarea>/<select>` raw fora de `components/ui/` — usar wrappers RHF ou componentes UI
 - Nunca `register()` em páginas — usar `control` + wrapper RHF
 - Nunca importar `react-hot-toast` — usar `sonner`
+- Nunca renderizar `StoreInitializer` em mais de um lugar para a mesma rota — cada instância tem `initialized.current` próprio e causa dupla escrita no store
+- Nunca ler `localStorage` sem validar o valor em runtime (cast TypeScript não é validação)
