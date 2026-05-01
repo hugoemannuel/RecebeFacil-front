@@ -198,7 +198,8 @@ export default function PlanosPage() {
       }
     }
 
-    const result = await createCheckoutAction(planId, period);
+    const result = await createCheckoutAction(planId, period, splitData?.document);
+    console.log("Resultado do Checkout:", result);
 
     if (result.success && result.url) {
       window.location.href = result.url;

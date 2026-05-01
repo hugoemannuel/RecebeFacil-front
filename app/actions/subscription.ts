@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { api } from '@/services/api';
 import { redirect } from 'next/navigation';
 
-export async function createCheckoutAction(planType: string, period: 'MONTHLY' | 'YEARLY') {
+export async function createCheckoutAction(planType: string, period: 'MONTHLY' | 'YEARLY', document?: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;
 
@@ -15,7 +15,7 @@ export async function createCheckoutAction(planType: string, period: 'MONTHLY' |
   try {
     const response = await api.post(
       '/subscription/checkout',
-      { planType, period },
+      { planType, period, document },
       {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -22,7 +22,7 @@ interface SplitOnboardingModalProps {
 }
 
 export function SplitOnboardingModal({ isOpen, onClose, onConfirm, planName }: SplitOnboardingModalProps) {
-  const [step, setStep] = useState<'CONTRACT' | 'FORM'>('CONTRACT');
+  const [step, setStep] = useState<'CONTRACT' | 'BANK_DATA' | 'CHECKOUT_DATA'>('CONTRACT');
   const [loadingTerms, setLoadingTerms] = useState(true);
   const [termsData, setTermsData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +33,28 @@ export function SplitOnboardingModal({ isOpen, onClose, onConfirm, planName }: S
     account: '',
     accountType: 'CHECKING'
   });
+
+  // Funções de Máscara
+  const maskDocument = (val: string) => {
+    const raw = val.replace(/\D/g, "");
+    if (raw.length <= 11) {
+      return raw.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4").substring(0, 14);
+    }
+    return raw.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5").substring(0, 18);
+  };
+
+  const maskAgency = (val: string) => val.replace(/\D/g, "").substring(0, 4);
+  const maskAccount = (val: string) => {
+    const raw = val.replace(/\D/g, "");
+    if (raw.length > 1) {
+      return raw.replace(/(\d+)(\d{1})$/, "$1-$2");
+    }
+    return raw;
+  };
+
+  const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, document: maskDocument(e.target.value) });
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -58,16 +80,16 @@ export function SplitOnboardingModal({ isOpen, onClose, onConfirm, planName }: S
 
   if (!isOpen) return null;
 
-  const handleNext = () => {
-    if (step === 'CONTRACT') {
-      setStep('FORM');
-    } else {
-      onConfirm({ ...formData, version: termsData?.version });
-    }
-  };
-
-  const handleSkip = () => {
-    onConfirm({ version: termsData?.version }); // Confirma sem os dados por enquanto
+  const handleConfirm = () => {
+    // Envia os dados limpos (sem máscara) para o back-end
+    const cleanData = {
+      ...formData,
+      document: formData.document.replace(/\D/g, ""),
+      agency: formData.agency.replace(/\D/g, ""),
+      account: formData.account.replace(/\D/g, ""),
+      version: termsData?.version || '1.0.0'
+    };
+    onConfirm(cleanData);
   };
 
   return (
@@ -189,7 +211,7 @@ export function SplitOnboardingModal({ isOpen, onClose, onConfirm, planName }: S
 
               <div className="flex flex-col gap-3">
                 <button 
-                  onClick={handleNext}
+                  onClick={() => setStep('BANK_DATA')}
                   className="w-full bg-green-500 hover:bg-green-600 text-white py-5 rounded-2xl font-black text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-green-500/20 flex items-center justify-center gap-3 group"
                 >
                   Concordo e Desejo Ativar
@@ -200,32 +222,21 @@ export function SplitOnboardingModal({ isOpen, onClose, onConfirm, planName }: S
                 </p>
               </div>
             </div>
-          ) : (
+          ) : step === 'BANK_DATA' ? (
             <div className="flex-1 flex flex-col animate-in slide-in-from-right-8 duration-500">
               <div className="mb-10">
                 <h3 className="text-2xl font-black text-zinc-900 mb-2">Dados para Recebimento</h3>
-                <p className="text-zinc-500 text-sm font-medium">Onde o Asaas deve depositar o seu dinheiro? (Você pode preencher depois)</p>
+                <p className="text-zinc-500 text-sm font-medium">Onde o Asaas deve depositar o seu dinheiro? (Opcional agora)</p>
               </div>
 
               <div className="flex-1 space-y-6 mb-10">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Documento Principal (CPF ou CNPJ)</label>
-                  <input 
-                    type="text" 
-                    placeholder="000.000.000-00"
-                    className="w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500/50 transition-all font-bold placeholder:text-zinc-300"
-                    value={formData.document}
-                    onChange={(e) => setFormData({...formData, document: e.target.value})}
-                  />
-                </div>
-                
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Instituição Bancária</label>
+                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Banco</label>
                     <input 
                       type="text" 
-                      placeholder="Ex: Banco Inter"
-                      className="w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500/50 transition-all font-bold placeholder:text-zinc-300"
+                      placeholder="Ex: Itaú"
+                      className="w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-5 py-4 text-sm font-bold"
                       value={formData.bank}
                       onChange={(e) => setFormData({...formData, bank: e.target.value})}
                     />
@@ -235,37 +246,74 @@ export function SplitOnboardingModal({ isOpen, onClose, onConfirm, planName }: S
                     <input 
                       type="text" 
                       placeholder="0001"
-                      className="w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500/50 transition-all font-bold placeholder:text-zinc-300"
+                      className="w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-5 py-4 text-sm font-bold"
                       value={formData.agency}
-                      onChange={(e) => setFormData({...formData, agency: e.target.value})}
+                      onChange={(e) => setFormData({...formData, agency: maskAgency(e.target.value)})}
                     />
                   </div>
                 </div>
-
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Número da Conta</label>
                   <input 
                     type="text" 
-                    placeholder="00000000-0"
-                    className="w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500/50 transition-all font-bold placeholder:text-zinc-300"
+                    placeholder="12345-6"
+                    className="w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-5 py-4 text-sm font-bold"
                     value={formData.account}
-                    onChange={(e) => setFormData({...formData, account: e.target.value})}
+                    onChange={(e) => setFormData({...formData, account: maskAccount(e.target.value)})}
                   />
                 </div>
               </div>
 
               <div className="flex flex-col gap-4">
                 <button 
-                  onClick={() => onConfirm({ ...formData, version: termsData?.version })}
+                  onClick={() => setStep('CHECKOUT_DATA')}
                   className="w-full bg-zinc-900 text-white py-5 rounded-2xl font-black text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-zinc-900/20 flex items-center justify-center gap-2"
                 >
-                  Salvar e Finalizar Assinatura
+                  Próximo Passo
                 </button>
                 <button 
-                  onClick={handleSkip}
+                  onClick={() => setStep('CHECKOUT_DATA')}
                   className="w-full py-2 rounded-2xl font-bold text-[10px] text-zinc-400 hover:text-zinc-900 transition-colors flex items-center justify-center uppercase tracking-widest"
                 >
                   Preencher dados bancários depois
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex-1 flex flex-col animate-in slide-in-from-right-8 duration-500">
+              <div className="mb-10">
+                <h3 className="text-2xl font-black text-zinc-900 mb-2">Dados de Faturamento</h3>
+                <p className="text-zinc-500 text-sm font-medium">Informe seu documento para gerar a cobrança do plano.</p>
+              </div>
+
+              <div className="flex-1 space-y-6 mb-10">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">CPF ou CNPJ</label>
+                  <input 
+                    type="text" 
+                    placeholder="000.000.000-00"
+                    autoFocus
+                    className={`w-full bg-zinc-50 border-2 ${formData.document.replace(/\D/g, "").length >= 11 ? 'border-zinc-100' : 'border-red-100'} rounded-2xl px-6 py-5 focus:border-green-500 focus:bg-white transition-all outline-none text-lg font-black tracking-tighter`}
+                    value={formData.document}
+                    onChange={handleDocumentChange}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <button 
+                  disabled={formData.document.replace(/\D/g, "").length < 11}
+                  onClick={handleConfirm}
+                  className="w-full px-8 py-6 bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:bg-zinc-200 disabled:shadow-none text-white rounded-[2rem] font-black transition-all shadow-xl shadow-green-200 flex items-center justify-center gap-3 uppercase tracking-widest text-xs"
+                >
+                  Finalizar e Pagar Plano
+                  <IconCheckCircle2 className="w-5 h-5" />
+                </button>
+                <button 
+                  onClick={() => setStep('BANK_DATA')}
+                  className="w-full py-2 rounded-3xl font-black text-zinc-400 hover:text-zinc-600 transition-all uppercase tracking-widest text-[9px]"
+                >
+                  Voltar
                 </button>
               </div>
             </div>
@@ -275,7 +323,8 @@ export function SplitOnboardingModal({ isOpen, onClose, onConfirm, planName }: S
           {!loadingTerms && (
             <div className="mt-auto flex justify-center gap-3 pt-8">
               <div className={`w-12 h-1.5 rounded-full transition-all duration-500 ${step === 'CONTRACT' ? 'bg-green-500 shadow-lg shadow-green-500/20' : 'bg-zinc-100'}`}></div>
-              <div className={`w-12 h-1.5 rounded-full transition-all duration-500 ${step === 'FORM' ? 'bg-green-500 shadow-lg shadow-green-500/20' : 'bg-zinc-100'}`}></div>
+              <div className={`w-12 h-1.5 rounded-full transition-all duration-500 ${step === 'BANK_DATA' ? 'bg-green-500 shadow-lg shadow-green-500/20' : 'bg-zinc-100'}`}></div>
+              <div className={`w-12 h-1.5 rounded-full transition-all duration-500 ${step === 'CHECKOUT_DATA' ? 'bg-green-500 shadow-lg shadow-green-500/20' : 'bg-zinc-100'}`}></div>
             </div>
           )}
         </div>
