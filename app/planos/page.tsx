@@ -202,7 +202,14 @@ export default function PlanosPage() {
     console.log("Resultado do Checkout:", result);
 
     if (result.success && result.url) {
-      window.location.href = result.url;
+      const newWindow = window.open(result.url, '_blank');
+      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+        toast.error('O bloqueador de popups impediu a abertura da página de pagamento. Por favor, autorize popups ou clique no link que enviaremos.');
+        // Opcional: Você pode querer manter o loading ou mostrar o link explicitamente aqui
+      } else {
+        toast.success('Checkout aberto em uma nova aba!');
+      }
+      setLoading(null);
     } else {
       setError(result.error || 'Ocorreu um erro ao processar seu pedido.');
       setLoading(null);
@@ -411,9 +418,9 @@ export default function PlanosPage() {
       <SplitOnboardingModal
         isOpen={splitModalOpen}
         planName={selectedPlanForSplit?.name || ''}
+        isLoading={!!loading}
         onClose={() => setSplitModalOpen(false)}
         onConfirm={(data) => {
-          setSplitModalOpen(false);
           if (selectedPlanForSplit) {
             executeSubscription(selectedPlanForSplit.id, data);
           }

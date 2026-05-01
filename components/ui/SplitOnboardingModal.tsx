@@ -19,9 +19,10 @@ interface SplitOnboardingModalProps {
   onClose: () => void;
   onConfirm: (data?: any) => void;
   planName: string;
+  isLoading?: boolean;
 }
 
-export function SplitOnboardingModal({ isOpen, onClose, onConfirm, planName }: SplitOnboardingModalProps) {
+export function SplitOnboardingModal({ isOpen, onClose, onConfirm, planName, isLoading }: SplitOnboardingModalProps) {
   const [step, setStep] = useState<'CONTRACT' | 'BANK_DATA' | 'CHECKOUT_DATA'>('CONTRACT');
   const [loadingTerms, setLoadingTerms] = useState(true);
   const [termsData, setTermsData] = useState<any>(null);
@@ -106,7 +107,8 @@ export function SplitOnboardingModal({ isOpen, onClose, onConfirm, planName }: S
         {/* Header Close Button */}
         <button 
           onClick={onClose}
-          className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-zinc-50 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-all z-20"
+          disabled={isLoading}
+          className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-zinc-50 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-all z-20 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <IconX className="w-5 h-5" />
         </button>
@@ -302,16 +304,26 @@ export function SplitOnboardingModal({ isOpen, onClose, onConfirm, planName }: S
 
               <div className="flex flex-col gap-4">
                 <button 
-                  disabled={formData.document.replace(/\D/g, "").length < 11}
+                  disabled={formData.document.replace(/\D/g, "").length < 11 || isLoading}
                   onClick={handleConfirm}
                   className="w-full px-8 py-6 bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:bg-zinc-200 disabled:shadow-none text-white rounded-[2rem] font-black transition-all shadow-xl shadow-green-200 flex items-center justify-center gap-3 uppercase tracking-widest text-xs"
                 >
-                  Finalizar e Pagar Plano
-                  <IconCheckCircle2 className="w-5 h-5" />
+                  {isLoading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Processando...
+                    </>
+                  ) : (
+                    <>
+                      Finalizar e Pagar Plano
+                      <IconCheckCircle2 className="w-5 h-5" />
+                    </>
+                  )}
                 </button>
                 <button 
                   onClick={() => setStep('BANK_DATA')}
-                  className="w-full py-2 rounded-3xl font-black text-zinc-400 hover:text-zinc-600 transition-all uppercase tracking-widest text-[9px]"
+                  disabled={isLoading}
+                  className="w-full py-2 rounded-3xl font-black text-zinc-400 hover:text-zinc-600 transition-all uppercase tracking-widest text-[9px] disabled:opacity-50"
                 >
                   Voltar
                 </button>
