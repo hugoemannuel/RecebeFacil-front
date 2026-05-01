@@ -111,7 +111,9 @@ export function SplitOnboardingModal({ isOpen, onClose, onConfirm, planName }: S
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-bold text-zinc-400">Plataforma</span>
                   <div className="flex flex-col items-end">
-                    <span className="text-xl font-black text-white">{termsData?.platformFeePct || '1'}%</span>
+                    <span className="text-xl font-black text-white">
+                      {termsData?.fees?.[planName.toUpperCase()] || (planName.toUpperCase() === 'PRO' ? '2' : '1')}%
+                    </span>
                     <span className="text-[9px] text-zinc-500 font-bold uppercase">por recebimento</span>
                   </div>
                 </div>
