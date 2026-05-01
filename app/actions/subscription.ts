@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers';
 import { api } from '@/services/api';
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 
 export async function createCheckoutAction(planType: string, period: 'MONTHLY' | 'YEARLY', document?: string) {
   const cookieStore = await cookies();
@@ -26,6 +27,7 @@ export async function createCheckoutAction(planType: string, period: 'MONTHLY' |
     const { invoiceUrl } = response.data;
 
     if (invoiceUrl) {
+      revalidatePath('/dashboard', 'layout');
       return { success: true, url: invoiceUrl };
     }
 
@@ -47,6 +49,7 @@ export async function cancelSubscriptionAction() {
     const response = await api.post('/subscription/cancel', {}, {
       headers: { Authorization: `Bearer ${token}` },
     });
+    revalidatePath('/dashboard', 'layout');
     return { success: true, data: response.data };
   } catch (error: any) {
     const msg = error.response?.data?.message;

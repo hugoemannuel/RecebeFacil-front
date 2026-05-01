@@ -54,7 +54,7 @@ export const metadata: Metadata = {
 };
 
 import Script from "next/script";
-import { ThemeProvider } from "@/context/ThemeContext";
+import { ThemeInitializer } from "@/store/useThemeStore/ThemeInitializer";
 
 export default function RootLayout({
   children,
@@ -75,10 +75,9 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-300" suppressHydrationWarning>
-        <ThemeProvider>
-          {children}
-          <Toaster position="top-right" richColors closeButton />
-        </ThemeProvider>
+        <ThemeInitializer />
+        {children}
+        <Toaster position="top-right" richColors closeButton />
       </body>
     </html>
   );

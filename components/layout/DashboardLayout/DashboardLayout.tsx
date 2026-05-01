@@ -21,6 +21,7 @@ import { NewChargeDrawer } from '@/components/forms/NewChargeDrawer';
 import { ThemeToggle } from '@/components/layout/ThemeToggle/ThemeToggle';
 import { DashboardLayoutProps } from './interface';
 import { MENU_ITEMS, PLAN_BADGE } from './mock';
+import { useUserStore } from '@/store/useUserStore';
 
 
 export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: DashboardLayoutProps) {
@@ -32,13 +33,23 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [paymentAlertDismissed, setPaymentAlertDismissed] = useState(false);
 
-  const showPaymentAlert = subscription.payment_failed && !paymentAlertDismissed;
+  const [mounted, setMounted] = useState(false);
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const planBadge = PLAN_BADGE[subscription.plan] ?? PLAN_BADGE.FREE;
-  const userName = subscription.userName ?? 'Usuário';
+  const storeSubscription = useUserStore((state) => state.subscription);
+  const currentSubscription = storeSubscription || subscription;
+  
+  const showPaymentAlert = currentSubscription.payment_failed && !paymentAlertDismissed;
+
+  const planBadge = PLAN_BADGE[currentSubscription.plan] ?? PLAN_BADGE.FREE;
+  const userName = currentSubscription.userName ?? 'Usuário';
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-  const avatarSrc = subscription.avatarUrl
-    ? (subscription.avatarUrl.startsWith('http') ? subscription.avatarUrl : `${apiUrl}${subscription.avatarUrl}`)
+  const avatarSrc = currentSubscription.avatarUrl
+    ? (currentSubscription.avatarUrl.startsWith('http') 
+        ? currentSubscription.avatarUrl 
+        : `${apiUrl}${currentSubscription.avatarUrl}${mounted ? `${currentSubscription.avatarUrl.includes('?') ? '&' : '?'}t=${new Date().getTime()}` : ''}`)
     : null;
 
   return (
@@ -64,7 +75,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
           {MENU_ITEMS.map((item) => {
             const isActive = pathname === item.path;
             const isComingSoon = item.isComingSoon;
-            const isLocked = !isComingSoon && !subscription.allowed_modules.includes(item.module);
+            const isLocked = !isComingSoon && !currentSubscription.allowed_modules.includes(item.module);
             const Icon = item.icon;
 
             if (isComingSoon) {
@@ -116,7 +127,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
         </nav>
 
         {/* Upgrade banner para plano FREE */}
-        {subscription.plan === 'FREE' && (
+        {currentSubscription.plan === 'FREE' && (
           <div className="mx-4 mb-4 bg-linear-to-br from-[#18181b] to-[#064e3b] rounded-2xl p-4 border border-white/5 shadow-xl">
             <p className="text-white font-bold text-xs mb-1">Desbloqueie mais poder</p>
             <p className="text-slate-400 text-[11px] mb-3 leading-relaxed">Clientes, relatórios e importação de Excel no plano Starter.</p>
@@ -185,7 +196,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
           {MENU_ITEMS.map((item) => {
             const isActive = pathname === item.path;
             const isComingSoon = item.isComingSoon;
-            const isLocked = !isComingSoon && !subscription.allowed_modules.includes(item.module);
+            const isLocked = !isComingSoon && !currentSubscription.allowed_modules.includes(item.module);
             const Icon = item.icon;
 
             if (isComingSoon) {
@@ -282,7 +293,7 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
             </button>
             <button
               onClick={() => {
-                if (subscription.plan === 'FREE' && sentThisMonth >= 10) {
+                if (currentSubscription.plan === 'FREE' && sentThisMonth >= 10) {
                   setLimitReached(true);
                 } else {
                   setDrawerOpen(true);
@@ -344,8 +355,8 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
       <NewChargeDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        userName={subscription.userName}
-        planType={subscription.plan}
+        userName={currentSubscription.userName}
+        planType={currentSubscription.plan}
       />
 
     </div>

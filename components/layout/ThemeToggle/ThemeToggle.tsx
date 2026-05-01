@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTheme } from "../../../context/ThemeContext";
+import { useThemeStore } from "@/store/useThemeStore";
 import { IconSun, IconMoon } from "@/components/ui/Icons";
 
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme } = useThemeStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

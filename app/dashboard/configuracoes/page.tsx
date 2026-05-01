@@ -4,6 +4,7 @@ import { api } from '@/services/api';
 import { DashboardLayout } from '@/components/layout/DashboardLayout/DashboardLayout';
 import { ConfiguracoesClient } from './ConfiguracoesClient';
 import { SubscriptionStatus } from '@/components/layout/DashboardLayout/interface';
+import { StoreInitializer } from '@/store/useUserStore/StoreInitializer';
 
 export default async function ConfiguracoesPage() {
   const token = (await cookies()).get('recebefacil_token')?.value;
@@ -34,12 +35,15 @@ export default async function ConfiguracoesPage() {
   };
 
   return (
-    <DashboardLayout subscription={subscription}>
+    <>
+      <StoreInitializer user={profile} subscription={subscription} />
+      <DashboardLayout subscription={subscription}>
       <ConfiguracoesClient
         profile={profile}
         subscription={subscriptionData}
         creditorProfile={creditorProfile}
       />
     </DashboardLayout>
+    </>
   );
 }

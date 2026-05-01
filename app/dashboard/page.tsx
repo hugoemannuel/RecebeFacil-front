@@ -12,6 +12,7 @@ import {
 import { PeriodSelect } from '@/components/dashboard/PeriodSelect';
 import { RecentActivityClient } from '@/components/dashboard/RecentActivityClient';
 import { SubscriptionStatus } from '@/components/layout/DashboardLayout/interface';
+import { StoreInitializer } from '@/store/useUserStore/StoreInitializer';
 
 export default async function Dashboard(props: { searchParams: Promise<{ period?: string; status?: string }> }) {
   const searchParams = await props.searchParams;
@@ -76,7 +77,9 @@ export default async function Dashboard(props: { searchParams: Promise<{ period?
   };
 
   return (
-    <DashboardLayout subscription={subscription} sentThisMonth={summary.sentThisMonth}>
+    <>
+      <StoreInitializer user={profileData} subscription={subscription} />
+      <DashboardLayout subscription={subscription} sentThisMonth={summary.sentThisMonth}>
 
       <div className="p-8 max-w-[1600px] mx-auto space-y-6">
 
@@ -268,6 +271,7 @@ export default async function Dashboard(props: { searchParams: Promise<{ period?
 
       </div>
     </DashboardLayout>
+    </>
   );
 }
 

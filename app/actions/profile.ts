@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers';
 import { api } from '@/services/api';
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 import { isAxiosError } from 'axios';
 
 async function getToken() {
@@ -25,6 +26,7 @@ export async function updateProfileAction(payload: { name: string; email: string
   const token = await getToken();
   try {
     const res = await api.patch('/users/me', payload, { headers: { Authorization: `Bearer ${token}` } });
+    revalidatePath('/dashboard', 'layout');
     return { success: true, data: res.data };
   } catch (error) {
     if (isAxiosError(error)) {
@@ -57,6 +59,7 @@ export async function uploadAvatarAction(formData: FormData) {
     }
 
     const data = await res.json();
+    revalidatePath('/dashboard', 'layout');
     return { success: true, data };
   } catch (error) {
     console.error('Erro no uploadAvatarAction:', error);

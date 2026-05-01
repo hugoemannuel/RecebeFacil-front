@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useRef, useTransition } from 'react';
+import { useState, useRef, useTransition, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import Link from 'next/link';
-import { useTheme } from '@/context/ThemeContext';
+import { useThemeStore } from '@/store/useThemeStore';
 import { ThemeToggle } from '@/components/layout/ThemeToggle/ThemeToggle';
 import {
   IconUser, IconMail, IconPhone, IconCamera, IconShieldCheck,
@@ -26,6 +26,7 @@ import { RHFInput } from '@/components/forms/rhf/RHFInput';
 import { RHFPasswordInput } from '@/components/forms/rhf/RHFPasswordInput';
 import { Input } from '@/components/ui/Input/Input';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { useUserStore } from '@/store/useUserStore';
 
 // ─── Tipos ────────────────────────────────────────────────────────────
 interface Props {
@@ -87,8 +88,17 @@ export function ConfiguracoesClient({ profile, subscription, creditorProfile }: 
   const [profileLoading, setProfileLoading] = useState(false);
   const [creditorLoading, setCreditorLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [mounted, setMounted] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const { theme } = useTheme();
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  const { theme } = useThemeStore();
+  const updateLocalUser = useUserStore(s => s.updateLocalUser);
+  const updateLocalSubscription = useUserStore(s => s.updateLocalSubscription);
+  const refreshStore = useUserStore(s => s.refresh);
+
 
   const plan = subscription?.plan ?? 'FREE';
   const sent = subscription?.sentThisMonth ?? 0;
@@ -108,17 +118,24 @@ export function ConfiguracoesClient({ profile, subscription, creditorProfile }: 
         const fd = new FormData();
         fd.append('file', avatarFile);
         const avatarRes = await uploadAvatarAction(fd);
-        if (!avatarRes.success) {
-          toast.error(avatarRes.error ?? 'Erro ao enviar foto.');
-          setAvatarPreview(initialAvatar);
+          if (!avatarRes.success) {
+            toast.error(avatarRes.error ?? 'Erro ao enviar foto.');
+            setAvatarPreview(initialAvatar);
+            setAvatarFile(null);
+            setProfileLoading(false);
+            return;
+          }
+          if (avatarRes.data?.avatar_url) {
+            updateLocalUser({ avatar_url: avatarRes.data.avatar_url });
+          }
           setAvatarFile(null);
-          setProfileLoading(false);
-          return;
         }
-        setAvatarFile(null);
-      }
       const res = await updateProfileAction(data);
-      if (res.success) toast.success('Perfil atualizado com sucesso!');
+      if (res.success) {
+        updateLocalUser({ name: data.name });
+        toast.success('Perfil atualizado com sucesso!');
+        refreshStore(); // Garante sincronia total
+      }
       else toast.error(res.error ?? 'Ops, algo deu errado. Tente novamente.');
       setProfileLoading(false);
     });
@@ -129,7 +146,9 @@ export function ConfiguracoesClient({ profile, subscription, creditorProfile }: 
     const result = await cancelSubscriptionAction();
     if (result.success) {
       setCancelAtPeriodEnd(true);
+      updateLocalSubscription({ cancel_at_period_end: true });
       toast.success('Plano cancelado. Acesso mantido até o fim do período.');
+      refreshStore();
     } else {
       toast.error(result.error ?? 'Erro ao cancelar.');
     }
@@ -211,11 +230,14 @@ export function ConfiguracoesClient({ profile, subscription, creditorProfile }: 
 
       {/* Dark mode hint card */}
       <div className="flex items-center gap-3 bg-zinc-50 dark:bg-surface border border-zinc-200 dark:border-white/5 rounded-2xl px-4 py-3 text-sm text-zinc-500 dark:text-zinc-400 transition-colors duration-300">
-        {theme === 'light'
+        {!mounted ? (
+          <div className="w-4 h-4 shrink-0" />
+        ) : theme === 'light'
           ? <IconMoon className="w-4 h-4 shrink-0" />
-          : <IconSun className="w-4 h-4 shrink-0 text-amber-400" />}
+          : <IconSun className="w-4 h-4 shrink-0 text-amber-400" />
+        }
         <span>
-          Modo <strong className="text-zinc-700 dark:text-zinc-200">{theme === 'light' ? 'claro' : 'escuro'}</strong> ativo — alterne pelo botão acima ou no cabeçalho.
+          Modo <strong className="text-zinc-700 dark:text-zinc-200">{!mounted ? '...' : (theme === 'light' ? 'claro' : 'escuro')}</strong> ativo — alterne pelo botão acima ou no cabeçalho.
         </span>
       </div>
 
