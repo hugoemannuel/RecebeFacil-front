@@ -81,7 +81,6 @@ export function ChargesClient({
   const [upgradeModule, setUpgradeModule] = useState<string | null>(null);
   const [automacaoModalOpen, setAutomacaoModalOpen] = useState(false);
   const [selectedRecurringId, setSelectedRecurringId] = useState<string | null>(null);
-  const [automacaoChargePreview, setAutomacaoChargePreview] = useState<{ debtorName: string; amount: number; dueDate: string } | null>(null);
   const [deletingChargeId, setDeletingChargeId] = useState<string | null>(null);
   const [cancelingChargeId, setCancelingChargeId] = useState<string | null>(null);
   const [statusUpdate, setStatusUpdate] = useState<{ chargeId: string; status: string; label: string } | null>(null);
@@ -184,11 +183,6 @@ export function ChargesClient({
                 toast.info('Esta cobrança não possui recorrência configurada.');
               } else {
                 setSelectedRecurringId(recurringId);
-                setAutomacaoChargePreview({
-                  debtorName: info.row.original.debtorName,
-                  amount: info.row.original.amount,
-                  dueDate: info.row.original.dueDate,
-                });
                 setAutomacaoModalOpen(true);
               }
             }}
@@ -675,15 +669,8 @@ export function ChargesClient({
       {automacaoModalOpen && selectedRecurringId && (
         <AutomacaoModal
           isOpen={automacaoModalOpen}
-          onClose={() => { setAutomacaoModalOpen(false); setSelectedRecurringId(null); setAutomacaoChargePreview(null); }}
+          onClose={() => { setAutomacaoModalOpen(false); setSelectedRecurringId(null); }}
           recurringChargeId={selectedRecurringId}
-          initialData={automacaoChargePreview ? {
-            frequency: 'MONTHLY',
-            description: '',
-            nextGenerationDate: automacaoChargePreview.dueDate,
-            debtorName: automacaoChargePreview.debtorName,
-            amount: automacaoChargePreview.amount,
-          } : undefined}
           onSuccess={() => router.refresh()}
         />
       )}

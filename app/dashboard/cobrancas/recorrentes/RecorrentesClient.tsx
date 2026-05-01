@@ -248,14 +248,6 @@ export function RecorrentesClient({ initialData, plan }: Props) {
           isOpen={!!editingRule}
           onClose={() => setEditingRule(null)}
           recurringChargeId={editingRule.id}
-          initialData={{
-            frequency: editingRule.frequency,
-            description: editingRule.description,
-            nextGenerationDate: editingRule.nextGenerationDate,
-            custom_message: editingRule.custom_message,
-            debtorName: editingRule.debtorName,
-            amount: editingRule.amount,
-          }}
           onSuccess={() => {
             setEditingRule(null);
             router.refresh();

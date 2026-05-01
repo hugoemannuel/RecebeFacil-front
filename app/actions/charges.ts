@@ -186,6 +186,22 @@ export async function bulkRemindAction(chargeIds: string[]): Promise<ActionResul
   }
 }
 
+export async function getRecurringChargeAction(ruleId: string): Promise<ActionResult> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('recebefacil_token')?.value;
+  if (!token) return { success: false, error: 'Não autorizado' };
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/charges/recurring/${ruleId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return { success: false, error: 'Erro ao buscar automação' };
+    return { success: true, data: await res.json() };
+  } catch {
+    return { success: false, error: 'Servidor indisponível' };
+  }
+}
+
 export async function getRecurringChargesAction(): Promise<ActionResult> {
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;
