@@ -22,7 +22,7 @@ export default async function RecorrentesPage() {
   ]);
 
   if (!recurringRes.success) {
-    // Handle error or show empty
+    redirect('/dashboard');
   }
 
   const subscription: SubscriptionStatus = {
