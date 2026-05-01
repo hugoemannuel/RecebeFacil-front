@@ -10,6 +10,7 @@ when_to_use: Quando criar page.tsx, componentes, actions, serviços de API, ou a
 app/
   actions/           ← Server Actions ('use server')
     auth.ts          ← loginAction, registerAction, logoutAction
+    automation.ts    ← getAutomationConfigAction, updateAutomationConfigAction, getTemplatesAction, updateTemplateAction
     charges.ts       ← createChargeAction, updateChargeStatusAction, ...
     clients.ts       ← createClientAction, updateClientAction
     demo.ts          ← sendDemoAction (pública, sem token)
@@ -32,7 +33,7 @@ app/
     relatorios/
       page.tsx + RelatoriosClient.tsx + RelatorioPDF.tsx
     configuracoes/
-      page.tsx + ConfiguracoesClient.tsx  ← Perfil, senha, PIX, integrações
+      page.tsx + ConfiguracoesClient.tsx  ← Abas: Perfil, Recebimento, Automação, Templates, Plano, Segurança
   login/ | cadastro/ | planos/
   layout.tsx | page.tsx (Landing Page)
 

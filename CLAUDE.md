@@ -44,7 +44,7 @@ The API defaults to `http://localhost:3001` if the variable is absent.
 
 All mutations go through `app/actions/`. Actions return `{ success: true, data }` or `{ success: false, error: string }`. Error messages are in Portuguese. Plan-limit errors arrive as HTTP 403 with codes like `LIMIT_REACHED` or `RECURRENCE_NOT_ALLOWED`.
 
-Available actions: `auth.ts`, `charges.ts`, `clients.ts`, `demo.ts`, `profile.ts`, `subscription.ts`, `templates.ts`.
+Available actions: `auth.ts`, `automation.ts`, `charges.ts`, `clients.ts`, `demo.ts`, `profile.ts`, `subscription.ts`, `templates.ts`.
 
 ### Subscription / plan gating
 
