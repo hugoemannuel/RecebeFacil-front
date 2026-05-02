@@ -123,6 +123,7 @@ export function NewChargeModal({
         pix_key_type: data.send_pix_button && !hasPixKey ? data.pix_key_type : undefined,
         save_as_template: data.save_as_template,
         template_name: data.template_name,
+        ...(data.max_installments ? { max_installments: parseInt(data.max_installments, 10) } : {}),
       });
       if (result.success) {
         toast.success('Cobrança enviada via WhatsApp! ✅');

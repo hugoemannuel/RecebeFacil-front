@@ -51,6 +51,23 @@ export function StepChargeDetails({ planType }: { planType: PlanType }) {
             })}
           </div>
         </div>
+
+        {values.recurrence !== 'ONCE' && (planType === 'PRO' || planType === 'UNLIMITED') && (
+          <div className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-1 duration-200">
+            <RHFInput
+              name="max_installments"
+              control={control}
+              label="Nº de parcelas"
+              type="number"
+              placeholder="Indefinido"
+            />
+            <div className="flex items-end pb-1">
+              <p className="text-xs text-zinc-400 leading-snug">
+                Deixe em branco para cobrar <span className="font-semibold text-zinc-500">sem limite</span>.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

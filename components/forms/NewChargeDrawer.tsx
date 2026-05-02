@@ -48,6 +48,7 @@ const baseSchema = z.object({
   pix_key_type: z.enum(['CPF', 'CNPJ', 'PHONE', 'EMAIL', 'EVP']).optional(),
   save_as_template: z.boolean().default(false),
   template_name: z.string().optional(),
+  max_installments: z.string().optional(),
 }).refine((data) => {
   if (data.save_as_template && !data.template_name) return false;
   return true;
@@ -167,6 +168,7 @@ export function NewChargeDrawer({ open, onClose, userName = 'Minha Empresa', has
         pix_key_type: data.send_pix_button && !hasPixKey ? data.pix_key_type : undefined,
         save_as_template: data.save_as_template,
         template_name: data.template_name,
+        ...(data.max_installments ? { max_installments: parseInt(data.max_installments, 10) } : {}),
       });
       if (result.success) {
         toast.success('Cobrança enviada via WhatsApp! ✅');
@@ -400,6 +402,23 @@ function StepChargeDetails({ planType, onUpgrade }: {
             })}
           </div>
         </div>
+
+        {values.recurrence !== 'ONCE' && (planType === 'PRO' || planType === 'UNLIMITED') && (
+          <div className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-1 duration-200">
+            <RHFInput
+              name="max_installments"
+              control={control}
+              label="Nº de parcelas"
+              type="number"
+              placeholder="Indefinido"
+            />
+            <div className="flex items-end pb-1">
+              <p className="text-xs text-zinc-400 dark:text-zinc-500 leading-snug">
+                Deixe em branco para cobrar <span className="font-semibold text-zinc-500 dark:text-zinc-400">sem limite</span>.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

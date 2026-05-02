@@ -17,6 +17,7 @@ export interface CreateChargePayload {
   pix_key_type?: 'CPF' | 'CNPJ' | 'PHONE' | 'EMAIL' | 'EVP' | string;
   save_as_template?: boolean;
   template_name?: string;
+  max_installments?: number | null;
 }
 
 /**
@@ -241,7 +242,7 @@ export async function cancelRecurringChargeAction(ruleId: string): Promise<Actio
 
 export async function automateChargeAction(
   chargeId: string,
-  payload: { frequency: 'WEEKLY' | 'MONTHLY' | 'YEARLY'; next_generation_date: string; custom_message?: string },
+  payload: { frequency: 'WEEKLY' | 'MONTHLY' | 'YEARLY'; next_generation_date: string; custom_message?: string; max_installments?: number | null },
 ): Promise<ActionResult> {
   const cookieStore = await cookies();
   const token = cookieStore.get('recebefacil_token')?.value;

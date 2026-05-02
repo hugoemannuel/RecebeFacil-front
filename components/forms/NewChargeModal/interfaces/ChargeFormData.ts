@@ -37,6 +37,7 @@ export const baseSchema = z.object({
   pix_key_type: z.enum(['CPF', 'CNPJ', 'PHONE', 'EMAIL', 'EVP']).optional(),
   save_as_template: z.boolean().default(false),
   template_name: z.string().optional(),
+  max_installments: z.string().optional(),
 }).refine((data) => {
   if (data.save_as_template && !data.template_name) return false;
   return true;

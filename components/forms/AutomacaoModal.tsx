@@ -21,6 +21,7 @@ const schema = z.object({
   description: z.string().optional(),
   next_generation_date: z.string().min(1, 'Informe a data do próximo envio'),
   custom_message: z.string().min(5, 'Mensagem muito curta'),
+  max_installments: z.string().optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -103,7 +104,7 @@ export function AutomacaoModal({
 
       if (isCreateMode) {
         const message = DEFAULT_TEMPLATE;
-        reset({ frequency: 'MONTHLY', description: '', next_generation_date: '', custom_message: message });
+        reset({ frequency: 'MONTHLY', description: '', next_generation_date: '', custom_message: message, max_installments: '' });
         setDebtorName(initialDebtorName ?? 'Cliente');
         setAmount(initialAmount ?? 0);
         const match = combined.find(t => t.value === message);
@@ -116,6 +117,7 @@ export function AutomacaoModal({
           description: d.description,
           next_generation_date: d.nextGenerationDate ? toDateInput(d.nextGenerationDate) : '',
           custom_message: message,
+          max_installments: d.max_installments != null ? String(d.max_installments) : '',
         });
         setDebtorName(d.debtorName ?? 'Cliente');
         setAmount(d.amount ?? 0);
@@ -164,11 +166,14 @@ export function AutomacaoModal({
   function onSubmit(data: FormData) {
     setServerError(null);
     startTransition(async () => {
+      const { max_installments: rawMax, ...restData } = data;
+      const maxInstallments = rawMax ? parseInt(rawMax, 10) : undefined;
       if (isCreateMode) {
         const res = await automateChargeAction(chargeId!, {
           frequency: data.frequency,
           next_generation_date: data.next_generation_date,
           custom_message: data.custom_message,
+          ...(maxInstallments ? { max_installments: maxInstallments } : {}),
         });
         if (res.success) {
           toast.success('Automação criada com sucesso!');
@@ -178,7 +183,10 @@ export function AutomacaoModal({
           setServerError(res.error ?? 'Erro ao criar automação. Tente novamente.');
         }
       } else {
-        const res = await updateRecurringAction(recurringChargeId!, data);
+        const res = await updateRecurringAction(recurringChargeId!, {
+          ...restData,
+          ...(maxInstallments ? { max_installments: maxInstallments } : {}),
+        });
         if (res.success) {
           toast.success('Automação atualizada com sucesso!');
           onSuccess?.();
@@ -251,6 +259,21 @@ export function AutomacaoModal({
                     label="Próximo envio"
                     type="date"
                   />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <RHFInput
+                    name="max_installments"
+                    control={control}
+                    label="Nº de parcelas"
+                    type="number"
+                    placeholder="Indefinido"
+                  />
+                  <div className="flex items-end pb-1">
+                    <p className="text-xs text-zinc-400 leading-snug">
+                      Deixe em branco para cobrar <span className="font-semibold text-zinc-500">sem limite</span> de parcelas.
+                    </p>
+                  </div>
                 </div>
 
                 {!isCreateMode && (

@@ -44,7 +44,7 @@ export default async function Dashboard(props: { searchParams: Promise<{ period?
   if (metricsRes.status === 'rejected') console.error('Failed to fetch metrics:', metricsRes.reason);
   if (subscriptionRes.status === 'rejected') console.error('Failed to fetch subscription:', subscriptionRes.reason);
 
-  const summary = metrics?.summary || { totalPending: 0, totalOverdue: 0, sentThisMonth: 0, totalSent: 0, conversionRate: '0.0' };
+  const summary = metrics?.summary || { totalPending: 0, totalOverdue: 0, totalFutureRecurring: 0, sentThisMonth: 0, totalSent: 0, conversionRate: '0.0' };
   const actionNecessary = metrics?.actionNecessary || 0;
   const topClients = metrics?.topClients || [];
   const chartData = metrics?.chart || [
@@ -115,7 +115,7 @@ export default async function Dashboard(props: { searchParams: Promise<{ period?
             </div>
             <div>
               <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Total a Receber</p>
-              <p className="text-2xl font-bold text-zinc-700 dark:text-zinc-100 tracking-tight">{formatMoney(summary.totalPending)}</p>
+              <p className="text-2xl font-bold text-zinc-700 dark:text-zinc-100 tracking-tight">{formatMoney(summary.totalPending + (summary.totalFutureRecurring || 0))}</p>
             </div>
           </div>
 
