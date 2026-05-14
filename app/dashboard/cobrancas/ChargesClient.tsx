@@ -217,7 +217,7 @@ export function ChargesClient({
                   window.open(`https://wa.me/${row.original.phone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`, '_blank');
                   toast.success('Redirecionando para WhatsApp Web...');
                 }}
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm"
               >
                 <IconSend className="w-3 h-3" /> Cobrar
               </button>

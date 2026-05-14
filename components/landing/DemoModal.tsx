@@ -163,6 +163,7 @@ export function DemoModal({ open, onClose, onBlocked }: Props) {
                     label="Seu nome"
                     placeholder="Ex: João Silva"
                     icon={<IconUser className="w-4 h-4" />}
+                    className="bg-white! text-zinc-800! border-zinc-200!"
                   />
                   <RHFInput<FormData>
                     name="phone"
@@ -172,6 +173,7 @@ export function DemoModal({ open, onClose, onBlocked }: Props) {
                     type="tel"
                     mask={maskPhone}
                     icon={<IconPhone className="w-4 h-4" />}
+                    className="bg-white! text-zinc-800! border-zinc-200!"
                   />
                 </div>
 
@@ -180,6 +182,7 @@ export function DemoModal({ open, onClose, onBlocked }: Props) {
                   value={values.message}
                   onChange={(value) => setValue('message', value, { shouldValidate: true })}
                   options={TEMPLATE_OPTIONS}
+                  className="bg-white! text-zinc-800! border-zinc-200!"
                 />
 
                 <RHFTextarea<FormData>
@@ -188,6 +191,7 @@ export function DemoModal({ open, onClose, onBlocked }: Props) {
                   label="Mensagem"
                   inputRef={textareaRef}
                   rows={9}
+                  className="bg-white! text-zinc-800! border-zinc-200!"
                 />
 
                 <p className="text-xs text-zinc-400">
@@ -195,14 +199,14 @@ export function DemoModal({ open, onClose, onBlocked }: Props) {
                 </p>
               </div>
 
-              {/* Right — preview (só no desktop) */}
-              <div className="hidden md:flex w-[340px] border-l border-zinc-100 flex-col bg-zinc-50 shrink-0">
+              {/* Right — preview */}
+              <div className="flex w-full md:w-[340px] border-t md:border-t-0 md:border-l border-zinc-100 flex-col bg-zinc-50 shrink-0">
                 <div className="px-5 py-4 border-b border-zinc-100">
                   <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
                     <IconSparkles className="w-3.5 h-3.5 text-green-500" /> Preview ao vivo
                   </p>
                 </div>
-                <div className="flex-1 p-4 overflow-hidden">
+                <div className="flex-1 p-4 overflow-hidden min-h-[200px]">
                   <div className="h-full rounded-2xl overflow-hidden shadow-md">
                     <WhatsAppPreview
                       senderName="RecebeFácil"

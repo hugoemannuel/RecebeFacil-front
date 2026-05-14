@@ -30,7 +30,7 @@ export default function Home() {
         </nav>
 
         <div className="flex items-center gap-4">
-          <Link href="/login" className="text-[11px] font-black text-zinc-600 hover:text-green-500 transition-all hover:translate-x-1 cursor-pointer hidden md:block tracking-widest uppercase">ENTRAR</Link>
+          <Link href="/login" className="text-[11px] font-black text-zinc-600 hover:text-green-500 transition-all hover:translate-x-1 cursor-pointer tracking-widest uppercase">ENTRAR</Link>
           <Link href="/cadastro" className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-full text-xs font-black transition-all hover:scale-105 active:scale-95 shadow-md shadow-green-500/20 uppercase tracking-wider cursor-pointer">
             Começar grátis
           </Link>

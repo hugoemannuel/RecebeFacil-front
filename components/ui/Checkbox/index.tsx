@@ -9,9 +9,10 @@ type CheckboxProps = {
   disabled?: boolean;
   indeterminate?: boolean;
   size?: "sm" | "md";
+  className?: string;
 };
 
-export function Checkbox({ id, checked, onChange, disabled, indeterminate, size = "sm" }: CheckboxProps) {
+export function Checkbox({ id, checked, onChange, disabled, indeterminate, size = "sm", className = "" }: CheckboxProps) {
   const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -42,6 +43,7 @@ export function Checkbox({ id, checked, onChange, disabled, indeterminate, size 
           peer-indeterminate:bg-green-500 peer-indeterminate:border-green-500
           peer-disabled:opacity-50
           transition-colors cursor-pointer
+          ${className}
         `}
         onClick={() => ref.current?.click()}
       >

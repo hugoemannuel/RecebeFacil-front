@@ -278,10 +278,10 @@ export function DashboardLayout({ children, subscription, sentThisMonth = 0 }: D
             >
               <IconMenu className="w-6 h-6" />
             </button>
-            <div className="flex-1 hidden sm:block">
+            <div className="flex-1 block">
               <Input
                 icon={<IconSearch className="w-4 h-4" />}
-                placeholder="Buscar cobranças ou clientes..."
+                placeholder="Buscar..."
                 className="rounded-full bg-surface-soft dark:bg-background border-none"
               />
             </div>

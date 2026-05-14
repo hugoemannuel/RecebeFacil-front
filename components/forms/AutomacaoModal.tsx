@@ -243,7 +243,7 @@ export function AutomacaoModal({
         ) : (
           <>
             {/* Body */}
-            <div className="flex flex-1 overflow-hidden min-h-0">
+            <div className="flex flex-col md:flex-row flex-1 overflow-hidden min-h-0">
               {/* Left — form */}
               <div className="flex-1 p-6 space-y-5 overflow-y-auto">
                 <div className="grid grid-cols-2 gap-4">
@@ -341,10 +341,10 @@ export function AutomacaoModal({
                 )}
               </div>
 
-              {/* Right — WhatsApp preview (desktop only) */}
-              <div className="hidden md:flex w-80 flex-col border-l border-zinc-100 dark:border-white/6 bg-zinc-50/50 dark:bg-white/[0.02] p-5">
+              {/* Right — WhatsApp preview */}
+              <div className="flex w-full md:w-80 flex-col border-t md:border-t-0 md:border-l border-zinc-100 dark:border-white/6 bg-zinc-50/50 dark:bg-white/2 p-5 shrink-0">
                 <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-3">Pré-visualização</p>
-                <div className="flex-1 rounded-2xl overflow-hidden border border-zinc-200 dark:border-white/10 min-h-0">
+                <div className="flex-1 rounded-2xl overflow-hidden border border-zinc-200 dark:border-white/10 min-h-[200px]">
                   <WhatsAppPreview
                     senderName="RecebeFácil"
                     message={previewMessage}
