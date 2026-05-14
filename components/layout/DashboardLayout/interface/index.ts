@@ -1,6 +1,6 @@
 export interface SubscriptionStatus {
   plan: 'FREE' | 'STARTER' | 'PRO' | 'UNLIMITED';
-  status: 'ACTIVE' | 'CANCELED' | 'PAST_DUE' | 'NONE';
+  status: 'ACTIVE' | 'CANCELED' | 'OVERDUE' | 'NONE';
   allowed_modules: string[];
   current_period_end: string | null;
   cancel_at_period_end?: boolean;

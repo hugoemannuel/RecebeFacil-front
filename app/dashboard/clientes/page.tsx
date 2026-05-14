@@ -27,7 +27,7 @@ export default async function ClientsPage() {
   const subscriptionData = subscriptionRes.status === 'fulfilled' ? subscriptionRes.value.data : null;
   const userData = userRes.status === 'fulfilled' ? userRes.value.data : null;
 
-  const userName = subscriptionData?.userName || 'Usuário';
+  const userName = userData?.name || 'Usuário';
 
   const subscription: SubscriptionStatus = {
     plan: subscriptionData?.plan ?? 'FREE',

@@ -1,11 +1,10 @@
 export interface ReportSummary {
-  total_revenue: number;
-  paid_count: number;
-  pending_count: number;
-  overdue_count: number;
-  recovery_rate: number;
-  revenue_change: number;
-  recovery_change: number;
+  totalPaid: number;
+  totalOverdue: number;
+  totalPending: number;
+  countPaid: number;
+  countOverdue: number;
+  countPending: number;
 }
 
 export interface PerformanceData {
@@ -13,23 +12,16 @@ export interface PerformanceData {
   recoveredAmount: number;
   avoidedChurn: number;
   averageDaysToPay: number;
-  chart: Array<{
-    name: string;
-    total: number;
-    paid: number;
-  }>;
 }
 
 export interface TopCustomer {
   id: string;
   name: string;
-  total_paid: number;
-  charge_count: number;
   overdueCount: number;
   totalOverdueAmount: number;
 }
 
 export interface ForecastData {
-  date: string;
-  expected: number;
+  name: string;
+  valor: number;
 }

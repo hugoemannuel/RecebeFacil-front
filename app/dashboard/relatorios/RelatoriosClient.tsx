@@ -46,18 +46,11 @@ export function RelatoriosClient({ isUnlimited, plan, token, userName }: Relator
   const [forecast, setForecast] = useState<ForecastData[]>([]);
   const [isMounted, setIsMounted] = useState(false);
 
-  useEffect(() => {
-    setIsMounted(true);
-    if (isUnlimited) {
-      loadData();
-    }
-  }, [isUnlimited]);
-
   async function loadData() {
     try {
       setLoading(true);
       const headers = { Authorization: `Bearer ${token}` };
-      
+
       const [sumRes, perfRes, custRes, foreRes] = await Promise.all([
         api.get('/reports/summary', { headers }),
         api.get('/reports/performance', { headers }),
@@ -76,10 +69,16 @@ export function RelatoriosClient({ isUnlimited, plan, token, userName }: Relator
     }
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setIsMounted(true); }, []);
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
+  useEffect(() => { if (isUnlimited) loadData(); }, [isUnlimited]);
+
   // Se o forecast vier vazio, mostramos um estado base amigável
   const chartData = forecast.length > 0 ? forecast : [
-    { date: 'Hoje', expected: 0 },
-    { date: '+30d', expected: 0 },
+    { name: 'Hoje', valor: 0 },
+    { name: '+30d', valor: 0 },
   ];
 
   if (!isUnlimited) {

@@ -42,7 +42,7 @@ export default async function ChargesPage() {
   const usageCount = metrics?.summary?.sentThisMonth || 0;
   const usageLimit = limits[userPlan] || 10;
 
-  const userName = metrics?.user?.name || 'Usuário';
+  const userName = userData?.name || 'Usuário';
 
   const subscription: SubscriptionStatus = {
     plan: subscriptionData?.plan ?? 'FREE',

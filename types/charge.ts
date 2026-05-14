@@ -1,12 +1,10 @@
 export interface Charge {
   id: string;
-  debtor_name: string;
-  debtor_phone: string;
   amount: number;
   due_date: string;
   description: string;
   status: 'PENDING' | 'PAID' | 'OVERDUE' | 'CANCELED';
-  recurrence: 'ONCE' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
+  recurrence?: 'ONCE' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
   custom_message?: string;
   created_at: string;
   payment_date?: string;

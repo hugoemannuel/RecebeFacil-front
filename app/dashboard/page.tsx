@@ -57,7 +57,7 @@ export default async function Dashboard(props: { searchParams: Promise<{ period?
     { label: 'SÁB', amount: 0, heightPercentage: 10 },
   ];
   const recentActivity = metrics?.recentActivity || [];
-  const userName = metrics?.user?.name || 'Usuário';
+  const userName = profileData?.name || 'Usuário';
 
   const subscription: SubscriptionStatus = {
     plan: subscriptionData?.plan ?? 'FREE',

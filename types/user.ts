@@ -1,10 +1,10 @@
 export interface CreditorProfile {
   id: string;
-  name: string;
+  business_name?: string;
+  document?: string;
   pix_key?: string;
   pix_key_type?: 'CPF' | 'CNPJ' | 'PHONE' | 'EMAIL' | 'EVP';
-  whatsapp_number?: string;
-  business_name?: string;
+  pix_merchant_name?: string;
 }
 
 export interface User {
